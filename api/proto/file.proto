@@ -1,2 +1,8 @@
 // Downloading files and streaming
 // priority 3
+
+syntax = "proto3";
+
+package file;
+
+option go_package = "github.com/CAATHARSIS/music-service/api/gen/file;filepb";

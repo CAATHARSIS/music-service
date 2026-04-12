@@ -1,2 +1,8 @@
 // playlist work
 // priority 4
+
+syntax = "proto3";
+
+package playlist;
+
+option go_package = "github.com/CAATHARSIS/music-service/api/gen/playlist;playlistpb";

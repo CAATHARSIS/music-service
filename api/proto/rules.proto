@@ -1,2 +1,8 @@
 // playlist generation
 // priority 5
+
+syntax = "proto3";
+
+package rules;
+
+option go_package = "github.com/CAATHARSIS/music-service/api/gen/rules;rulespb";

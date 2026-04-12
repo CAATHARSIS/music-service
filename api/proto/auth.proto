@@ -1,2 +1,8 @@
 // TODO
 // priority 2
+
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/CAATHARSIS/music-service/api/gen/auth;authpb";
