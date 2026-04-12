@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/CAATHARSIS/music-service/api/gen/common;commonpb";
+
+message Empty {}
+
+message HealthyCheckResponse {
+    string status = 1;
+    map<string, string> services = 2; // dependency services status
+}
+
+message PaginationRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+}
+
+message PaginationResponse {
+    int32 page = 1;
+    int32 page_size = 2;
+    int32 total_pages = 3;
+    int32 total_count = 4;
+}
+
+message UserContext {
+    string user_id = 1;
+    string role = 2;
+}

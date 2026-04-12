@@ -1,0 +1,433 @@
+// tracks, albums, gentres, artists CRUD, search
+// priority 1
+syntax = "proto3";
+
+package catalog;
+
+import "common.proto";
+
+option go_package = "github.com/CAATHARSIS/music-service/api/gen/catalog;catalogpb";
+
+// Catalog Service - main service for managing music-service
+service CatalogService {
+    // Tracks
+
+    // Get track by id
+    rpc GetTrack(GetTrackRequest) returns (Track);
+
+    // List tracks with filtration and pagination
+    rpc ListTracks(ListTracksRequest) returns (ListTrackResponse);
+
+    // Create new track
+    rpc CreateTrack(CreateTrackRequest) returns (Track);
+
+    // Update existed track
+    rpc UpdateTrack(UpdateTrackRequest) returns (Track);
+
+    // Delete track
+    rpc DeleteTrack(DeleteTrackRequest) returns (common.Empty);
+
+    // Search tracks by parametres
+    rpc SearchTracks(SearchTrackRequest) returns (ListTrackResponse);
+
+    // Get popular tracks
+    rpc GetPopularTracks(GetPopularTracksRequest) returns (ListTrackResponse);
+
+    // Increment plays count by value
+    rpc IncrementPlaysCount(IncrementPlaysCountRequest) returns (common.Empty);
+
+    // Artists
+
+    // Get artist by id
+    rpc GetArtist(GetArtistRequest) returns (Artist);
+
+    // List artists
+    rpc ListArtists(ListArtistsRequest) returns (ListArtistsResponse);
+
+    // Create new artist
+    rpc CreateArtist(CreateArtistRequest) returns (Artist);
+
+    // Update existed artist
+    rpc UpdateArtist(UpdateArtistRequest) returns (Artist);
+
+    // Delete artist
+    rpc DeleteArtist(DeleteArtistRequest) returns (common.Empty);
+
+    // Artist search
+    rpc SearchArtist(SearchArtistsRequest) returns (ListArtistsRequest);
+
+    // Get artists tracks
+    rpc GetArtistTrack(GetArtistTracksRequest) returns (ListTrackResponse);
+
+    // Get artists albums
+    rpc GetArtistAlbums(GetArtistAlbumsRequest) returns (ListAlbumsResponse);
+
+    // Albums
+
+    // Get album by id
+    rpc GetAlbum(GetAlbumRequest) returns (Album);
+
+    // List albums
+    rpc ListAlbums(ListAlbumsRequest) returns (ListAlbumsResponse);
+
+    // Create album
+    rpc CreateAlbum(CreateAlbumRequest) returns (Album);
+
+    // Update existed album
+    rpc UpdateAlbum(UpdateAlbumRequest) returns (Album);
+
+    // Delete album
+    rpc DeleteAlbum(DeleteAlbumRequest) returns (common.Empty);
+    
+    // Get tracks from album
+    rpc GetAlbumTracks(GetAlbumTracksRequest) returns (ListAlbumsRequest);
+
+    // Genres
+
+    // List genres
+    rpc ListGenres(ListGenresRequest) returns (ListGenresResponse);
+    
+    // Create new genre
+    rpc CreateGenre(CreateGenreRequest) returns (Genre);
+
+    // Get tracks by genre
+    rpc GetTrackByGenre(GetTracksByGenreRequest) returns (ListGenresResponse);
+
+    // Service
+
+    // Heath check
+    rpc Health(common.Empty) returns (common.HealthyCheckResponse);
+}
+
+message Track {
+    string id = 1;
+    string title = 2;
+    int32 duration = 3;
+    int32 year = 4;
+
+    Artist artist = 5;
+    Album album = 6;
+    repeated Genre genres = 7;
+
+    string file_id = 8;
+    optional string cover_image_id = 9;
+
+    int64 plays_count = 10;
+    int32 track_number = 11;
+    optional string lyrics = 12;
+
+    string created_at = 13;
+    string updated_at = 14;
+}
+
+message Artist {
+    string id = 1;
+    string name = 2;
+    optional string country = 3;
+    optional string avatar_image_id = 4;
+    repeated Genre genres = 5;
+    int64 total_plays = 6;
+
+    string created_at = 7;
+    string updated_at = 8;
+}
+
+message Album {
+    string id = 1;
+    string title = 2;
+    int32 year = 3;
+
+    Artist artist = 4;
+    repeated Genre genres = 5;
+
+    AlbumType type = 6;
+
+    optional string cover_image_id = 7;
+
+    string created_at = 11;
+    string updated_at = 12;
+}
+
+message Genre {
+    string id = 1;
+    string name = 2;
+    optional string description = 3;
+}
+
+enum AlbumType {
+    ALBUM_TYPE_UNSPECIFIED = 0;
+    ALBUM_TYPE_ALBUM = 1;
+    ALBUM_TYPE_EP = 2;
+    ALBUM_TYPE_SINLGE = 3;
+}
+
+// Track
+
+message GetTrackRequest {
+    string id = 1;
+
+    bool include_artist = 2;
+    bool include_album = 3;
+    bool include_genres = 4;
+}
+
+message ListTracksRequest {
+    common.PaginationRequest pagination = 1;
+
+    optional string artist_id = 2;
+    optional string album_id = 3;
+    optional string genre_ids = 4;
+    optional int32 year_from = 5;
+    optional int32 year_to = 6;
+
+    TrackSortBy sort_by = 7;
+    SortOrder sort_oder = 8;
+}
+
+message ListTrackResponse {
+    repeated Track track = 1;
+    common.PaginationResponse pagination = 2;
+}
+
+message CreateTrackRequest {
+    string title = 1;
+    int32 duration = 2;
+    int32 year = 3;
+
+    string artist_id = 4;
+    string album_id = 5;
+    repeated string genre_ids = 6;
+
+    string file_id = 7;
+    optional string cover_image_id = 8;
+    optional int32 track_number = 9;
+    optional string lyrics = 10;
+}
+
+message UpdateTrackRequest {
+    string id = 1;
+
+    optional string title = 2;
+    optional int32 duration = 3;
+    optional int32 year = 4;
+    optional string artist_id = 5;
+    optional string album_id = 6;
+    repeated string genres_id = 7;
+    optional string file_id = 8;
+    optional string cover_image_id = 9;
+    optional int32 track_number = 10;
+    optional string lyrycs = 11;
+}
+
+message DeleteTrackRequest {
+    string track_id = 1;
+    bool delete_file = 2;
+}
+
+message SearchTrackRequest {
+    string query = 1;
+
+    repeated SearchField fields = 2;
+
+    common.PaginationRequest pagination = 3;
+
+    bool include_artist = 4;
+    bool include_album = 5;
+}
+
+enum SearchField {
+    SEARCH_FIELD_UNSPECIFIED = 0;
+    SEARCH_FIELD_TITLE = 1;
+    SEARCH_FIELD_ARTIST = 2;
+    SEARCH_FIELD_ALBUM = 3;
+    SEARCH_FILED_LYRICS = 4;
+    SEARCH_FIELD_ALL = 5;
+}
+
+message GetPopularTracksRequest {
+    common.PaginationRequest pagingation = 1;
+    optional int32 min_plays = 2;
+    optional string genre_id = 3;
+}
+
+message IncrementPlaysCountRequest {
+    string id = 1;
+    int32 increment_by = 2;
+}
+
+enum TrackSortBy {
+    TRACK_SORT_BY_UNSPECIFIED = 0;
+    TRACK_SORT_BY_TITLE = 1;
+    TRACK_SORT_BY_ARTIST = 2;
+    TRACK_SORT_BY_YEAR = 3;
+}
+
+// Artist
+
+message GetArtistRequest {
+    string id = 1;
+    bool include_genres = 2;
+}
+
+message ListArtistsRequest {
+    common.PaginationRequest pagination = 1;
+
+    repeated string genres_id = 2;
+    optional string country = 3;
+    
+    ArtistSortBy sort_by = 4;
+    SortOrder sort_order = 5;
+}
+
+message ListArtistsResponse {
+    repeated Artist artists = 1;
+    common.PaginationResponse pagination = 2;
+}
+
+message CreateArtistRequest {
+    string name = 1;
+    optional string country = 2;
+    optional string avatar_image_id = 3;
+    repeated string genre_ids = 4;
+}
+
+message UpdateArtistRequest {
+    string id = 1;
+
+    optional string name = 2;
+    optional string country = 3;
+    optional string avatar_image_id = 4;
+    repeated string genre_ids = 5;
+}
+
+message DeleteArtistRequest {
+    string id = 1;
+    bool cascade = 2; // to delete bounded objects
+}
+
+message SearchArtistsRequest {
+    string query = 1;
+    common.PaginationRequest pagination = 2;
+}
+
+message GetArtistTracksRequest {
+    string artist_id = 1;
+    common.PaginationRequest pagination = 2;
+    TrackSortBy sort_by = 3;
+    SortOrder sort_order = 4;
+}
+
+message GetArtistAlbumsRequest {
+    string artist_id = 1;
+    common.PaginationRequest pagination = 2;
+    AlbumSortBy sort_by = 3;
+    SortOrder sort_order = 4;
+}
+
+enum ArtistSortBy {
+    ARTIST_SORT_BY_UNSPECIFIED = 0;
+    ARTIST_SORT_BY_NAME = 1;
+    ARTIST_SORT_BY_TOTAL_PLAYS = 2;
+}
+
+// Album
+
+message GetAlbumRequest {
+    string id = 1;
+    bool include_artists = 2;
+    bool include_genres = 3;
+}
+
+message ListAlbumsRequest {
+    common.PaginationRequest pagination = 1;
+
+    optional string artist_id = 2;
+    repeated string genres_id = 3;
+    optional int32 year_from = 4;
+    optional int32 year_to = 5;
+    optional AlbumType type = 6;
+}
+
+message ListAlbumsResponse {
+    repeated Album albums = 1;
+
+    common.PaginationResponse pagination = 2;
+}
+
+message CreateAlbumRequest {
+    string title = 1;
+    int32 year = 2;
+    string artist_id = 3;
+    repeated string genre_ids = 4;
+    AlbumType type = 5;
+    optional string cover_image_id = 6;
+}
+
+message UpdateAlbumRequest {
+    string id = 1;
+
+    optional string title = 2;
+    optional int32 year = 3;
+    optional string artist_id = 4;
+    repeated string genre_ids = 5;
+    optional AlbumType type = 6;
+    optional string cover_image_id = 7;
+}
+
+message DeleteAlbumRequest {
+    string id = 1;
+    bool cascade = 2; // delete bounded objects
+}
+
+message GetAlbumTracksRequest {
+    string id = 1;
+    common.PaginationRequest pagination = 2;
+}
+
+enum AlbumSortBy {
+    ALBUM_SORT_BY_UNSPECIEFED = 0;
+    ALBUM_SORT_BY_TITLE = 1;
+    ALBUM_SORT_BY_ARTIST = 2;
+    ALBUM_SORT_BY_YEAR = 3;
+    ALBUM_SORT_BY_TOTAL_PLAYS = 4;
+}
+
+// Genre
+
+message ListGenresRequest {
+    common.PaginationRequest pagination = 1;
+    optional string query = 2;
+
+    GenreSortBy sort_by = 3;
+    SortOrder sort_order = 4;
+}
+
+message ListGenresResponse {
+    repeated Genre genres = 1;
+    common.PaginationResponse pagination = 2;
+}
+
+message CreateGenreRequest {
+    string name = 1;
+    optional string description = 2;
+}
+
+message GetTracksByGenreRequest {
+    string genre_id = 1;
+    common.PaginationRequest pagination = 2;
+    TrackSortBy sort_by = 3;
+    SortOrder sort_order = 4;
+}
+
+enum GenreSortBy {
+    GENRE_SORT_BY_UNSPECIFIED = 0;
+    GENRE_SORT_BY_NAME = 1;
+}
+
+// Common
+
+enum SortOrder {
+    SORT_ORDER_UNSPECIFIED = 0;
+    SORT_ORDER_ASC = 1;
+    SORT_ORDER_DESC = 2;
+}
