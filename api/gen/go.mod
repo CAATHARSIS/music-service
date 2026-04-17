@@ -1,8 +1,9 @@
-module github.com/CAATHARSIS/music-service/api/gen
+module github.com/CAATHARSIS/music-service/api
 
 go 1.25.1
 
 require (
+	github.com/CAATHARSIS/music-service/api/gen v0.0.0-20260414121833-4bca8d1b8389
 	google.golang.org/grpc v1.80.0
 	google.golang.org/protobuf v1.36.11
 )
