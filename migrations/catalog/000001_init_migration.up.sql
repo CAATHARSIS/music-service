@@ -79,46 +79,9 @@ CREATE TABLE IF NOT EXISTS tracks (
 );
 -- search vector for tracks
 ALTER TABLE tracks
-ADD COLUMN IF NOT EXISTS search_vector tsvector;
--- trigger function for search vector
-CREATE OR REPLACE FUNCTION update_tracks_search_vector() RETURNS TRIGGER AS $$ BEGIN NEW.search_vector := setweight(
-        to_tsvector('simple', coalesce(NEW.title, '')),
-        'A'
-    ) || setweight(
-        to_tsvector(
-            'simple',
-            coalesce(
-                (
-                    SELECT name
-                    FROM artists
-                    WHERE id = NEW.artist_id
-                ),
-                ''
-            )
-        ),
-        'B'
-    ) || setweight(
-        to_tsvector(
-            'simple',
-            coalesce(
-                (
-                    SELECT title
-                    FROM albums
-                    WHERE id = NEW.album_id
-                ),
-                ''
-            )
-        ),
-        'C'
-    );
-RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
--- create trigger
-CREATE TRIGGER trg_tracks_update_search_vector BEFORE
-INSERT
-    OR
-UPDATE ON tracks FOR EACH ROW EXECUTE FUNCTION update_tracks_search_vector();
+ADD COLUMN IF NOT EXISTS search_vector tsvector GENERATED ALWAYS AS (
+        setweight(to_tsvector('simple', coalesce(title, '')), 'A')
+    ) STORED;
 -- create indexes
 CREATE INDEX IF NOT EXISTS idx_tracks_search ON tracks USING GIN (search_vector);
 CREATE INDEX IF NOT EXISTS idx_tracks_title_trgm ON tracks USING GIN (title gin_trgm_ops);

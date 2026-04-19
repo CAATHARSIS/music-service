@@ -10,8 +10,6 @@ DROP INDEX IF EXISTS idx_tracks_artist_id;
 DROP INDEX IF EXISTS idx_tracks_title_trgm;
 DROP INDEX IF EXISTS idx_tracks_search;
 ALTER TABLE tracks DROP COLUMN IF EXISTS search_vector;
-DROP TRIGGER IF EXISTS trg_tracks_update_search_vector ON tracks;
-DROP FUNCTION IF EXISTS update_tracks_search_vector();
 -- tracks table
 DROP TABLE IF EXISTS tracks;
 -- album table
