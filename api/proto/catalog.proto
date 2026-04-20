@@ -113,7 +113,7 @@ message Track {
     optional string cover_image_id = 9;
 
     int64 plays_count = 10;
-    int32 track_number = 11;
+    optional int32 track_number = 11;
     optional string lyrics = 12;
 
     string created_at = 13;

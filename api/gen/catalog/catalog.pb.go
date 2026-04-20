@@ -398,7 +398,7 @@ type Track struct {
 	FileId        string                 `protobuf:"bytes,8,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
 	CoverImageId  *string                `protobuf:"bytes,9,opt,name=cover_image_id,json=coverImageId,proto3,oneof" json:"cover_image_id,omitempty"`
 	PlaysCount    int64                  `protobuf:"varint,10,opt,name=plays_count,json=playsCount,proto3" json:"plays_count,omitempty"`
-	TrackNumber   int32                  `protobuf:"varint,11,opt,name=track_number,json=trackNumber,proto3" json:"track_number,omitempty"`
+	TrackNumber   *int32                 `protobuf:"varint,11,opt,name=track_number,json=trackNumber,proto3,oneof" json:"track_number,omitempty"`
 	Lyrics        *string                `protobuf:"bytes,12,opt,name=lyrics,proto3,oneof" json:"lyrics,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -507,8 +507,8 @@ func (x *Track) GetPlaysCount() int64 {
 }
 
 func (x *Track) GetTrackNumber() int32 {
-	if x != nil {
-		return x.TrackNumber
+	if x != nil && x.TrackNumber != nil {
+		return *x.TrackNumber
 	}
 	return 0
 }
@@ -2786,7 +2786,7 @@ var File_catalog_proto protoreflect.FileDescriptor
 
 const file_catalog_proto_rawDesc = "" +
 	"\n" +
-	"\rcatalog.proto\x12\acatalog\x1a\fcommon.proto\"\xd5\x03\n" +
+	"\rcatalog.proto\x12\acatalog\x1a\fcommon.proto\"\xeb\x03\n" +
 	"\x05Track\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
@@ -2799,14 +2799,15 @@ const file_catalog_proto_rawDesc = "" +
 	"\x0ecover_image_id\x18\t \x01(\tH\x00R\fcoverImageId\x88\x01\x01\x12\x1f\n" +
 	"\vplays_count\x18\n" +
 	" \x01(\x03R\n" +
-	"playsCount\x12!\n" +
-	"\ftrack_number\x18\v \x01(\x05R\vtrackNumber\x12\x1b\n" +
-	"\x06lyrics\x18\f \x01(\tH\x01R\x06lyrics\x88\x01\x01\x12\x1d\n" +
+	"playsCount\x12&\n" +
+	"\ftrack_number\x18\v \x01(\x05H\x01R\vtrackNumber\x88\x01\x01\x12\x1b\n" +
+	"\x06lyrics\x18\f \x01(\tH\x02R\x06lyrics\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\r \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\x0e \x01(\tR\tupdatedAtB\x11\n" +
-	"\x0f_cover_image_idB\t\n" +
+	"\x0f_cover_image_idB\x0f\n" +
+	"\r_track_numberB\t\n" +
 	"\a_lyrics\"\x9f\x02\n" +
 	"\x06Artist\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +

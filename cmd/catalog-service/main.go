@@ -9,6 +9,7 @@ import (
 
 	"github.com/CAATHARSIS/music-service/internal/catalog/config"
 	"github.com/CAATHARSIS/music-service/internal/catalog/database"
+	"github.com/CAATHARSIS/music-service/internal/catalog/repository"
 )
 
 func main() {
@@ -20,6 +21,9 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
+	defer db.Close()
 
-	fmt.Printf("%v", db)
+	repo := repository.NewRepository(db, logger)
+
+	fmt.Println(repo)
 }

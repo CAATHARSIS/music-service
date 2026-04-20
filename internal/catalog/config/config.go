@@ -26,7 +26,7 @@ func Load(log *slog.Logger) *Config {
 		DBPort:     getEnv("DB_PORT", "5432"),
 		DBUser:     getEnv("DB_USER", "postgres"),
 		DBPassword: getEnv("DB_PASSWORD", "postgres"),
-		DBName:     getEnv("DB_NAME", "catalog-service"),
+		DBName:     getEnv("DB_NAME", "catalog-service-test"),
 		DBSSLMode:  getEnv("DB_SSL_MODE", "disable"),
 
 		GRPCPort: getEnv("GRPC_PORT", "50053"),

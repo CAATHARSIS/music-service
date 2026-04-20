@@ -8,7 +8,7 @@ type Track struct {
 	Duration    int       `db:"duration" json:"duration"`
 	Year        int       `db:"year" json:"year"`
 	FileID      string    `db:"file_id" json:"file_id"`
-	CoverImagID *string   `db:"cover_image_id" json:"cover_image_id,omitempty"`
+	CoverImageID *string   `db:"cover_image_id" json:"cover_image_id,omitempty"`
 	TrackNumber *int      `db:"track_number" json:"track_number,omitempty"`
 	Lyrics      *string   `db:"lyrics" json:"lyrics,omitempty"`
 	PlaysCount  int       `db:"plays_count" json:"plays_count"`
@@ -47,7 +47,83 @@ type Album struct {
 }
 
 type Genre struct {
-	ID          string  `db:"id" json:"id"`
-	Name        string  `db:"name" json:"name"`
-	Description *string `db:"description" json:"description"`
+	ID          string    `db:"id" json:"id"`
+	Name        string    `db:"name" json:"name"`
+	Description *string   `db:"description" json:"description"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
+
+type CreateTrackParams struct {
+	Title       string
+	Duration    int
+	Year        int
+	ArtistID    string
+	AlbumID     *string
+	GenreIDs    []string
+	FileID      string
+	CoverImageID *string
+	TrackNumber *int
+	Lyrics      *string
+}
+
+type GetTrackOptions struct {
+	IncludeArtist bool
+	IncludeAlbum  bool
+	IncludeGenres bool
+}
+
+type UpdateTrackParams struct {
+	Title       *string
+	Duration    *int
+	Year        *int
+	FileID      *string
+	CoverImageID *string
+	TrackNumber *int
+	Lyrics      *string
+	ArtistID    *string
+	AlbumID     *string
+	GenreIDs    *[]string
+}
+
+// Filters
+
+type TrackFilter struct {
+	ArtistID    string
+	AlbumID     string
+	GenreIDs    []string
+	YearFrom    int
+	YearTo      int
+	MinDuration int
+	MaxDuration int
+	SortBy      TrackSortBy
+	SortOrder   SortOrder
+	Page        int
+	PageSize    int
+}
+
+// Pagination Result
+
+type TrackListResult struct {
+	Tracks     []*Track `json:"tracks"`
+	Page       int      `json:"page"`
+	PageSize   int      `json:"page_size"`
+}
+
+// Additional Types
+
+type TrackSortBy string
+
+const (
+	SortByTitle  TrackSortBy = "title"
+	SortByArtist TrackSortBy = "artist"
+	SortByYear   TrackSortBy = "year"
+	SortByPlays  TrackSortBy = "plays"
+)
+
+type SortOrder string
+
+const (
+	SortOrderAsc  SortOrder = "asc"
+	SortOrderDesc SortOrder = "desc"
+)
