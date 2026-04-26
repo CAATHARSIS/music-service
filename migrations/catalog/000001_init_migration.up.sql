@@ -53,6 +53,8 @@ ALTER TABLE albums
 ADD COLUMN IF NOT EXISTS search_vector tsvector GENERATED ALWAYS AS (
         setweight(to_tsvector('simple', coalesce(title, '')), 'A')
     ) STORED;
+CREATE INDEX IF NOT EXISTS idx_albums_search ON albums USING GIN (search_vector);
+CREATE INDEX IF NOT EXISTS idx_albums_title_trgm ON albums USING GIN (title gin_trgm_ops);
 -- track table
 CREATE TABLE IF NOT EXISTS tracks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

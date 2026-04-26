@@ -12,6 +12,9 @@ DROP INDEX IF EXISTS idx_tracks_search;
 ALTER TABLE tracks DROP COLUMN IF EXISTS search_vector;
 -- tracks table
 DROP TABLE IF EXISTS tracks;
+--indexes
+DROP INDEX IF EXISTS idx_albums_title_trgm;
+DROP INDEX IF EXISTS idx_albums_search;
 -- album table
 ALTER TABLE albums DROP COLUMN IF EXISTS search_vector;
 DROP TABLE IF EXISTS albums;

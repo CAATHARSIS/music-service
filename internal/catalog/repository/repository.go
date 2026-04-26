@@ -42,6 +42,7 @@ type Repository interface {
 	DeleteTrackByID(ctx context.Context, id string) error
 	ListTracks(ctx context.Context, filter *models.TrackFilter) (*models.TrackListResult, error)
 	IncrementPlays(ctx context.Context, trackID string, incrementBy int64) error
+	SearchTracks(ctx context.Context, query string, opts *models.SearchOptions) ([]*models.Track, error)
 }
 
 type repository struct {
@@ -620,6 +621,104 @@ func (r *repository) IncrementPlays(ctx context.Context, trackID string, increme
 	return nil
 }
 
+func (r *repository) SearchTracks(ctx context.Context, query string, opts *models.SearchOptions) ([]*models.Track, error) {
+	if opts == nil {
+		opts = &models.SearchOptions{}
+	}
+
+	safeQuery := sanitizeTSQuery(query)
+	if safeQuery != "" {
+		tracks, err := r.searchTracksFullText(ctx, safeQuery, opts)
+		if err != nil && len(tracks) >= 1 {
+			return tracks, nil
+		}
+	}
+
+	tracks, err := r.searchTracksFuzzy(ctx, query, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return tracks, nil
+}
+
+func (r *repository) searchTracksFullText(ctx context.Context, safeQuery string, opts *models.SearchOptions) ([]*models.Track, error) {
+	sql := r.buildSearchTracksQuery(true, opts)
+
+	var tracks []*models.Track
+	err := r.db.SelectContext(ctx, &tracks, sql, safeQuery, opts.Limit)
+	return tracks, err
+}
+
+func (r *repository) searchTracksFuzzy(ctx context.Context, query string, opts *models.SearchOptions) ([]*models.Track, error) {
+	sql := r.buildSearchTracksQuery(false, opts)
+	
+	var tracks []*models.Track
+	err := r.db.SelectContext(ctx, &tracks, sql, query, opts.Limit)
+	return tracks, err
+}
+
+func (r *repository) buildSearchTracksQuery(isFullText bool, opts *models.SearchOptions) string {
+	selectPart := []string{
+		"t.id",
+		"t.title",
+		"t.duration",
+		"t.year",
+		"t.file_id",
+		"t.cover_image_id",
+		"t.track_number",
+		"t.lyrics",
+		"t.plays_count",
+		"t.created_at",
+		"t.updated_at",
+		"t.artist_id",
+		"t.album_id",
+	}
+
+	fromPart := "FROM tracks t"
+	wherePart := ""
+	orderByPart := ""
+
+	if opts.IncludeArtist {
+		selectPart = append(selectPart, 
+			"a.id as \"artist.id\"",
+            "a.name as \"artist.name\"",
+            "a.country as \"artist.country\"",
+            "a.avatar_image_id as \"artist.avatar_image_id\"",
+            "a.total_plays as \"artist.total_plays\"",
+		)
+		fromPart += " JOIN artists a ON t.artist_id = a.id"
+	}
+
+	if opts.IncludeAlbum {
+		selectPart = append(selectPart, 
+			"al.id as \"album.id\"",
+            "al.title as \"album.title\"",
+            "al.year as \"album.year\"",
+            "al.cover_image_id as \"album.cover_image_id\"",
+		)
+		fromPart += " LEFT JOIN albums al ON t.album_id = al.id"
+	}
+
+	if isFullText {
+		wherePart = "WHERE t.search_vector @@ to_tsquery('simple', $1)"
+		selectPart = append(selectPart, "ts_rank(t.search_vector, to_tsquery('simple', $1)) as rank")
+		orderByPart = "ORDER BY rank DESC"
+	} else {
+		wherePart = "WHERE t.title % $1"
+		selectPart = append(selectPart, "similarity(t.title, $1) as sim")
+		orderByPart = "ORDER BY sim DESC"
+	}
+
+	return fmt.Sprintf(`
+		SELECT %s
+		%s
+		%s
+		%s
+		LIMIT $2
+	`, strings.Join(selectPart, ", "), fromPart, wherePart, orderByPart)
+}
+
 // Genre Methods
 
 func (r *repository) addTrackGenres(ctx context.Context, trackID string, genreIDs []string) error {
@@ -724,4 +823,25 @@ func (r *repository) checkWhiteList(table, column string) error {
 	}
 
 	return nil
+}
+
+// Help Functions
+
+func sanitizeTSQuery(query string) string {
+	specialChars := []string{"'", "\\", ":", "&", "|", "!", "(", ")", "<", ">", "*"}
+	sanitized := query
+	for _, char := range specialChars {
+		sanitized = strings.ReplaceAll(sanitized, char, "")
+	}
+
+	words := strings.Fields(sanitized)
+	if len(words) == 0 {
+		return ""
+	}
+
+	for i, word := range words {
+		words[i] = strings.ToLower(word)
+	}
+
+	return strings.Join(words, " & ")
 }

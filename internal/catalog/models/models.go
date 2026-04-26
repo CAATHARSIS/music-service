@@ -3,17 +3,17 @@ package models
 import "time"
 
 type Track struct {
-	ID          string    `db:"id" json:"id"`
-	Title       string    `db:"title" json:"title"`
-	Duration    int       `db:"duration" json:"duration"`
-	Year        int       `db:"year" json:"year"`
-	FileID      string    `db:"file_id" json:"file_id"`
+	ID           string    `db:"id" json:"id"`
+	Title        string    `db:"title" json:"title"`
+	Duration     int       `db:"duration" json:"duration"`
+	Year         int       `db:"year" json:"year"`
+	FileID       string    `db:"file_id" json:"file_id"`
 	CoverImageID *string   `db:"cover_image_id" json:"cover_image_id,omitempty"`
-	TrackNumber *int      `db:"track_number" json:"track_number,omitempty"`
-	Lyrics      *string   `db:"lyrics" json:"lyrics,omitempty"`
-	PlaysCount  int       `db:"plays_count" json:"plays_count"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
+	TrackNumber  *int      `db:"track_number" json:"track_number,omitempty"`
+	Lyrics       *string   `db:"lyrics" json:"lyrics,omitempty"`
+	PlaysCount   int       `db:"plays_count" json:"plays_count"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 
 	Artist *Artist  `db:"artist" json:"artist"`
 	Album  *Album   `db:"album" json:"album"`
@@ -55,16 +55,16 @@ type Genre struct {
 }
 
 type CreateTrackParams struct {
-	Title       string
-	Duration    int
-	Year        int
-	ArtistID    string
-	AlbumID     *string
-	GenreIDs    []string
-	FileID      string
+	Title        string
+	Duration     int
+	Year         int
+	ArtistID     string
+	AlbumID      *string
+	GenreIDs     []string
+	FileID       string
 	CoverImageID *string
-	TrackNumber *int
-	Lyrics      *string
+	TrackNumber  *int
+	Lyrics       *string
 }
 
 type GetTrackOptions struct {
@@ -74,16 +74,22 @@ type GetTrackOptions struct {
 }
 
 type UpdateTrackParams struct {
-	Title       *string
-	Duration    *int
-	Year        *int
-	FileID      *string
+	Title        *string
+	Duration     *int
+	Year         *int
+	FileID       *string
 	CoverImageID *string
-	TrackNumber *int
-	Lyrics      *string
-	ArtistID    *string
-	AlbumID     *string
-	GenreIDs    *[]string
+	TrackNumber  *int
+	Lyrics       *string
+	ArtistID     *string
+	AlbumID      *string
+	GenreIDs     *[]string
+}
+
+type SearchOptions struct {
+	Limit         int
+	IncludeArtist bool
+	IncludeAlbum  bool
 }
 
 // Filters
@@ -105,9 +111,9 @@ type TrackFilter struct {
 // Pagination Result
 
 type TrackListResult struct {
-	Tracks     []*Track `json:"tracks"`
-	Page       int      `json:"page"`
-	PageSize   int      `json:"page_size"`
+	Tracks   []*Track `json:"tracks"`
+	Page     int      `json:"page"`
+	PageSize int      `json:"page_size"`
 }
 
 // Additional Types
