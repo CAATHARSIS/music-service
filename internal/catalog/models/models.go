@@ -86,6 +86,20 @@ type UpdateTrackParams struct {
 	GenreIDs     *[]string
 }
 
+type CreateArtistParams struct {
+	Name string
+	Country *string
+	AvatarImageID *string
+	GenreIDs []string
+}
+
+type UpdateArtistParams struct {
+    Name          *string
+    Country       *string
+    AvatarImageID *string
+    GenreIDs      *[]string
+}
+
 type SearchOptions struct {
 	Limit         int
 	IncludeArtist bool
@@ -108,12 +122,28 @@ type TrackFilter struct {
 	PageSize    int
 }
 
+type ArtistFilter struct {
+    GenreIDs  []string
+    Country   string
+    MinPlays  int64
+    SortBy    ArtistSortBy
+    SortOrder SortOrder
+    Page      int
+    PageSize  int
+}
+
 // Pagination Result
 
 type TrackListResult struct {
 	Tracks   []*Track `json:"tracks"`
 	Page     int      `json:"page"`
 	PageSize int      `json:"page_size"`
+}
+
+type ArtistListResult struct {
+    Artists    []*Artist `json:"artists"`
+    Page       int       `json:"page"`
+    PageSize   int       `json:"page_size"`
 }
 
 // Additional Types
@@ -125,6 +155,13 @@ const (
 	SortByArtist TrackSortBy = "artist"
 	SortByYear   TrackSortBy = "year"
 	SortByPlays  TrackSortBy = "plays"
+)
+
+type ArtistSortBy string
+
+const (
+    SortArtistsByName       ArtistSortBy = "name"
+    SortArtistsByPlays      ArtistSortBy = "plays"
 )
 
 type SortOrder string

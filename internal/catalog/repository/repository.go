@@ -43,6 +43,18 @@ type Repository interface {
 	ListTracks(ctx context.Context, filter *models.TrackFilter) (*models.TrackListResult, error)
 	IncrementPlays(ctx context.Context, trackID string, incrementBy int64) error
 	SearchTracks(ctx context.Context, query string, opts *models.SearchOptions) ([]*models.Track, error)
+
+	// Artists
+	CreateArtist(ctx context.Context, params *models.CreateArtistParams) (*models.Artist, error)
+	GetArtistByID(ctx context.Context, id string) (*models.Artist, error)
+	GetArtistByIDs(ctx context.Context, ids []string) ([]*models.Artist, error)
+	UpdateArtist(ctx context.Context, id string, params *models.UpdateArtistParams) (*models.Artist, error)
+	DeleteArtistByID(ctx context.Context, id string) error
+	ListArtists(ctx context.Context, filter *models.ArtistFilter) (*models.ArtistListResult, error)
+	GetArtistTracks(ctx context.Context, artistID string, limit int) ([]*models.Track, error)
+	GetArtistAlbums(ctx context.Context, artistID string) ([]*models.Album, error)
+	UpdateArtistStats(ctx context.Context, artistID string, incrementBy int64) error
+	SearchArtists(ctx context.Context, query string, limit int) ([]*models.Artist, error)
 }
 
 type repository struct {
@@ -719,6 +731,468 @@ func (r *repository) buildSearchTracksQuery(isFullText bool, opts *models.Search
 	`, strings.Join(selectPart, ", "), fromPart, wherePart, orderByPart)
 }
 
+// Artists
+
+func (r *repository) CreateArtist(ctx context.Context, params *models.CreateArtistParams) (*models.Artist, error) {
+	query := `
+		INSERT INTO artists (
+			id,
+			name,
+			country,
+			avatar_image_id,
+			created_at,
+			updated_at
+		)
+		VALUES (
+			$1,
+			$2,
+			$3,
+			$4,
+			NOW(),
+			NOW()
+		)
+		RETURNING
+			id,
+			name,
+			country,
+			avatar_image_id,
+			created_at,
+			updated_at
+
+	`
+
+	artist := &models.Artist{
+        ID:        uuid.New().String(),
+        CreatedAt: time.Now(),
+        UpdatedAt: time.Now(),
+    }
+    
+    err := r.db.QueryRowContext(ctx, query,
+        artist.ID,
+        params.Name,
+        params.Country,
+        params.AvatarImageID,
+    ).Scan(
+        &artist.ID,
+		&artist.Name,
+		&artist.Country,
+        &artist.AvatarImageID,
+        &artist.TotalPlays,
+        &artist.CreatedAt,
+		&artist.UpdatedAt,
+    )
+    
+    if err != nil {
+        r.log.Error("failed to create artist", "error", err)
+        return nil, fmt.Errorf("create artist: %w", err)
+    }
+    
+    if len(params.GenreIDs) > 0 {
+        if err := r.addArtistGenres(ctx, artist.ID, params.GenreIDs); err != nil {
+            r.log.Error("failed to add artist genres", "error", err)
+        }
+    }
+    
+    return artist, nil
+}
+
+func (r *repository) GetArtistByID(ctx context.Context, id string) (*models.Artist, error) {
+	query := `
+        SELECT 
+            id,
+			name,
+			country,
+			avatar_image_id,
+            total_plays,
+            created_at,
+			updated_at
+        FROM
+			artists
+        WHERE
+			id = $1
+    `
+    
+    var artist models.Artist
+    err := r.db.QueryRowContext(ctx, query, id).Scan(
+        &artist.ID,
+		&artist.Name,
+		&artist.Country,
+        &artist.AvatarImageID,
+        &artist.TotalPlays,
+        &artist.CreatedAt,
+		&artist.UpdatedAt,
+    )
+    
+    if err == sql.ErrNoRows {
+        return nil, ErrNotFound
+    }
+
+    if err != nil {
+        return nil, err
+    }
+    
+    return &artist, nil
+}
+
+func (r *repository) GetArtistByIDs(ctx context.Context, ids []string) ([]*models.Artist, error) {
+	if len(ids) == 0 {
+        return []*models.Artist{}, nil
+    }
+    
+    query := `
+        SELECT 
+            id,
+			name,
+			country,
+			avatar_image_id,
+            total_plays,
+			created_at,
+			updated_at
+        FROM
+			artists
+        WHERE
+			id = ANY($1)
+    `
+    
+    var artists []*models.Artist
+    err := r.db.SelectContext(ctx, &artists, query, pq.Array(ids))
+    if err != nil {
+        r.log.Error("failed to get artists by ids", "error", err)
+        return nil, fmt.Errorf("get artists by ids: %w", err)
+    }
+    
+    return artists, nil
+}
+
+func (r *repository) UpdateArtist(ctx context.Context, id string, params *models.UpdateArtistParams) (*models.Artist, error) {
+	setParts := []string{"updated_at = NOW()"}
+    args := []interface{}{id}
+    argIdx := 2
+    
+    if params.Name != nil {
+        setParts = append(setParts, fmt.Sprintf("name = $%d", argIdx))
+        args = append(args, *params.Name)
+        argIdx++
+    }
+    
+    if params.Country != nil {
+        setParts = append(setParts, fmt.Sprintf("country = $%d", argIdx))
+        args = append(args, *params.Country)
+        argIdx++
+    }
+    
+    if params.AvatarImageID != nil {
+        setParts = append(setParts, fmt.Sprintf("avatar_image_id = $%d", argIdx))
+        args = append(args, *params.AvatarImageID)
+    }
+    
+    if len(setParts) == 1 {
+        return r.GetArtistByID(ctx, id)
+    }
+    
+    query := fmt.Sprintf(`
+        UPDATE
+			artists 
+        SET
+			%s
+        WHERE
+			id = $1
+        RETURNING
+			id,
+			name,
+			country,
+			avatar_image_id,
+            total_plays,
+			created_at,
+			updated_at
+    `, strings.Join(setParts, ", "))
+    
+    var artist  models.Artist
+    err := r.db.QueryRowContext(ctx, query, args...).Scan(
+        &artist.ID,
+		&artist.Name,
+		&artist.Country,
+        &artist.AvatarImageID,
+        &artist.TotalPlays,
+        &artist.CreatedAt,
+		&artist.UpdatedAt,
+    )
+    
+    if err == sql.ErrNoRows {
+        return nil, ErrNotFound
+    }
+    if err != nil {
+        r.log.Error("failed to update artist","error", err)
+        return nil, fmt.Errorf("update artist: %w", err)
+    }
+    
+    if params.GenreIDs != nil {
+        if err := r.setArtistGenres(ctx, id, *params.GenreIDs); err != nil {
+            r.log.Error("failed to update artist genres", "error", err)
+        }
+    }
+    
+    return &artist, nil
+}
+
+func (r *repository) DeleteArtistByID(ctx context.Context, id string) error {
+	result, err := r.db.ExecContext(ctx, "DELETE FROM artist WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	// from artist_genres table deleting will be by postgres by cascade
+
+	return nil
+}
+
+func (r *repository) ListArtists(ctx context.Context, filter *models.ArtistFilter) (*models.ArtistListResult, error) {
+	if filter == nil {
+        filter = &models.ArtistFilter{}
+    }
+    
+	// Вынести в service!!!
+    if filter.Page <= 0 {
+        filter.Page = 1
+    }
+
+    if filter.PageSize <= 0 {
+        filter.PageSize = 20
+    }
+
+	if filter.PageSize > 100 {
+		filter.PageSize = 100
+	}
+	//!!!
+    
+    whereParts := []string{"1=1"}
+    args := []interface{}{}
+    argIdx := 1
+    
+    if len(filter.GenreIDs) > 0 {
+        whereParts = append(whereParts, fmt.Sprintf(`
+            EXISTS (
+                SELECT 1 FROM artist_genres ag 
+                WHERE ag.artist_id = artists.id AND ag.genre_id = ANY($%d)
+            )
+        `, argIdx))
+        args = append(args, pq.Array(filter.GenreIDs))
+        argIdx++
+    }
+    
+    if filter.Country != "" {
+        whereParts = append(whereParts, fmt.Sprintf("country = $%d", argIdx))
+        args = append(args, filter.Country)
+        argIdx++
+    }
+    
+    if filter.MinPlays > 0 {
+        whereParts = append(whereParts, fmt.Sprintf("total_plays >= $%d", argIdx))
+        args = append(args, filter.MinPlays)
+        argIdx++
+    }
+    
+    whereClause := strings.Join(whereParts, " AND ")
+    
+    orderBy := "created_at DESC"
+    switch filter.SortBy {
+    case models.SortArtistsByPlays:
+        orderBy = "total_plays DESC"
+    case models.SortArtistsByName:
+        orderBy = "name ASC"
+    }
+    
+    query := fmt.Sprintf(`
+        SELECT 
+            id,
+			name,
+			country,
+			avatar_image_id,
+            total_plays,
+            created_at,
+			updated_at
+        FROM
+			artists
+        WHERE
+			%s
+        ORDER BY
+			%s
+        LIMIT $%d
+		OFFSET $%d
+    `, whereClause, orderBy, argIdx, argIdx+1)
+    
+    args = append(args, filter.PageSize, (filter.Page-1)*filter.PageSize)
+    
+    var artists []*models.Artist
+    err := r.db.SelectContext(ctx, &artists, query, args...)
+    if err != nil {
+        return nil, fmt.Errorf("list artists: %w", err)
+    }
+    
+    return &models.ArtistListResult{
+        Artists:    artists,
+        Page:       filter.Page,
+        PageSize:   filter.PageSize,
+    }, nil
+}
+
+func (r *repository) GetArtistTracks(ctx context.Context, artistID string, limit int) ([]*models.Track, error) {
+	query := `
+        SELECT 
+            t.id,
+			t.title,
+			t.duration,
+			t.year,
+			t.file_id,
+			t.cover_image_id,
+			t.track_number,
+			t.lyrics,
+            t.plays_count,
+			t.created_at,
+			t.updated_at,
+            a.id as "artist.id",
+			a.name as "artist.name",
+            al.id as "album.id",
+			al.title as "album.title"
+        FROM
+			tracks t
+        JOIN
+			artists a ON t.artist_id = a.id
+        LEFT JOIN
+			albums al ON t.album_id = al.id
+        WHERE
+			t.artist_id = $1
+        ORDER BY
+			t.plays_count DESC
+        LIMIT $2
+    `
+    
+    var tracks []*models.Track
+    err := r.db.SelectContext(ctx, &tracks, query, artistID, limit)
+    if err != nil {
+        return nil, fmt.Errorf("get artist tracks: %w", err)
+    }
+    
+    return tracks, nil
+}
+
+func (r *repository) GetArtistAlbums(ctx context.Context, artistID string) ([]*models.Album, error) {
+	query := `
+        SELECT 
+            id,
+			title,
+			year,
+			cover_image_id,
+			album_type,
+            created_at,
+			updated_at
+        FROM
+			albums
+        WHERE
+			artist_id = $1
+        ORDER BY
+			year DESC, title ASC
+    `
+    
+    var albums []*models.Album
+    err := r.db.SelectContext(ctx, &albums, query, artistID)
+    if err != nil {
+        return nil, fmt.Errorf("get artist albums: %w", err)
+    }
+    
+    return albums, nil
+}
+
+func (r *repository) UpdateArtistStats(ctx context.Context, artistID string, incrementBy int64) error {
+	query := `
+        UPDATE
+			artists 
+        SET 
+            total_plays = (
+                SELECT COALESCE(SUM(plays_count), 0) 
+                FROM tracks 
+                WHERE artist_id = $1
+            ),
+            updated_at = NOW()
+        WHERE
+			id = $1
+    `
+    
+    result, err := r.db.ExecContext(ctx, query, artistID)
+    if err != nil {
+        r.log.Error("failed to update artist stats", "error", err)
+        return fmt.Errorf("update artist stats: %w", err)
+    }
+    
+    rows, _ := result.RowsAffected()
+    if rows == 0 {
+        return ErrNotFound
+    }
+    
+    return nil
+}
+
+func (r *repository) SearchArtists(ctx context.Context, query string, limit int) ([]*models.Artist, error) {
+	safeQuery := sanitizeTSQuery(query)
+    
+    if safeQuery != "" {
+        sql := `
+            SELECT 
+                id,
+				name,
+				country,
+				avatar_image_id,
+                total_plays,
+				created_at,
+				updated_at,
+                ts_rank(search_vector, to_tsquery('simple', $1)) as rank
+            FROM
+				artists
+            WHERE
+				search_vector @@ to_tsquery('simple', $1)
+            ORDER BY
+				rank DESC
+            LIMIT $2
+        `
+        
+        var artists []*models.Artist
+        err := r.db.SelectContext(ctx, &artists, sql, safeQuery, limit)
+        
+        if err == nil && len(artists) >= 3 {
+            return artists, nil
+        }
+    }
+    
+    fuzzySQL := `
+        SELECT 
+            id,
+			name,
+			country,
+			avatar_image_id,
+            total_plays,
+			created_at,
+			updated_at,
+            similarity(name, $1) as sim
+        FROM
+			artists
+        WHERE
+			name % $1
+        ORDER BY
+			sim DESC
+        LIMIT $2
+    `
+    
+    var artists []*models.Artist
+    err := r.db.SelectContext(ctx, &artists, fuzzySQL, query, limit)
+    return artists, err
+}
+
 // Genre Methods
 
 func (r *repository) addTrackGenres(ctx context.Context, trackID string, genreIDs []string) error {
@@ -731,6 +1205,14 @@ func (r *repository) getTrackGenres(ctx context.Context, trackID string) ([]*mod
 
 func (r *repository) setTrackGenres(ctx context.Context, trackID string, genresIDs []string) error {
 	return r.SetGenres(ctx, "track_genres", "track_id", trackID, genresIDs)
+}
+
+func (r *repository) addArtistGenres(ctx context.Context, artistID string, genreIDs []string) error {
+	return r.addGenres(ctx, "artist_genres", "artist_id", artistID, genreIDs)
+}
+
+func (r *repository) setArtistGenres(ctx context.Context, artistID string, genresIDs []string) error {
+	return r.SetGenres(ctx, "artist_genres", "artist_id", artistID, genresIDs)
 }
 
 func (r *repository) addGenres(ctx context.Context, table, column, id string, genresIDs []string) error {
