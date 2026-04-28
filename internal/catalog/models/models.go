@@ -36,14 +36,23 @@ type Artist struct {
 }
 
 type Album struct {
-	ID           string  `db:"id" json:"id"`
-	Title        string  `db:"title" json:"title"`
-	Year         int32   `db:"year" json:"year"`
-	AlbumType    string  `db:"album_type" json:"album_type"`
-	CoverImageID *string `db:"cover_image_id" json:"cover_image_id"`
+	ID           string    `db:"id" json:"id"`
+	Title        string    `db:"title" json:"title"`
+	Year         int32     `db:"year" json:"year"`
+	ArtistID     string    `db:"artist_id" json:"artist_id"`
+	AlbumType    AlbumType `db:"album_type" json:"album_type"`
+	CoverImageID *string   `db:"cover_image_id" json:"cover_image_id"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 
 	Artist *Artist  `db:"artist" json:"artist,omitempty"`
 	Genres []*Genre `json:"genres,omitempty"`
+}
+
+type AlbumWithTracks struct {
+	Album  *Album
+	Tracks []*Track `json:"tracks"`
+	Genres []*Genre `json:"genres"`
 }
 
 type Genre struct {
@@ -87,23 +96,47 @@ type UpdateTrackParams struct {
 }
 
 type CreateArtistParams struct {
-	Name string
-	Country *string
+	Name          string
+	Country       *string
 	AvatarImageID *string
-	GenreIDs []string
+	GenreIDs      []string
 }
 
 type UpdateArtistParams struct {
-    Name          *string
-    Country       *string
-    AvatarImageID *string
-    GenreIDs      *[]string
+	Name          *string
+	Country       *string
+	AvatarImageID *string
+	GenreIDs      *[]string
 }
 
-type SearchOptions struct {
+type SearchTracksOptions struct {
 	Limit         int
 	IncludeArtist bool
 	IncludeAlbum  bool
+}
+
+type CreateAlbumParams struct {
+	Title        string
+	Year         int
+	ArtistID     string
+	CoverImageID *string
+	AlbumType    AlbumType
+	GenresIDs    []string
+}
+
+type UpdateAlbumParams struct {
+	Title        *string
+	Year         *int
+	ArtistID     *string
+	CoverImageID *string
+	AlbumType    *string
+	GenreIDs     []string
+}
+
+type SearchAlbumsOptions struct {
+	Limit         int
+	IncludeArtist bool
+	IncludeTracks  bool
 }
 
 // Filters
@@ -123,13 +156,25 @@ type TrackFilter struct {
 }
 
 type ArtistFilter struct {
-    GenreIDs  []string
-    Country   string
-    MinPlays  int64
-    SortBy    ArtistSortBy
-    SortOrder SortOrder
-    Page      int
-    PageSize  int
+	GenreIDs  []string
+	Country   string
+	MinPlays  int64
+	SortBy    ArtistSortBy
+	SortOrder SortOrder
+	Page      int
+	PageSize  int
+}
+
+type AlbumFilter struct {
+	ArtistID  string
+	GenreIDs  []string
+	YearFrom  int
+	YearTo    int
+	AlbumType AlbumType
+	SortBy    AlbumSortBy
+	SortOrder SortOrder
+	Page      int
+	PageSize  int
 }
 
 // Pagination Result
@@ -141,9 +186,15 @@ type TrackListResult struct {
 }
 
 type ArtistListResult struct {
-    Artists    []*Artist `json:"artists"`
-    Page       int       `json:"page"`
-    PageSize   int       `json:"page_size"`
+	Artists  []*Artist `json:"artists"`
+	Page     int       `json:"page"`
+	PageSize int       `json:"page_size"`
+}
+
+type AlbumListResult struct {
+	Albums   []*Album `json:"albums"`
+	Page     int      `json:"page"`
+	PageSize int      `json:"page_size"`
 }
 
 // Additional Types
@@ -160,8 +211,15 @@ const (
 type ArtistSortBy string
 
 const (
-    SortArtistsByName       ArtistSortBy = "name"
-    SortArtistsByPlays      ArtistSortBy = "plays"
+	SortArtistsByName  ArtistSortBy = "name"
+	SortArtistsByPlays ArtistSortBy = "plays"
+)
+
+type AlbumSortBy string
+
+const (
+	SortAlbumByTitle AlbumSortBy = "title"
+	SortAlbumByYear  AlbumSortBy = "year"
 )
 
 type SortOrder string
@@ -169,4 +227,13 @@ type SortOrder string
 const (
 	SortOrderAsc  SortOrder = "asc"
 	SortOrderDesc SortOrder = "desc"
+)
+
+type AlbumType string
+
+const (
+	AlbumTypeUnspecified AlbumType = "unspecified"
+	AlbumTypeAlbum       AlbumType = "album"
+	AlbumTypeEP          AlbumType = "EP"
+	AlbumTypeSingle      AlbumType = "single"
 )
