@@ -136,7 +136,12 @@ type UpdateAlbumParams struct {
 type SearchAlbumsOptions struct {
 	Limit         int
 	IncludeArtist bool
-	IncludeTracks  bool
+	IncludeTracks bool
+}
+
+type CreateGenreParams struct {
+	Name        string
+	Description *string
 }
 
 // Filters

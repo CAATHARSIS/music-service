@@ -64,6 +64,12 @@ type Repository interface {
 	DeleteAlbum(ctx context.Context, id string) error
 	ListAlbums(ctx context.Context, filter *models.AlbumFilter) (*models.AlbumListResult, error)
 	SearchAlbums(ctx context.Context, query string, opts *models.SearchAlbumsOptions) ([]*models.Album, error)
+
+	// Genres
+	CreateGenre(ctx context.Context, params *models.CreateGenreParams) (*models.Genre, error)
+	GetGenreByID(ctx context.Context, id string) (*models.Genre, error)
+	ListGenres(ctx context.Context) ([]*models.Genre, error)
+	GetTracksByGenre(ctx context.Context, genreID string, limit int) ([]*models.Track, error)
 }
 
 type repository struct {
@@ -157,9 +163,11 @@ func (r *repository) CreateTrack(ctx context.Context, trackParams *models.Create
 		}
 	}
 
-	// track.Artist, _ = r.getArtist(ctx, trackParams.ArtistID)
-	// track.Album, _ = r.getAlbum(ctx, trackParams.AlbumID)
-	// track.Genres, _ = r.getTrackGenres(ctx, track.ID)
+	track.Artist, _ = r.GetArtistByID(ctx, trackParams.ArtistID)
+	if trackParams.AlbumID != nil {
+		track.Album, _ = r.GetAlbumByID(ctx, *trackParams.AlbumID)
+	}
+	track.Genres, _ = r.getTrackGenres(ctx, track.ID)
 
 	return track, nil
 }
@@ -1787,16 +1795,153 @@ func (r *repository) SetGenres(ctx context.Context, table, column, id string, ge
 	return tx.Commit()
 }
 
-func (r *repository) checkWhiteList(table, column string) error {
-	if _, ok := allowedTables[table]; !ok {
-		return fmt.Errorf("invalid table name: %s", table)
+func (r *repository) CreateGenre(ctx context.Context, params *models.CreateGenreParams) (*models.Genre, error) {
+	query := `
+        INSERT INTO genres (
+			id,
+			name,
+			description,
+			created_at,
+			updated_at
+		)
+        VALUES (
+			$1, 
+			$2,
+			$3,
+			$4,
+			NOW(),
+			NOW()
+		)
+        RETURNING
+			id,
+			name,
+			description,
+			created_at,
+			updated_at
+    `
+    
+    genre := &models.Genre{
+        ID:        uuid.New().String(),
+        CreatedAt: time.Now(),
+        UpdatedAt: time.Now(),
+    }
+    
+    err := r.db.QueryRowContext(ctx, query,
+        genre.ID,
+		params.Name,
+		params.Description,
+    ).Scan(
+        &genre.ID,
+		&genre.Name,
+		&genre.Description,
+        &genre.CreatedAt,
+		&genre.UpdatedAt,
+    )
+    
+    if err != nil {
+        r.log.Error("failed to create genre", "error", err)
+        return nil, fmt.Errorf("create genre: %w", err)
+    }
+    
+    return genre, nil
+}
+
+func (r *repository) GetGenreByID(ctx context.Context, id string) (*models.Genre, error) {
+	query := `
+		SELECT 
+			id,
+			name,
+			description,
+			created_at,
+			updated_at
+		FROM
+			genres
+		WHERE
+			id = $1
+	`
+	
+	var genre models.Genre
+	err := r.db.GetContext(ctx, &genre, query, id)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			r.log.Error("failed to get genre by id", "error", ErrNotFound)
+			return nil, ErrNotFound
+		}
+		r.log.Error("failed to get genre by id", "error", err)
+		return nil, err
 	}
 
-	if _, ok := allowedColumns[column]; !ok {
-		return fmt.Errorf("invalid column name: %s", column)
+	return &genre, nil
+}
+
+func (r *repository) ListGenres(ctx context.Context) ([]*models.Genre, error) {
+	query := `
+		SELECT
+			id,
+			name,
+			description,
+			created_at,
+			updated_at
+		FROM
+			genres
+		ORDER BY
+			name ASC
+	`
+
+	var genres []*models.Genre
+	err := r.db.SelectContext(ctx, &genres, query)
+	if err != nil {
+		r.log.Error("failed to list genres", "error", err)
+		return nil, fmt.Errorf("list genres: %w", err)
 	}
 
-	return nil
+	return genres, nil
+}
+
+func (r *repository) GetTracksByGenre(ctx context.Context, genreID string, limit int) ([]*models.Track, error) {
+	query := `
+		SELECT
+			t.id,
+			t.title,
+			t.duration,
+			t.year,
+			t.file_id,
+			t.cover_image_id,
+			t.plays_count,
+			t.created_at,
+			t.updated_at,
+			a.id as "artist.id",
+			a.name as "artist.name",
+			al.id as "album.id",
+			al.title as "album.title"
+		FROM
+			tracks t
+		JOIN
+			artists a ON t.artist_id = a.id
+		LEFT JOIN
+			albums al ON t.album_id = al.id
+		JOIN
+			tracks_genres tg ON t.id = tg.track_id
+		WHERE
+			tg.genre_id = $1
+		ORDER BY
+			t.plays_count DESC
+		LIMIT
+			$2
+	`
+
+	var tracks []*models.Track
+	err := r.db.SelectContext(ctx, &tracks, query, genreID, limit)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+
+		return nil, err
+	}
+
+	return tracks, nil
 }
 
 // Help Functions
@@ -1818,4 +1963,17 @@ func sanitizeTSQuery(query string) string {
 	}
 
 	return strings.Join(words, " & ")
+}
+
+
+func (r *repository) checkWhiteList(table, column string) error {
+	if _, ok := allowedTables[table]; !ok {
+		return fmt.Errorf("invalid table name: %s", table)
+	}
+
+	if _, ok := allowedColumns[column]; !ok {
+		return fmt.Errorf("invalid column name: %s", column)
+	}
+
+	return nil
 }
