@@ -60,7 +60,7 @@ type CatalogServiceClient interface {
 	// Get track by id
 	GetTrack(ctx context.Context, in *GetTrackRequest, opts ...grpc.CallOption) (*Track, error)
 	// List tracks with filtration and pagination
-	ListTracks(ctx context.Context, in *ListTracksRequest, opts ...grpc.CallOption) (*ListTrackResponse, error)
+	ListTracks(ctx context.Context, in *ListTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Create new track
 	CreateTrack(ctx context.Context, in *CreateTrackRequest, opts ...grpc.CallOption) (*Track, error)
 	// Update existed track
@@ -68,9 +68,9 @@ type CatalogServiceClient interface {
 	// Delete track
 	DeleteTrack(ctx context.Context, in *DeleteTrackRequest, opts ...grpc.CallOption) (*common.Empty, error)
 	// Search tracks by parametres
-	SearchTracks(ctx context.Context, in *SearchTrackRequest, opts ...grpc.CallOption) (*ListTrackResponse, error)
+	SearchTracks(ctx context.Context, in *SearchTrackRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Get popular tracks
-	GetPopularTracks(ctx context.Context, in *GetPopularTracksRequest, opts ...grpc.CallOption) (*ListTrackResponse, error)
+	GetPopularTracks(ctx context.Context, in *GetPopularTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Increment plays count by value
 	IncrementPlaysCount(ctx context.Context, in *IncrementPlaysCountRequest, opts ...grpc.CallOption) (*common.Empty, error)
 	// Get artist by id
@@ -86,7 +86,7 @@ type CatalogServiceClient interface {
 	// Artist search
 	SearchArtist(ctx context.Context, in *SearchArtistsRequest, opts ...grpc.CallOption) (*ListArtistsRequest, error)
 	// Get artists tracks
-	GetArtistTrack(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTrackResponse, error)
+	GetArtistTrack(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Get artists albums
 	GetArtistAlbums(ctx context.Context, in *GetArtistAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
 	// Get album by id
@@ -129,9 +129,9 @@ func (c *catalogServiceClient) GetTrack(ctx context.Context, in *GetTrackRequest
 	return out, nil
 }
 
-func (c *catalogServiceClient) ListTracks(ctx context.Context, in *ListTracksRequest, opts ...grpc.CallOption) (*ListTrackResponse, error) {
+func (c *catalogServiceClient) ListTracks(ctx context.Context, in *ListTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListTrackResponse)
+	out := new(ListTracksResponse)
 	err := c.cc.Invoke(ctx, CatalogService_ListTracks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -169,9 +169,9 @@ func (c *catalogServiceClient) DeleteTrack(ctx context.Context, in *DeleteTrackR
 	return out, nil
 }
 
-func (c *catalogServiceClient) SearchTracks(ctx context.Context, in *SearchTrackRequest, opts ...grpc.CallOption) (*ListTrackResponse, error) {
+func (c *catalogServiceClient) SearchTracks(ctx context.Context, in *SearchTrackRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListTrackResponse)
+	out := new(ListTracksResponse)
 	err := c.cc.Invoke(ctx, CatalogService_SearchTracks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -179,9 +179,9 @@ func (c *catalogServiceClient) SearchTracks(ctx context.Context, in *SearchTrack
 	return out, nil
 }
 
-func (c *catalogServiceClient) GetPopularTracks(ctx context.Context, in *GetPopularTracksRequest, opts ...grpc.CallOption) (*ListTrackResponse, error) {
+func (c *catalogServiceClient) GetPopularTracks(ctx context.Context, in *GetPopularTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListTrackResponse)
+	out := new(ListTracksResponse)
 	err := c.cc.Invoke(ctx, CatalogService_GetPopularTracks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -259,9 +259,9 @@ func (c *catalogServiceClient) SearchArtist(ctx context.Context, in *SearchArtis
 	return out, nil
 }
 
-func (c *catalogServiceClient) GetArtistTrack(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTrackResponse, error) {
+func (c *catalogServiceClient) GetArtistTrack(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListTrackResponse)
+	out := new(ListTracksResponse)
 	err := c.cc.Invoke(ctx, CatalogService_GetArtistTrack_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -388,7 +388,7 @@ type CatalogServiceServer interface {
 	// Get track by id
 	GetTrack(context.Context, *GetTrackRequest) (*Track, error)
 	// List tracks with filtration and pagination
-	ListTracks(context.Context, *ListTracksRequest) (*ListTrackResponse, error)
+	ListTracks(context.Context, *ListTracksRequest) (*ListTracksResponse, error)
 	// Create new track
 	CreateTrack(context.Context, *CreateTrackRequest) (*Track, error)
 	// Update existed track
@@ -396,9 +396,9 @@ type CatalogServiceServer interface {
 	// Delete track
 	DeleteTrack(context.Context, *DeleteTrackRequest) (*common.Empty, error)
 	// Search tracks by parametres
-	SearchTracks(context.Context, *SearchTrackRequest) (*ListTrackResponse, error)
+	SearchTracks(context.Context, *SearchTrackRequest) (*ListTracksResponse, error)
 	// Get popular tracks
-	GetPopularTracks(context.Context, *GetPopularTracksRequest) (*ListTrackResponse, error)
+	GetPopularTracks(context.Context, *GetPopularTracksRequest) (*ListTracksResponse, error)
 	// Increment plays count by value
 	IncrementPlaysCount(context.Context, *IncrementPlaysCountRequest) (*common.Empty, error)
 	// Get artist by id
@@ -414,7 +414,7 @@ type CatalogServiceServer interface {
 	// Artist search
 	SearchArtist(context.Context, *SearchArtistsRequest) (*ListArtistsRequest, error)
 	// Get artists tracks
-	GetArtistTrack(context.Context, *GetArtistTracksRequest) (*ListTrackResponse, error)
+	GetArtistTrack(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error)
 	// Get artists albums
 	GetArtistAlbums(context.Context, *GetArtistAlbumsRequest) (*ListAlbumsResponse, error)
 	// Get album by id
@@ -450,7 +450,7 @@ type UnimplementedCatalogServiceServer struct{}
 func (UnimplementedCatalogServiceServer) GetTrack(context.Context, *GetTrackRequest) (*Track, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTrack not implemented")
 }
-func (UnimplementedCatalogServiceServer) ListTracks(context.Context, *ListTracksRequest) (*ListTrackResponse, error) {
+func (UnimplementedCatalogServiceServer) ListTracks(context.Context, *ListTracksRequest) (*ListTracksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListTracks not implemented")
 }
 func (UnimplementedCatalogServiceServer) CreateTrack(context.Context, *CreateTrackRequest) (*Track, error) {
@@ -462,10 +462,10 @@ func (UnimplementedCatalogServiceServer) UpdateTrack(context.Context, *UpdateTra
 func (UnimplementedCatalogServiceServer) DeleteTrack(context.Context, *DeleteTrackRequest) (*common.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteTrack not implemented")
 }
-func (UnimplementedCatalogServiceServer) SearchTracks(context.Context, *SearchTrackRequest) (*ListTrackResponse, error) {
+func (UnimplementedCatalogServiceServer) SearchTracks(context.Context, *SearchTrackRequest) (*ListTracksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchTracks not implemented")
 }
-func (UnimplementedCatalogServiceServer) GetPopularTracks(context.Context, *GetPopularTracksRequest) (*ListTrackResponse, error) {
+func (UnimplementedCatalogServiceServer) GetPopularTracks(context.Context, *GetPopularTracksRequest) (*ListTracksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetPopularTracks not implemented")
 }
 func (UnimplementedCatalogServiceServer) IncrementPlaysCount(context.Context, *IncrementPlaysCountRequest) (*common.Empty, error) {
@@ -489,7 +489,7 @@ func (UnimplementedCatalogServiceServer) DeleteArtist(context.Context, *DeleteAr
 func (UnimplementedCatalogServiceServer) SearchArtist(context.Context, *SearchArtistsRequest) (*ListArtistsRequest, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchArtist not implemented")
 }
-func (UnimplementedCatalogServiceServer) GetArtistTrack(context.Context, *GetArtistTracksRequest) (*ListTrackResponse, error) {
+func (UnimplementedCatalogServiceServer) GetArtistTrack(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetArtistTrack not implemented")
 }
 func (UnimplementedCatalogServiceServer) GetArtistAlbums(context.Context, *GetArtistAlbumsRequest) (*ListAlbumsResponse, error) {

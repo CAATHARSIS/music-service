@@ -16,7 +16,7 @@ service CatalogService {
     rpc GetTrack(GetTrackRequest) returns (Track);
 
     // List tracks with filtration and pagination
-    rpc ListTracks(ListTracksRequest) returns (ListTrackResponse);
+    rpc ListTracks(ListTracksRequest) returns (ListTracksResponse);
 
     // Create new track
     rpc CreateTrack(CreateTrackRequest) returns (Track);
@@ -28,10 +28,10 @@ service CatalogService {
     rpc DeleteTrack(DeleteTrackRequest) returns (common.Empty);
 
     // Search tracks by parametres
-    rpc SearchTracks(SearchTrackRequest) returns (ListTrackResponse);
+    rpc SearchTracks(SearchTrackRequest) returns (ListTracksResponse);
 
     // Get popular tracks
-    rpc GetPopularTracks(GetPopularTracksRequest) returns (ListTrackResponse);
+    rpc GetPopularTracks(GetPopularTracksRequest) returns (ListTracksResponse);
 
     // Increment plays count by value
     rpc IncrementPlaysCount(IncrementPlaysCountRequest) returns (common.Empty);
@@ -57,7 +57,7 @@ service CatalogService {
     rpc SearchArtist(SearchArtistsRequest) returns (ListArtistsRequest);
 
     // Get artists tracks
-    rpc GetArtistTrack(GetArtistTracksRequest) returns (ListTrackResponse);
+    rpc GetArtistTrack(GetArtistTracksRequest) returns (ListTracksResponse);
 
     // Get artists albums
     rpc GetArtistAlbums(GetArtistAlbumsRequest) returns (ListAlbumsResponse);
@@ -176,7 +176,7 @@ message ListTracksRequest {
 
     optional string artist_id = 2;
     optional string album_id = 3;
-    optional string genre_ids = 4;
+    repeated string genre_ids = 4;
     optional int32 year_from = 5;
     optional int32 year_to = 6;
 
@@ -184,7 +184,7 @@ message ListTracksRequest {
     SortOrder sort_oder = 8;
 }
 
-message ListTrackResponse {
+message ListTracksResponse {
     repeated Track track = 1;
     common.PaginationResponse pagination = 2;
 }
@@ -389,7 +389,6 @@ enum AlbumSortBy {
     ALBUM_SORT_BY_TITLE = 1;
     ALBUM_SORT_BY_ARTIST = 2;
     ALBUM_SORT_BY_YEAR = 3;
-    ALBUM_SORT_BY_TOTAL_PLAYS = 4;
 }
 
 // Genre

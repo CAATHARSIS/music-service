@@ -37,7 +37,7 @@ type Repository interface {
 	// Tracks
 	CreateTrack(ctx context.Context, track *models.CreateTrackParams) (*models.Track, error)
 	GetTrackByID(ctx context.Context, id string, opts *models.GetTrackOptions) (*models.Track, error)
-	GetTrackByIDs(ctx context.Context, ids []string, opts *models.GetTrackOptions) ([]*models.Track, error)
+	GetTracksByIDs(ctx context.Context, ids []string, opts *models.GetTrackOptions) ([]*models.Track, error)
 	UpdateTrack(ctx context.Context, id string, params *models.UpdateTrackParams) (*models.Track, error)
 	DeleteTrackByID(ctx context.Context, id string) error
 	ListTracks(ctx context.Context, filter *models.TrackFilter) (*models.TrackListResult, error)
@@ -230,7 +230,7 @@ func (r *repository) GetTrackByID(ctx context.Context, id string, opts *models.G
 	return &track, nil
 }
 
-func (r *repository) GetTrackByIDs(ctx context.Context, ids []string, opts *models.GetTrackOptions) ([]*models.Track, error) {
+func (r *repository) GetTracksByIDs(ctx context.Context, ids []string, opts *models.GetTrackOptions) ([]*models.Track, error) {
 	if len(ids) == 0 {
 		return []*models.Track{}, nil
 	}

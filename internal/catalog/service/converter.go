@@ -27,7 +27,8 @@ func convertTrackToProto(track *models.Track) *catalogpb.Track {
 		pb.CoverImageId = track.CoverImageID
 	}
 	if track.TrackNumber != nil {
-		pb.TrackNumber = int32(*track.TrackNumber)
+		v := int32(*track.TrackNumber)
+		pb.TrackNumber = &v
 	}
 	if track.Lyrics != nil {
 		pb.Lyrics = track.Lyrics
@@ -168,5 +169,66 @@ func convertAlbumTypeToProto(albumType models.AlbumType) catalogpb.AlbumType {
 		return catalogpb.AlbumType_ALBUM_TYPE_SINLGE
 	default:
 		return catalogpb.AlbumType_ALBUM_TYPE_UNSPECIFIED
+	}
+}
+
+func convertAlbumTypeFromProto(pbType catalogpb.AlbumType) models.AlbumType {
+	switch pbType {
+	case catalogpb.AlbumType_ALBUM_TYPE_ALBUM:
+		return models.AlbumTypeAlbum
+	case catalogpb.AlbumType_ALBUM_TYPE_EP:
+		return models.AlbumTypeEP
+	case catalogpb.AlbumType_ALBUM_TYPE_SINLGE:
+		return models.AlbumTypeSingle
+	default:
+		return models.AlbumTypeUnspecified
+	}
+}
+
+func convertTrackSortBy(pbSort catalogpb.TrackSortBy) models.TrackSortBy {
+	switch pbSort {
+	case catalogpb.TrackSortBy_TRACK_SORT_BY_TITLE:
+		return models.SortByTitle
+	case catalogpb.TrackSortBy_TRACK_SORT_BY_ARTIST:
+		return models.SortByArtist
+	case catalogpb.TrackSortBy_TRACK_SORT_BY_YEAR:
+		return models.SortByYear
+	default:
+		return models.SortByTitle
+	}
+}
+
+func convertArtistSortBy(pbSort catalogpb.ArtistSortBy) models.ArtistSortBy {
+	switch pbSort {
+	case catalogpb.ArtistSortBy_ARTIST_SORT_BY_NAME:
+		return models.SortArtistsByName
+	case catalogpb.ArtistSortBy_ARTIST_SORT_BY_TOTAL_PLAYS:
+		return models.SortArtistsByPlays
+	default:
+		return models.SortArtistsByName
+	}
+}
+
+func convertAlbumSortBy(pbSort catalogpb.AlbumSortBy) models.AlbumSortBy {
+	switch pbSort {
+	case catalogpb.AlbumSortBy_ALBUM_SORT_BY_TITLE:
+		return models.SortAlbumByTitle
+	case catalogpb.AlbumSortBy_ALBUM_SORT_BY_ARTIST:
+		return models.SortAlbumByArtist
+	case catalogpb.AlbumSortBy_ALBUM_SORT_BY_YEAR:
+		return models.SortAlbumByYear
+	default:
+		return models.SortAlbumByTitle
+	}
+}
+
+func convertSortOrder(pbOrder catalogpb.SortOrder) models.SortOrder {
+	switch pbOrder {
+	case catalogpb.SortOrder_SORT_ORDER_ASC:
+		return models.SortOrderAsc
+	case catalogpb.SortOrder_SORT_ORDER_DESC:
+		return models.SortOrderDesc
+	default:
+		return ""
 	}
 }

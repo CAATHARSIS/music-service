@@ -165,8 +165,6 @@ type PaginationResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	TotalPages    int32                  `protobuf:"varint,3,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
-	TotalCount    int32                  `protobuf:"varint,4,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -211,20 +209,6 @@ func (x *PaginationResponse) GetPage() int32 {
 func (x *PaginationResponse) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
-	}
-	return 0
-}
-
-func (x *PaginationResponse) GetTotalPages() int32 {
-	if x != nil {
-		return x.TotalPages
-	}
-	return 0
-}
-
-func (x *PaginationResponse) GetTotalCount() int32 {
-	if x != nil {
-		return x.TotalCount
 	}
 	return 0
 }
@@ -295,14 +279,10 @@ const file_common_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"D\n" +
 	"\x11PaginationRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"\x87\x01\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"E\n" +
 	"\x12PaginationResponse\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1f\n" +
-	"\vtotal_pages\x18\x03 \x01(\x05R\n" +
-	"totalPages\x12\x1f\n" +
-	"\vtotal_count\x18\x04 \x01(\x05R\n" +
-	"totalCount\":\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\":\n" +
 	"\vUserContext\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04role\x18\x02 \x01(\tR\x04roleB=Z;github.com/CAATHARSIS/music-service/api/gen/common;commonpbb\x06proto3"

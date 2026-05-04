@@ -72,7 +72,7 @@ type CreateTrackParams struct {
 	GenreIDs     []string
 	FileID       string
 	CoverImageID *string
-	TrackNumber  *int
+	TrackNumber  *int32
 	Lyrics       *string
 }
 
@@ -84,11 +84,11 @@ type GetTrackOptions struct {
 
 type UpdateTrackParams struct {
 	Title        *string
-	Duration     *int
-	Year         *int
+	Duration     *int32
+	Year         *int32
 	FileID       *string
 	CoverImageID *string
-	TrackNumber  *int
+	TrackNumber  *int32
 	Lyrics       *string
 	ArtistID     *string
 	AlbumID      *string
@@ -223,8 +223,9 @@ const (
 type AlbumSortBy string
 
 const (
-	SortAlbumByTitle AlbumSortBy = "title"
-	SortAlbumByYear  AlbumSortBy = "year"
+	SortAlbumByTitle  AlbumSortBy = "title"
+	SortAlbumByYear   AlbumSortBy = "year"
+	SortAlbumByArtist AlbumSortBy = "artist"
 )
 
 type SortOrder string

@@ -19,8 +19,6 @@ message PaginationRequest {
 message PaginationResponse {
     int32 page = 1;
     int32 page_size = 2;
-    int32 total_pages = 3;
-    int32 total_count = 4;
 }
 
 message UserContext {
