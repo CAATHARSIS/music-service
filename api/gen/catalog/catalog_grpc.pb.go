@@ -29,7 +29,6 @@ const (
 	CatalogService_UpdateTrack_FullMethodName         = "/catalog.CatalogService/UpdateTrack"
 	CatalogService_DeleteTrack_FullMethodName         = "/catalog.CatalogService/DeleteTrack"
 	CatalogService_SearchTracks_FullMethodName        = "/catalog.CatalogService/SearchTracks"
-	CatalogService_GetPopularTracks_FullMethodName    = "/catalog.CatalogService/GetPopularTracks"
 	CatalogService_IncrementPlaysCount_FullMethodName = "/catalog.CatalogService/IncrementPlaysCount"
 	CatalogService_GetTracksByIDs_FullMethodName      = "/catalog.CatalogService/GetTracksByIDs"
 	CatalogService_GetArtist_FullMethodName           = "/catalog.CatalogService/GetArtist"
@@ -73,8 +72,6 @@ type CatalogServiceClient interface {
 	DeleteTrack(ctx context.Context, in *DeleteTrackRequest, opts ...grpc.CallOption) (*common.Empty, error)
 	// Search tracks by parametres
 	SearchTracks(ctx context.Context, in *SearchTrackRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
-	// Get popular tracks
-	GetPopularTracks(ctx context.Context, in *GetPopularTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Increment plays count by value
 	IncrementPlaysCount(ctx context.Context, in *IncrementPlaysCountRequest, opts ...grpc.CallOption) (*common.Empty, error)
 	// Get tracks by IDs (batch)
@@ -185,16 +182,6 @@ func (c *catalogServiceClient) SearchTracks(ctx context.Context, in *SearchTrack
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTracksResponse)
 	err := c.cc.Invoke(ctx, CatalogService_SearchTracks_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *catalogServiceClient) GetPopularTracks(ctx context.Context, in *GetPopularTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListTracksResponse)
-	err := c.cc.Invoke(ctx, CatalogService_GetPopularTracks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -449,8 +436,6 @@ type CatalogServiceServer interface {
 	DeleteTrack(context.Context, *DeleteTrackRequest) (*common.Empty, error)
 	// Search tracks by parametres
 	SearchTracks(context.Context, *SearchTrackRequest) (*ListTracksResponse, error)
-	// Get popular tracks
-	GetPopularTracks(context.Context, *GetPopularTracksRequest) (*ListTracksResponse, error)
 	// Increment plays count by value
 	IncrementPlaysCount(context.Context, *IncrementPlaysCountRequest) (*common.Empty, error)
 	// Get tracks by IDs (batch)
@@ -524,9 +509,6 @@ func (UnimplementedCatalogServiceServer) DeleteTrack(context.Context, *DeleteTra
 }
 func (UnimplementedCatalogServiceServer) SearchTracks(context.Context, *SearchTrackRequest) (*ListTracksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchTracks not implemented")
-}
-func (UnimplementedCatalogServiceServer) GetPopularTracks(context.Context, *GetPopularTracksRequest) (*ListTracksResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetPopularTracks not implemented")
 }
 func (UnimplementedCatalogServiceServer) IncrementPlaysCount(context.Context, *IncrementPlaysCountRequest) (*common.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method IncrementPlaysCount not implemented")
@@ -722,24 +704,6 @@ func _CatalogService_SearchTracks_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CatalogServiceServer).SearchTracks(ctx, req.(*SearchTrackRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CatalogService_GetPopularTracks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPopularTracksRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CatalogServiceServer).GetPopularTracks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CatalogService_GetPopularTracks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CatalogServiceServer).GetPopularTracks(ctx, req.(*GetPopularTracksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1188,10 +1152,6 @@ var CatalogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchTracks",
 			Handler:    _CatalogService_SearchTracks_Handler,
-		},
-		{
-			MethodName: "GetPopularTracks",
-			Handler:    _CatalogService_GetPopularTracks_Handler,
 		},
 		{
 			MethodName: "IncrementPlaysCount",
