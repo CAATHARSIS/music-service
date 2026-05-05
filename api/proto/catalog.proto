@@ -36,6 +36,9 @@ service CatalogService {
     // Increment plays count by value
     rpc IncrementPlaysCount(IncrementPlaysCountRequest) returns (common.Empty);
 
+    // Get tracks by IDs (batch)
+    rpc GetTracksByIDs(GetTracksByIDsRequest) returns (ListTracksResponse);
+
     // Artists
 
     // Get artist by id
@@ -57,10 +60,13 @@ service CatalogService {
     rpc SearchArtist(SearchArtistsRequest) returns (ListArtistsRequest);
 
     // Get artists tracks
-    rpc GetArtistTrack(GetArtistTracksRequest) returns (ListTracksResponse);
+    rpc GetArtistTracks(GetArtistTracksRequest) returns (ListTracksResponse);
 
     // Get artists albums
     rpc GetArtistAlbums(GetArtistAlbumsRequest) returns (ListAlbumsResponse);
+
+    // Get artists by IDs (batch)
+    rpc GetArtistsByIDs(GetArtistsByIDsRequest) returns (ListArtistsResponse);
 
     // Albums
 
@@ -79,8 +85,11 @@ service CatalogService {
     // Delete album
     rpc DeleteAlbum(DeleteAlbumRequest) returns (common.Empty);
     
-    // Get tracks from album
-    rpc GetAlbumTracks(GetAlbumTracksRequest) returns (ListAlbumsRequest);
+    // Get album with tracks
+    rpc GetAlbumWithTracks(GetAlbumTracksRequest) returns (ListAlbumsRequest);
+
+    // Get album with tracks
+    rpc SearchAlbums(SearchAlbumsRequest) returns (ListAlbumsResponse);
 
     // Genres
 
@@ -92,6 +101,9 @@ service CatalogService {
 
     // Get tracks by genre
     rpc GetTrackByGenre(GetTracksByGenreRequest) returns (ListGenresResponse);
+
+    // Get genre by id
+    rpc GetGenre(GetGenreRequest) returns (Genre);
 
     // Service
 
@@ -185,7 +197,7 @@ message ListTracksRequest {
 }
 
 message ListTracksResponse {
-    repeated Track track = 1;
+    repeated Track tracks = 1;
     common.PaginationResponse pagination = 2;
 }
 
@@ -253,6 +265,13 @@ message GetPopularTracksRequest {
 message IncrementPlaysCountRequest {
     string id = 1;
     int32 increment_by = 2;
+}
+
+message GetTracksByIDsRequest {
+    repeated string ids = 1;
+    bool include_artist = 2;
+    bool include_album = 3;
+    bool include_genres = 4;
 }
 
 enum TrackSortBy {
@@ -324,6 +343,10 @@ message GetArtistAlbumsRequest {
     SortOrder sort_order = 4;
 }
 
+message GetArtistsByIDsRequest {
+    repeated string ids = 1;
+}
+
 enum ArtistSortBy {
     ARTIST_SORT_BY_UNSPECIFIED = 0;
     ARTIST_SORT_BY_NAME = 1;
@@ -383,6 +406,11 @@ message GetAlbumTracksRequest {
     string id = 1;
     common.PaginationRequest pagination = 2;
 }
+message SearchAlbumsRequest {
+    string query = 1;
+    bool include_artist = 2;
+    common.PaginationRequest pagination = 3;
+}
 
 enum AlbumSortBy {
     ALBUM_SORT_BY_UNSPECIEFED = 0;
@@ -416,6 +444,10 @@ message GetTracksByGenreRequest {
     common.PaginationRequest pagination = 2;
     TrackSortBy sort_by = 3;
     SortOrder sort_order = 4;
+}
+
+message GetGenreRequest {
+    string id = 1;
 }
 
 enum GenreSortBy {

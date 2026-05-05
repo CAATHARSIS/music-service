@@ -31,23 +31,27 @@ const (
 	CatalogService_SearchTracks_FullMethodName        = "/catalog.CatalogService/SearchTracks"
 	CatalogService_GetPopularTracks_FullMethodName    = "/catalog.CatalogService/GetPopularTracks"
 	CatalogService_IncrementPlaysCount_FullMethodName = "/catalog.CatalogService/IncrementPlaysCount"
+	CatalogService_GetTracksByIDs_FullMethodName      = "/catalog.CatalogService/GetTracksByIDs"
 	CatalogService_GetArtist_FullMethodName           = "/catalog.CatalogService/GetArtist"
 	CatalogService_ListArtists_FullMethodName         = "/catalog.CatalogService/ListArtists"
 	CatalogService_CreateArtist_FullMethodName        = "/catalog.CatalogService/CreateArtist"
 	CatalogService_UpdateArtist_FullMethodName        = "/catalog.CatalogService/UpdateArtist"
 	CatalogService_DeleteArtist_FullMethodName        = "/catalog.CatalogService/DeleteArtist"
 	CatalogService_SearchArtist_FullMethodName        = "/catalog.CatalogService/SearchArtist"
-	CatalogService_GetArtistTrack_FullMethodName      = "/catalog.CatalogService/GetArtistTrack"
+	CatalogService_GetArtistTracks_FullMethodName     = "/catalog.CatalogService/GetArtistTracks"
 	CatalogService_GetArtistAlbums_FullMethodName     = "/catalog.CatalogService/GetArtistAlbums"
+	CatalogService_GetArtistsByIDs_FullMethodName     = "/catalog.CatalogService/GetArtistsByIDs"
 	CatalogService_GetAlbum_FullMethodName            = "/catalog.CatalogService/GetAlbum"
 	CatalogService_ListAlbums_FullMethodName          = "/catalog.CatalogService/ListAlbums"
 	CatalogService_CreateAlbum_FullMethodName         = "/catalog.CatalogService/CreateAlbum"
 	CatalogService_UpdateAlbum_FullMethodName         = "/catalog.CatalogService/UpdateAlbum"
 	CatalogService_DeleteAlbum_FullMethodName         = "/catalog.CatalogService/DeleteAlbum"
-	CatalogService_GetAlbumTracks_FullMethodName      = "/catalog.CatalogService/GetAlbumTracks"
+	CatalogService_GetAlbumWithTracks_FullMethodName  = "/catalog.CatalogService/GetAlbumWithTracks"
+	CatalogService_SearchAlbums_FullMethodName        = "/catalog.CatalogService/SearchAlbums"
 	CatalogService_ListGenres_FullMethodName          = "/catalog.CatalogService/ListGenres"
 	CatalogService_CreateGenre_FullMethodName         = "/catalog.CatalogService/CreateGenre"
 	CatalogService_GetTrackByGenre_FullMethodName     = "/catalog.CatalogService/GetTrackByGenre"
+	CatalogService_GetGenre_FullMethodName            = "/catalog.CatalogService/GetGenre"
 	CatalogService_Health_FullMethodName              = "/catalog.CatalogService/Health"
 )
 
@@ -73,6 +77,8 @@ type CatalogServiceClient interface {
 	GetPopularTracks(ctx context.Context, in *GetPopularTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Increment plays count by value
 	IncrementPlaysCount(ctx context.Context, in *IncrementPlaysCountRequest, opts ...grpc.CallOption) (*common.Empty, error)
+	// Get tracks by IDs (batch)
+	GetTracksByIDs(ctx context.Context, in *GetTracksByIDsRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Get artist by id
 	GetArtist(ctx context.Context, in *GetArtistRequest, opts ...grpc.CallOption) (*Artist, error)
 	// List artists
@@ -86,9 +92,11 @@ type CatalogServiceClient interface {
 	// Artist search
 	SearchArtist(ctx context.Context, in *SearchArtistsRequest, opts ...grpc.CallOption) (*ListArtistsRequest, error)
 	// Get artists tracks
-	GetArtistTrack(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
+	GetArtistTracks(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Get artists albums
 	GetArtistAlbums(ctx context.Context, in *GetArtistAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
+	// Get artists by IDs (batch)
+	GetArtistsByIDs(ctx context.Context, in *GetArtistsByIDsRequest, opts ...grpc.CallOption) (*ListArtistsResponse, error)
 	// Get album by id
 	GetAlbum(ctx context.Context, in *GetAlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	// List albums
@@ -99,14 +107,18 @@ type CatalogServiceClient interface {
 	UpdateAlbum(ctx context.Context, in *UpdateAlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	// Delete album
 	DeleteAlbum(ctx context.Context, in *DeleteAlbumRequest, opts ...grpc.CallOption) (*common.Empty, error)
-	// Get tracks from album
-	GetAlbumTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*ListAlbumsRequest, error)
+	// Get album with tracks
+	GetAlbumWithTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*ListAlbumsRequest, error)
+	// Get album with tracks
+	SearchAlbums(ctx context.Context, in *SearchAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
 	// List genres
 	ListGenres(ctx context.Context, in *ListGenresRequest, opts ...grpc.CallOption) (*ListGenresResponse, error)
 	// Create new genre
 	CreateGenre(ctx context.Context, in *CreateGenreRequest, opts ...grpc.CallOption) (*Genre, error)
 	// Get tracks by genre
 	GetTrackByGenre(ctx context.Context, in *GetTracksByGenreRequest, opts ...grpc.CallOption) (*ListGenresResponse, error)
+	// Get genre by id
+	GetGenre(ctx context.Context, in *GetGenreRequest, opts ...grpc.CallOption) (*Genre, error)
 	// Heath check
 	Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error)
 }
@@ -199,6 +211,16 @@ func (c *catalogServiceClient) IncrementPlaysCount(ctx context.Context, in *Incr
 	return out, nil
 }
 
+func (c *catalogServiceClient) GetTracksByIDs(ctx context.Context, in *GetTracksByIDsRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTracksResponse)
+	err := c.cc.Invoke(ctx, CatalogService_GetTracksByIDs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *catalogServiceClient) GetArtist(ctx context.Context, in *GetArtistRequest, opts ...grpc.CallOption) (*Artist, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Artist)
@@ -259,10 +281,10 @@ func (c *catalogServiceClient) SearchArtist(ctx context.Context, in *SearchArtis
 	return out, nil
 }
 
-func (c *catalogServiceClient) GetArtistTrack(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
+func (c *catalogServiceClient) GetArtistTracks(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTracksResponse)
-	err := c.cc.Invoke(ctx, CatalogService_GetArtistTrack_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CatalogService_GetArtistTracks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -273,6 +295,16 @@ func (c *catalogServiceClient) GetArtistAlbums(ctx context.Context, in *GetArtis
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAlbumsResponse)
 	err := c.cc.Invoke(ctx, CatalogService_GetArtistAlbums_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *catalogServiceClient) GetArtistsByIDs(ctx context.Context, in *GetArtistsByIDsRequest, opts ...grpc.CallOption) (*ListArtistsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListArtistsResponse)
+	err := c.cc.Invoke(ctx, CatalogService_GetArtistsByIDs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -329,10 +361,20 @@ func (c *catalogServiceClient) DeleteAlbum(ctx context.Context, in *DeleteAlbumR
 	return out, nil
 }
 
-func (c *catalogServiceClient) GetAlbumTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*ListAlbumsRequest, error) {
+func (c *catalogServiceClient) GetAlbumWithTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*ListAlbumsRequest, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAlbumsRequest)
-	err := c.cc.Invoke(ctx, CatalogService_GetAlbumTracks_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CatalogService_GetAlbumWithTracks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *catalogServiceClient) SearchAlbums(ctx context.Context, in *SearchAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAlbumsResponse)
+	err := c.cc.Invoke(ctx, CatalogService_SearchAlbums_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -363,6 +405,16 @@ func (c *catalogServiceClient) GetTrackByGenre(ctx context.Context, in *GetTrack
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListGenresResponse)
 	err := c.cc.Invoke(ctx, CatalogService_GetTrackByGenre_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *catalogServiceClient) GetGenre(ctx context.Context, in *GetGenreRequest, opts ...grpc.CallOption) (*Genre, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Genre)
+	err := c.cc.Invoke(ctx, CatalogService_GetGenre_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -401,6 +453,8 @@ type CatalogServiceServer interface {
 	GetPopularTracks(context.Context, *GetPopularTracksRequest) (*ListTracksResponse, error)
 	// Increment plays count by value
 	IncrementPlaysCount(context.Context, *IncrementPlaysCountRequest) (*common.Empty, error)
+	// Get tracks by IDs (batch)
+	GetTracksByIDs(context.Context, *GetTracksByIDsRequest) (*ListTracksResponse, error)
 	// Get artist by id
 	GetArtist(context.Context, *GetArtistRequest) (*Artist, error)
 	// List artists
@@ -414,9 +468,11 @@ type CatalogServiceServer interface {
 	// Artist search
 	SearchArtist(context.Context, *SearchArtistsRequest) (*ListArtistsRequest, error)
 	// Get artists tracks
-	GetArtistTrack(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error)
+	GetArtistTracks(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error)
 	// Get artists albums
 	GetArtistAlbums(context.Context, *GetArtistAlbumsRequest) (*ListAlbumsResponse, error)
+	// Get artists by IDs (batch)
+	GetArtistsByIDs(context.Context, *GetArtistsByIDsRequest) (*ListArtistsResponse, error)
 	// Get album by id
 	GetAlbum(context.Context, *GetAlbumRequest) (*Album, error)
 	// List albums
@@ -427,14 +483,18 @@ type CatalogServiceServer interface {
 	UpdateAlbum(context.Context, *UpdateAlbumRequest) (*Album, error)
 	// Delete album
 	DeleteAlbum(context.Context, *DeleteAlbumRequest) (*common.Empty, error)
-	// Get tracks from album
-	GetAlbumTracks(context.Context, *GetAlbumTracksRequest) (*ListAlbumsRequest, error)
+	// Get album with tracks
+	GetAlbumWithTracks(context.Context, *GetAlbumTracksRequest) (*ListAlbumsRequest, error)
+	// Get album with tracks
+	SearchAlbums(context.Context, *SearchAlbumsRequest) (*ListAlbumsResponse, error)
 	// List genres
 	ListGenres(context.Context, *ListGenresRequest) (*ListGenresResponse, error)
 	// Create new genre
 	CreateGenre(context.Context, *CreateGenreRequest) (*Genre, error)
 	// Get tracks by genre
 	GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListGenresResponse, error)
+	// Get genre by id
+	GetGenre(context.Context, *GetGenreRequest) (*Genre, error)
 	// Heath check
 	Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error)
 	mustEmbedUnimplementedCatalogServiceServer()
@@ -471,6 +531,9 @@ func (UnimplementedCatalogServiceServer) GetPopularTracks(context.Context, *GetP
 func (UnimplementedCatalogServiceServer) IncrementPlaysCount(context.Context, *IncrementPlaysCountRequest) (*common.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method IncrementPlaysCount not implemented")
 }
+func (UnimplementedCatalogServiceServer) GetTracksByIDs(context.Context, *GetTracksByIDsRequest) (*ListTracksResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTracksByIDs not implemented")
+}
 func (UnimplementedCatalogServiceServer) GetArtist(context.Context, *GetArtistRequest) (*Artist, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetArtist not implemented")
 }
@@ -489,11 +552,14 @@ func (UnimplementedCatalogServiceServer) DeleteArtist(context.Context, *DeleteAr
 func (UnimplementedCatalogServiceServer) SearchArtist(context.Context, *SearchArtistsRequest) (*ListArtistsRequest, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchArtist not implemented")
 }
-func (UnimplementedCatalogServiceServer) GetArtistTrack(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetArtistTrack not implemented")
+func (UnimplementedCatalogServiceServer) GetArtistTracks(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetArtistTracks not implemented")
 }
 func (UnimplementedCatalogServiceServer) GetArtistAlbums(context.Context, *GetArtistAlbumsRequest) (*ListAlbumsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetArtistAlbums not implemented")
+}
+func (UnimplementedCatalogServiceServer) GetArtistsByIDs(context.Context, *GetArtistsByIDsRequest) (*ListArtistsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetArtistsByIDs not implemented")
 }
 func (UnimplementedCatalogServiceServer) GetAlbum(context.Context, *GetAlbumRequest) (*Album, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAlbum not implemented")
@@ -510,8 +576,11 @@ func (UnimplementedCatalogServiceServer) UpdateAlbum(context.Context, *UpdateAlb
 func (UnimplementedCatalogServiceServer) DeleteAlbum(context.Context, *DeleteAlbumRequest) (*common.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteAlbum not implemented")
 }
-func (UnimplementedCatalogServiceServer) GetAlbumTracks(context.Context, *GetAlbumTracksRequest) (*ListAlbumsRequest, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetAlbumTracks not implemented")
+func (UnimplementedCatalogServiceServer) GetAlbumWithTracks(context.Context, *GetAlbumTracksRequest) (*ListAlbumsRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAlbumWithTracks not implemented")
+}
+func (UnimplementedCatalogServiceServer) SearchAlbums(context.Context, *SearchAlbumsRequest) (*ListAlbumsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SearchAlbums not implemented")
 }
 func (UnimplementedCatalogServiceServer) ListGenres(context.Context, *ListGenresRequest) (*ListGenresResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListGenres not implemented")
@@ -521,6 +590,9 @@ func (UnimplementedCatalogServiceServer) CreateGenre(context.Context, *CreateGen
 }
 func (UnimplementedCatalogServiceServer) GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListGenresResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTrackByGenre not implemented")
+}
+func (UnimplementedCatalogServiceServer) GetGenre(context.Context, *GetGenreRequest) (*Genre, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetGenre not implemented")
 }
 func (UnimplementedCatalogServiceServer) Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
@@ -690,6 +762,24 @@ func _CatalogService_IncrementPlaysCount_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CatalogService_GetTracksByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTracksByIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServiceServer).GetTracksByIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CatalogService_GetTracksByIDs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServiceServer).GetTracksByIDs(ctx, req.(*GetTracksByIDsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CatalogService_GetArtist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetArtistRequest)
 	if err := dec(in); err != nil {
@@ -798,20 +888,20 @@ func _CatalogService_SearchArtist_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CatalogService_GetArtistTrack_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CatalogService_GetArtistTracks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetArtistTracksRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CatalogServiceServer).GetArtistTrack(ctx, in)
+		return srv.(CatalogServiceServer).GetArtistTracks(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CatalogService_GetArtistTrack_FullMethodName,
+		FullMethod: CatalogService_GetArtistTracks_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CatalogServiceServer).GetArtistTrack(ctx, req.(*GetArtistTracksRequest))
+		return srv.(CatalogServiceServer).GetArtistTracks(ctx, req.(*GetArtistTracksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -830,6 +920,24 @@ func _CatalogService_GetArtistAlbums_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CatalogServiceServer).GetArtistAlbums(ctx, req.(*GetArtistAlbumsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CatalogService_GetArtistsByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArtistsByIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServiceServer).GetArtistsByIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CatalogService_GetArtistsByIDs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServiceServer).GetArtistsByIDs(ctx, req.(*GetArtistsByIDsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -924,20 +1032,38 @@ func _CatalogService_DeleteAlbum_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CatalogService_GetAlbumTracks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CatalogService_GetAlbumWithTracks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAlbumTracksRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CatalogServiceServer).GetAlbumTracks(ctx, in)
+		return srv.(CatalogServiceServer).GetAlbumWithTracks(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CatalogService_GetAlbumTracks_FullMethodName,
+		FullMethod: CatalogService_GetAlbumWithTracks_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CatalogServiceServer).GetAlbumTracks(ctx, req.(*GetAlbumTracksRequest))
+		return srv.(CatalogServiceServer).GetAlbumWithTracks(ctx, req.(*GetAlbumTracksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CatalogService_SearchAlbums_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchAlbumsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServiceServer).SearchAlbums(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CatalogService_SearchAlbums_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServiceServer).SearchAlbums(ctx, req.(*SearchAlbumsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -992,6 +1118,24 @@ func _CatalogService_GetTrackByGenre_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CatalogServiceServer).GetTrackByGenre(ctx, req.(*GetTracksByGenreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CatalogService_GetGenre_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGenreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServiceServer).GetGenre(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CatalogService_GetGenre_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServiceServer).GetGenre(ctx, req.(*GetGenreRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1054,6 +1198,10 @@ var CatalogService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CatalogService_IncrementPlaysCount_Handler,
 		},
 		{
+			MethodName: "GetTracksByIDs",
+			Handler:    _CatalogService_GetTracksByIDs_Handler,
+		},
+		{
 			MethodName: "GetArtist",
 			Handler:    _CatalogService_GetArtist_Handler,
 		},
@@ -1078,12 +1226,16 @@ var CatalogService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CatalogService_SearchArtist_Handler,
 		},
 		{
-			MethodName: "GetArtistTrack",
-			Handler:    _CatalogService_GetArtistTrack_Handler,
+			MethodName: "GetArtistTracks",
+			Handler:    _CatalogService_GetArtistTracks_Handler,
 		},
 		{
 			MethodName: "GetArtistAlbums",
 			Handler:    _CatalogService_GetArtistAlbums_Handler,
+		},
+		{
+			MethodName: "GetArtistsByIDs",
+			Handler:    _CatalogService_GetArtistsByIDs_Handler,
 		},
 		{
 			MethodName: "GetAlbum",
@@ -1106,8 +1258,12 @@ var CatalogService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CatalogService_DeleteAlbum_Handler,
 		},
 		{
-			MethodName: "GetAlbumTracks",
-			Handler:    _CatalogService_GetAlbumTracks_Handler,
+			MethodName: "GetAlbumWithTracks",
+			Handler:    _CatalogService_GetAlbumWithTracks_Handler,
+		},
+		{
+			MethodName: "SearchAlbums",
+			Handler:    _CatalogService_SearchAlbums_Handler,
 		},
 		{
 			MethodName: "ListGenres",
@@ -1120,6 +1276,10 @@ var CatalogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTrackByGenre",
 			Handler:    _CatalogService_GetTrackByGenre_Handler,
+		},
+		{
+			MethodName: "GetGenre",
+			Handler:    _CatalogService_GetGenre_Handler,
 		},
 		{
 			MethodName: "Health",
