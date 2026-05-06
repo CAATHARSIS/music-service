@@ -126,10 +126,10 @@ type CreateAlbumParams struct {
 
 type UpdateAlbumParams struct {
 	Title        *string
-	Year         *int
+	Year         *int32
 	ArtistID     *string
 	CoverImageID *string
-	AlbumType    *string
+	AlbumType    *AlbumType
 	GenreIDs     []string
 }
 

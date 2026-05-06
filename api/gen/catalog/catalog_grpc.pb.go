@@ -105,7 +105,7 @@ type CatalogServiceClient interface {
 	// Delete album
 	DeleteAlbum(ctx context.Context, in *DeleteAlbumRequest, opts ...grpc.CallOption) (*common.Empty, error)
 	// Get album with tracks
-	GetAlbumWithTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
+	GetAlbumWithTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*AlbumWithTracks, error)
 	// Get album with tracks
 	SearchAlbums(ctx context.Context, in *SearchAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
 	// List genres
@@ -348,9 +348,9 @@ func (c *catalogServiceClient) DeleteAlbum(ctx context.Context, in *DeleteAlbumR
 	return out, nil
 }
 
-func (c *catalogServiceClient) GetAlbumWithTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error) {
+func (c *catalogServiceClient) GetAlbumWithTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*AlbumWithTracks, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListAlbumsResponse)
+	out := new(AlbumWithTracks)
 	err := c.cc.Invoke(ctx, CatalogService_GetAlbumWithTracks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -469,7 +469,7 @@ type CatalogServiceServer interface {
 	// Delete album
 	DeleteAlbum(context.Context, *DeleteAlbumRequest) (*common.Empty, error)
 	// Get album with tracks
-	GetAlbumWithTracks(context.Context, *GetAlbumTracksRequest) (*ListAlbumsResponse, error)
+	GetAlbumWithTracks(context.Context, *GetAlbumTracksRequest) (*AlbumWithTracks, error)
 	// Get album with tracks
 	SearchAlbums(context.Context, *SearchAlbumsRequest) (*ListAlbumsResponse, error)
 	// List genres
@@ -558,7 +558,7 @@ func (UnimplementedCatalogServiceServer) UpdateAlbum(context.Context, *UpdateAlb
 func (UnimplementedCatalogServiceServer) DeleteAlbum(context.Context, *DeleteAlbumRequest) (*common.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteAlbum not implemented")
 }
-func (UnimplementedCatalogServiceServer) GetAlbumWithTracks(context.Context, *GetAlbumTracksRequest) (*ListAlbumsResponse, error) {
+func (UnimplementedCatalogServiceServer) GetAlbumWithTracks(context.Context, *GetAlbumTracksRequest) (*AlbumWithTracks, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAlbumWithTracks not implemented")
 }
 func (UnimplementedCatalogServiceServer) SearchAlbums(context.Context, *SearchAlbumsRequest) (*ListAlbumsResponse, error) {

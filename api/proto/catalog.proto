@@ -83,7 +83,7 @@ service CatalogService {
     rpc DeleteAlbum(DeleteAlbumRequest) returns (common.Empty);
     
     // Get album with tracks
-    rpc GetAlbumWithTracks(GetAlbumTracksRequest) returns (ListAlbumsResponse);
+    rpc GetAlbumWithTracks(GetAlbumTracksRequest) returns (AlbumWithTracks);
 
     // Get album with tracks
     rpc SearchAlbums(SearchAlbumsRequest) returns (ListAlbumsResponse);
@@ -161,6 +161,12 @@ message Genre {
     string id = 1;
     string name = 2;
     optional string description = 3;
+}
+
+message AlbumWithTracks {
+    Album album = 1;
+    repeated Track tracks = 2;
+    repeated Genre genres = 3;
 }
 
 enum AlbumType {
@@ -398,8 +404,8 @@ message DeleteAlbumRequest {
 
 message GetAlbumTracksRequest {
     string id = 1;
-    common.PaginationRequest pagination = 2;
 }
+
 message SearchAlbumsRequest {
     string query = 1;
     bool include_artist = 2;

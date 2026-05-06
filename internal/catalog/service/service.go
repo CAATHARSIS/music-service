@@ -498,6 +498,194 @@ func (s *CatalogService) GetArtistsByIDs(ctx context.Context, req *catalogpb.Get
 	}, nil
 }
 
+// Albums
+
+func (s *CatalogService) GetAlbum(ctx context.Context, req *catalogpb.GetAlbumRequest) (*catalogpb.Album, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "album id is required")
+	}
+
+	album, err := s.repo.GetAlbumByID(ctx, req.Id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "album not found")
+		}
+		s.log.Error("get album failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertAlbumToProto(album), nil
+}
+
+func (s *CatalogService) ListAlbums(ctx context.Context, req *catalogpb.ListAlbumsRequest) (*catalogpb.ListAlbumsResponse, error) {
+	page, pageSize := s.paginationDefaults(
+		int(req.GetPagination().GetPage()),
+		int(req.GetPagination().GetPageSize()),
+	)
+
+	filter := &models.AlbumFilter{
+		Page: page,
+		PageSize: pageSize,
+		SortBy: convertAlbumSortBy(req.SortBy),
+		SortOrder: convertSortOrder(req.SortOrder),
+	}
+
+	if req.ArtistId != nil {
+		filter.ArtistID = *req.ArtistId
+	}
+	if req.YearFrom != nil {
+		filter.YearFrom = int(*req.YearFrom)
+	}
+	if req.YearTo != nil {
+		filter.YearTo = int(*req.YearTo)
+	}
+	if len(req.GenresId) > 0 {
+		filter.GenreIDs = req.GenresId
+	}
+
+	if req.Type != nil {
+		filter.AlbumType = convertAlbumTypeFromProto(*req.Type)
+	} else {
+		filter.AlbumType = models.AlbumTypeUnspecified
+	}
+
+	result, err := s.repo.ListAlbums(ctx, filter)
+	if err != nil {
+		s.log.Error("list albums failed", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListAlbumsResponse{
+		Albums: convertAlbumsToproto(result.Albums),
+		Pagination: &commonpb.PaginationResponse{
+			Page: int32(result.Page),
+			PageSize: int32(result.PageSize),
+		},
+	}, nil
+}
+
+func (s *CatalogService) CreateAlbum(ctx context.Context, req *catalogpb.CreateAlbumRequest) (*catalogpb.Album, error) {
+	if req.Title == "" {
+		return nil, status.Error(codes.InvalidArgument, "title is required")
+	}
+	if req.ArtistId == "" {
+		return nil, status.Error(codes.InvalidArgument, "artist_id is required")
+	}
+
+	params := &models.CreateAlbumParams{
+		Title: req.Title,
+		Year: int(req.Year),
+		ArtistID: req.ArtistId,
+		AlbumType: convertAlbumTypeFromProto(req.Type),
+		CoverImageID: req.CoverImageId,
+		GenresIDs: req.GenreIds,
+	}
+
+	album, err := s.repo.CreateAlbum(ctx, params)
+	if err != nil {
+		s.log.Error("create album failed", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertAlbumToProto(album), nil
+}
+
+func (s *CatalogService) UpdateAlbum(ctx context.Context, req *catalogpb.UpdateAlbumRequest) (*catalogpb.Album, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "album id is required")
+	}
+
+	albumType := convertAlbumTypeFromProto(req.GetType())
+
+	params := &models.UpdateAlbumParams{
+		Title: req.Title,
+		Year: req.Year,
+		ArtistID: req.ArtistId,
+		CoverImageID: req.CoverImageId,
+		AlbumType: &albumType,
+	}
+
+	if len(req.GenreIds) > 0 {
+		params.GenreIDs = req.GenreIds
+	}
+
+	album, err := s.repo.UpdateAlbum(ctx, req.Id, params)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "album not found")
+		}
+		s.log.Error("update album failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertAlbumToProto(album), nil
+}
+
+func (s *CatalogService) DeleteAlbum(ctx context.Context, req *catalogpb.DeleteAlbumRequest) (*commonpb.Empty, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "album id is required")
+	}
+	
+	if err := s.repo.DeleteAlbum(ctx, req.Id); err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "album not found")
+		}
+		s.log.Error("delete album failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &commonpb.Empty{}, nil
+}
+
+func (s *CatalogService) GetAlbumWithTracks(ctx context.Context, req *catalogpb.GetAlbumTracksRequest) (*catalogpb.AlbumWithTracks, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "album_id is required")
+	}
+
+	albumWithTracks, err := s.repo.GetAlbumWithTracksByID(ctx, req.Id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "album not found")
+		}
+		s.log.Error("get album tracks failed", "album_id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.AlbumWithTracks{
+		Album: convertAlbumToProto(albumWithTracks.Album),
+		Tracks: convertTracksToProto(albumWithTracks.Tracks),
+		Genres: convertGenresToProto(albumWithTracks.Genres),
+	}, nil
+}
+
+func (s *CatalogService) SearchAlbums(ctx context.Context, req *catalogpb.SearchAlbumsRequest) (*catalogpb.ListAlbumsResponse, error) {
+	if req.Query == "" {
+		return &catalogpb.ListAlbumsResponse{}, nil
+	}
+
+	opts := &models.SearchAlbumsOptions{
+		Limit: 20,
+		IncludeArtist: req.IncludeArtist,
+	}
+
+	if req.Pagination != nil && req.Pagination.PageSize > 0 {
+		opts.Limit = int(req.Pagination.PageSize)
+	}
+
+	albums, err := s.repo.SearchAlbums(ctx, req.Query, opts)
+	if err != nil {
+		s.log.Error("search albums failed", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListAlbumsResponse{
+		Albums: convertAlbumsToproto(albums),
+		Pagination: &commonpb.PaginationResponse{
+			PageSize: int32(opts.Limit),
+		},
+	}, nil
+}
+
 func (s *CatalogService) paginationDefaults(page, pageSize int) (int, int) {
 	if page <= 0 {
 		page = 1
