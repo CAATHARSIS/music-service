@@ -2183,6 +2183,8 @@ type ListAlbumsRequest struct {
 	YearFrom      *int32                    `protobuf:"varint,4,opt,name=year_from,json=yearFrom,proto3,oneof" json:"year_from,omitempty"`
 	YearTo        *int32                    `protobuf:"varint,5,opt,name=year_to,json=yearTo,proto3,oneof" json:"year_to,omitempty"`
 	Type          *AlbumType                `protobuf:"varint,6,opt,name=type,proto3,enum=catalog.AlbumType,oneof" json:"type,omitempty"`
+	SortBy        AlbumSortBy               `protobuf:"varint,7,opt,name=sort_by,json=sortBy,proto3,enum=catalog.AlbumSortBy" json:"sort_by,omitempty"`
+	SortOrder     SortOrder                 `protobuf:"varint,8,opt,name=sort_order,json=sortOrder,proto3,enum=catalog.SortOrder" json:"sort_order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2257,6 +2259,20 @@ func (x *ListAlbumsRequest) GetType() AlbumType {
 		return *x.Type
 	}
 	return AlbumType_ALBUM_TYPE_UNSPECIFIED
+}
+
+func (x *ListAlbumsRequest) GetSortBy() AlbumSortBy {
+	if x != nil {
+		return x.SortBy
+	}
+	return AlbumSortBy_ALBUM_SORT_BY_UNSPECIEFED
+}
+
+func (x *ListAlbumsRequest) GetSortOrder() SortOrder {
+	if x != nil {
+		return x.SortOrder
+	}
+	return SortOrder_SORT_ORDER_UNSPECIFIED
 }
 
 type ListAlbumsResponse struct {
@@ -3148,7 +3164,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\x0fGetAlbumRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12'\n" +
 	"\x0finclude_artists\x18\x02 \x01(\bR\x0eincludeArtists\x12%\n" +
-	"\x0einclude_genres\x18\x03 \x01(\bR\rincludeGenres\"\xab\x02\n" +
+	"\x0einclude_genres\x18\x03 \x01(\bR\rincludeGenres\"\x8d\x03\n" +
 	"\x11ListAlbumsRequest\x129\n" +
 	"\n" +
 	"pagination\x18\x01 \x01(\v2\x19.common.PaginationRequestR\n" +
@@ -3157,7 +3173,10 @@ const file_catalog_proto_rawDesc = "" +
 	"\tgenres_id\x18\x03 \x03(\tR\bgenresId\x12 \n" +
 	"\tyear_from\x18\x04 \x01(\x05H\x01R\byearFrom\x88\x01\x01\x12\x1c\n" +
 	"\ayear_to\x18\x05 \x01(\x05H\x02R\x06yearTo\x88\x01\x01\x12+\n" +
-	"\x04type\x18\x06 \x01(\x0e2\x12.catalog.AlbumTypeH\x03R\x04type\x88\x01\x01B\f\n" +
+	"\x04type\x18\x06 \x01(\x0e2\x12.catalog.AlbumTypeH\x03R\x04type\x88\x01\x01\x12-\n" +
+	"\asort_by\x18\a \x01(\x0e2\x14.catalog.AlbumSortByR\x06sortBy\x121\n" +
+	"\n" +
+	"sort_order\x18\b \x01(\x0e2\x12.catalog.SortOrderR\tsortOrderB\f\n" +
 	"\n" +
 	"_artist_idB\f\n" +
 	"\n" +
@@ -3266,7 +3285,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\tSortOrder\x12\x1a\n" +
 	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +
-	"\x0fSORT_ORDER_DESC\x10\x022\xb1\x0f\n" +
+	"\x0fSORT_ORDER_DESC\x10\x022\xb3\x0f\n" +
 	"\x0eCatalogService\x124\n" +
 	"\bGetTrack\x12\x18.catalog.GetTrackRequest\x1a\x0e.catalog.Track\x12E\n" +
 	"\n" +
@@ -3281,8 +3300,8 @@ const file_catalog_proto_rawDesc = "" +
 	"\vListArtists\x12\x1b.catalog.ListArtistsRequest\x1a\x1c.catalog.ListArtistsResponse\x12=\n" +
 	"\fCreateArtist\x12\x1c.catalog.CreateArtistRequest\x1a\x0f.catalog.Artist\x12=\n" +
 	"\fUpdateArtist\x12\x1c.catalog.UpdateArtistRequest\x1a\x0f.catalog.Artist\x12;\n" +
-	"\fDeleteArtist\x12\x1c.catalog.DeleteArtistRequest\x1a\r.common.Empty\x12J\n" +
-	"\fSearchArtist\x12\x1d.catalog.SearchArtistsRequest\x1a\x1b.catalog.ListArtistsRequest\x12O\n" +
+	"\fDeleteArtist\x12\x1c.catalog.DeleteArtistRequest\x1a\r.common.Empty\x12K\n" +
+	"\rSearchArtists\x12\x1d.catalog.SearchArtistsRequest\x1a\x1b.catalog.ListArtistsRequest\x12O\n" +
 	"\x0fGetArtistTracks\x12\x1f.catalog.GetArtistTracksRequest\x1a\x1b.catalog.ListTracksResponse\x12O\n" +
 	"\x0fGetArtistAlbums\x12\x1f.catalog.GetArtistAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\x12P\n" +
 	"\x0fGetArtistsByIDs\x12\x1f.catalog.GetArtistsByIDsRequest\x1a\x1c.catalog.ListArtistsResponse\x124\n" +
@@ -3291,8 +3310,8 @@ const file_catalog_proto_rawDesc = "" +
 	"ListAlbums\x12\x1a.catalog.ListAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\x12:\n" +
 	"\vCreateAlbum\x12\x1b.catalog.CreateAlbumRequest\x1a\x0e.catalog.Album\x12:\n" +
 	"\vUpdateAlbum\x12\x1b.catalog.UpdateAlbumRequest\x1a\x0e.catalog.Album\x129\n" +
-	"\vDeleteAlbum\x12\x1b.catalog.DeleteAlbumRequest\x1a\r.common.Empty\x12P\n" +
-	"\x12GetAlbumWithTracks\x12\x1e.catalog.GetAlbumTracksRequest\x1a\x1a.catalog.ListAlbumsRequest\x12I\n" +
+	"\vDeleteAlbum\x12\x1b.catalog.DeleteAlbumRequest\x1a\r.common.Empty\x12Q\n" +
+	"\x12GetAlbumWithTracks\x12\x1e.catalog.GetAlbumTracksRequest\x1a\x1b.catalog.ListAlbumsResponse\x12I\n" +
 	"\fSearchAlbums\x12\x1c.catalog.SearchAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\x12E\n" +
 	"\n" +
 	"ListGenres\x12\x1a.catalog.ListGenresRequest\x1a\x1b.catalog.ListGenresResponse\x12:\n" +
@@ -3393,83 +3412,85 @@ var file_catalog_proto_depIdxs = []int32{
 	6,  // 25: catalog.GetArtistAlbumsRequest.sort_order:type_name -> catalog.SortOrder
 	43, // 26: catalog.ListAlbumsRequest.pagination:type_name -> common.PaginationRequest
 	0,  // 27: catalog.ListAlbumsRequest.type:type_name -> catalog.AlbumType
-	9,  // 28: catalog.ListAlbumsResponse.albums:type_name -> catalog.Album
-	44, // 29: catalog.ListAlbumsResponse.pagination:type_name -> common.PaginationResponse
-	0,  // 30: catalog.CreateAlbumRequest.type:type_name -> catalog.AlbumType
-	0,  // 31: catalog.UpdateAlbumRequest.type:type_name -> catalog.AlbumType
-	43, // 32: catalog.GetAlbumTracksRequest.pagination:type_name -> common.PaginationRequest
-	43, // 33: catalog.SearchAlbumsRequest.pagination:type_name -> common.PaginationRequest
-	43, // 34: catalog.ListGenresRequest.pagination:type_name -> common.PaginationRequest
-	5,  // 35: catalog.ListGenresRequest.sort_by:type_name -> catalog.GenreSortBy
-	6,  // 36: catalog.ListGenresRequest.sort_order:type_name -> catalog.SortOrder
-	10, // 37: catalog.ListGenresResponse.genres:type_name -> catalog.Genre
-	44, // 38: catalog.ListGenresResponse.pagination:type_name -> common.PaginationResponse
-	43, // 39: catalog.GetTracksByGenreRequest.pagination:type_name -> common.PaginationRequest
-	2,  // 40: catalog.GetTracksByGenreRequest.sort_by:type_name -> catalog.TrackSortBy
-	6,  // 41: catalog.GetTracksByGenreRequest.sort_order:type_name -> catalog.SortOrder
-	11, // 42: catalog.CatalogService.GetTrack:input_type -> catalog.GetTrackRequest
-	12, // 43: catalog.CatalogService.ListTracks:input_type -> catalog.ListTracksRequest
-	14, // 44: catalog.CatalogService.CreateTrack:input_type -> catalog.CreateTrackRequest
-	15, // 45: catalog.CatalogService.UpdateTrack:input_type -> catalog.UpdateTrackRequest
-	16, // 46: catalog.CatalogService.DeleteTrack:input_type -> catalog.DeleteTrackRequest
-	17, // 47: catalog.CatalogService.SearchTracks:input_type -> catalog.SearchTrackRequest
-	18, // 48: catalog.CatalogService.IncrementPlaysCount:input_type -> catalog.IncrementPlaysCountRequest
-	19, // 49: catalog.CatalogService.GetTracksByIDs:input_type -> catalog.GetTracksByIDsRequest
-	20, // 50: catalog.CatalogService.GetArtist:input_type -> catalog.GetArtistRequest
-	21, // 51: catalog.CatalogService.ListArtists:input_type -> catalog.ListArtistsRequest
-	23, // 52: catalog.CatalogService.CreateArtist:input_type -> catalog.CreateArtistRequest
-	24, // 53: catalog.CatalogService.UpdateArtist:input_type -> catalog.UpdateArtistRequest
-	25, // 54: catalog.CatalogService.DeleteArtist:input_type -> catalog.DeleteArtistRequest
-	26, // 55: catalog.CatalogService.SearchArtist:input_type -> catalog.SearchArtistsRequest
-	27, // 56: catalog.CatalogService.GetArtistTracks:input_type -> catalog.GetArtistTracksRequest
-	28, // 57: catalog.CatalogService.GetArtistAlbums:input_type -> catalog.GetArtistAlbumsRequest
-	29, // 58: catalog.CatalogService.GetArtistsByIDs:input_type -> catalog.GetArtistsByIDsRequest
-	30, // 59: catalog.CatalogService.GetAlbum:input_type -> catalog.GetAlbumRequest
-	31, // 60: catalog.CatalogService.ListAlbums:input_type -> catalog.ListAlbumsRequest
-	33, // 61: catalog.CatalogService.CreateAlbum:input_type -> catalog.CreateAlbumRequest
-	34, // 62: catalog.CatalogService.UpdateAlbum:input_type -> catalog.UpdateAlbumRequest
-	35, // 63: catalog.CatalogService.DeleteAlbum:input_type -> catalog.DeleteAlbumRequest
-	36, // 64: catalog.CatalogService.GetAlbumWithTracks:input_type -> catalog.GetAlbumTracksRequest
-	37, // 65: catalog.CatalogService.SearchAlbums:input_type -> catalog.SearchAlbumsRequest
-	38, // 66: catalog.CatalogService.ListGenres:input_type -> catalog.ListGenresRequest
-	40, // 67: catalog.CatalogService.CreateGenre:input_type -> catalog.CreateGenreRequest
-	41, // 68: catalog.CatalogService.GetTrackByGenre:input_type -> catalog.GetTracksByGenreRequest
-	42, // 69: catalog.CatalogService.GetGenre:input_type -> catalog.GetGenreRequest
-	45, // 70: catalog.CatalogService.Health:input_type -> common.Empty
-	7,  // 71: catalog.CatalogService.GetTrack:output_type -> catalog.Track
-	13, // 72: catalog.CatalogService.ListTracks:output_type -> catalog.ListTracksResponse
-	7,  // 73: catalog.CatalogService.CreateTrack:output_type -> catalog.Track
-	7,  // 74: catalog.CatalogService.UpdateTrack:output_type -> catalog.Track
-	45, // 75: catalog.CatalogService.DeleteTrack:output_type -> common.Empty
-	13, // 76: catalog.CatalogService.SearchTracks:output_type -> catalog.ListTracksResponse
-	45, // 77: catalog.CatalogService.IncrementPlaysCount:output_type -> common.Empty
-	13, // 78: catalog.CatalogService.GetTracksByIDs:output_type -> catalog.ListTracksResponse
-	8,  // 79: catalog.CatalogService.GetArtist:output_type -> catalog.Artist
-	22, // 80: catalog.CatalogService.ListArtists:output_type -> catalog.ListArtistsResponse
-	8,  // 81: catalog.CatalogService.CreateArtist:output_type -> catalog.Artist
-	8,  // 82: catalog.CatalogService.UpdateArtist:output_type -> catalog.Artist
-	45, // 83: catalog.CatalogService.DeleteArtist:output_type -> common.Empty
-	21, // 84: catalog.CatalogService.SearchArtist:output_type -> catalog.ListArtistsRequest
-	13, // 85: catalog.CatalogService.GetArtistTracks:output_type -> catalog.ListTracksResponse
-	32, // 86: catalog.CatalogService.GetArtistAlbums:output_type -> catalog.ListAlbumsResponse
-	22, // 87: catalog.CatalogService.GetArtistsByIDs:output_type -> catalog.ListArtistsResponse
-	9,  // 88: catalog.CatalogService.GetAlbum:output_type -> catalog.Album
-	32, // 89: catalog.CatalogService.ListAlbums:output_type -> catalog.ListAlbumsResponse
-	9,  // 90: catalog.CatalogService.CreateAlbum:output_type -> catalog.Album
-	9,  // 91: catalog.CatalogService.UpdateAlbum:output_type -> catalog.Album
-	45, // 92: catalog.CatalogService.DeleteAlbum:output_type -> common.Empty
-	31, // 93: catalog.CatalogService.GetAlbumWithTracks:output_type -> catalog.ListAlbumsRequest
-	32, // 94: catalog.CatalogService.SearchAlbums:output_type -> catalog.ListAlbumsResponse
-	39, // 95: catalog.CatalogService.ListGenres:output_type -> catalog.ListGenresResponse
-	10, // 96: catalog.CatalogService.CreateGenre:output_type -> catalog.Genre
-	39, // 97: catalog.CatalogService.GetTrackByGenre:output_type -> catalog.ListGenresResponse
-	10, // 98: catalog.CatalogService.GetGenre:output_type -> catalog.Genre
-	46, // 99: catalog.CatalogService.Health:output_type -> common.HealthyCheckResponse
-	71, // [71:100] is the sub-list for method output_type
-	42, // [42:71] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	4,  // 28: catalog.ListAlbumsRequest.sort_by:type_name -> catalog.AlbumSortBy
+	6,  // 29: catalog.ListAlbumsRequest.sort_order:type_name -> catalog.SortOrder
+	9,  // 30: catalog.ListAlbumsResponse.albums:type_name -> catalog.Album
+	44, // 31: catalog.ListAlbumsResponse.pagination:type_name -> common.PaginationResponse
+	0,  // 32: catalog.CreateAlbumRequest.type:type_name -> catalog.AlbumType
+	0,  // 33: catalog.UpdateAlbumRequest.type:type_name -> catalog.AlbumType
+	43, // 34: catalog.GetAlbumTracksRequest.pagination:type_name -> common.PaginationRequest
+	43, // 35: catalog.SearchAlbumsRequest.pagination:type_name -> common.PaginationRequest
+	43, // 36: catalog.ListGenresRequest.pagination:type_name -> common.PaginationRequest
+	5,  // 37: catalog.ListGenresRequest.sort_by:type_name -> catalog.GenreSortBy
+	6,  // 38: catalog.ListGenresRequest.sort_order:type_name -> catalog.SortOrder
+	10, // 39: catalog.ListGenresResponse.genres:type_name -> catalog.Genre
+	44, // 40: catalog.ListGenresResponse.pagination:type_name -> common.PaginationResponse
+	43, // 41: catalog.GetTracksByGenreRequest.pagination:type_name -> common.PaginationRequest
+	2,  // 42: catalog.GetTracksByGenreRequest.sort_by:type_name -> catalog.TrackSortBy
+	6,  // 43: catalog.GetTracksByGenreRequest.sort_order:type_name -> catalog.SortOrder
+	11, // 44: catalog.CatalogService.GetTrack:input_type -> catalog.GetTrackRequest
+	12, // 45: catalog.CatalogService.ListTracks:input_type -> catalog.ListTracksRequest
+	14, // 46: catalog.CatalogService.CreateTrack:input_type -> catalog.CreateTrackRequest
+	15, // 47: catalog.CatalogService.UpdateTrack:input_type -> catalog.UpdateTrackRequest
+	16, // 48: catalog.CatalogService.DeleteTrack:input_type -> catalog.DeleteTrackRequest
+	17, // 49: catalog.CatalogService.SearchTracks:input_type -> catalog.SearchTrackRequest
+	18, // 50: catalog.CatalogService.IncrementPlaysCount:input_type -> catalog.IncrementPlaysCountRequest
+	19, // 51: catalog.CatalogService.GetTracksByIDs:input_type -> catalog.GetTracksByIDsRequest
+	20, // 52: catalog.CatalogService.GetArtist:input_type -> catalog.GetArtistRequest
+	21, // 53: catalog.CatalogService.ListArtists:input_type -> catalog.ListArtistsRequest
+	23, // 54: catalog.CatalogService.CreateArtist:input_type -> catalog.CreateArtistRequest
+	24, // 55: catalog.CatalogService.UpdateArtist:input_type -> catalog.UpdateArtistRequest
+	25, // 56: catalog.CatalogService.DeleteArtist:input_type -> catalog.DeleteArtistRequest
+	26, // 57: catalog.CatalogService.SearchArtists:input_type -> catalog.SearchArtistsRequest
+	27, // 58: catalog.CatalogService.GetArtistTracks:input_type -> catalog.GetArtistTracksRequest
+	28, // 59: catalog.CatalogService.GetArtistAlbums:input_type -> catalog.GetArtistAlbumsRequest
+	29, // 60: catalog.CatalogService.GetArtistsByIDs:input_type -> catalog.GetArtistsByIDsRequest
+	30, // 61: catalog.CatalogService.GetAlbum:input_type -> catalog.GetAlbumRequest
+	31, // 62: catalog.CatalogService.ListAlbums:input_type -> catalog.ListAlbumsRequest
+	33, // 63: catalog.CatalogService.CreateAlbum:input_type -> catalog.CreateAlbumRequest
+	34, // 64: catalog.CatalogService.UpdateAlbum:input_type -> catalog.UpdateAlbumRequest
+	35, // 65: catalog.CatalogService.DeleteAlbum:input_type -> catalog.DeleteAlbumRequest
+	36, // 66: catalog.CatalogService.GetAlbumWithTracks:input_type -> catalog.GetAlbumTracksRequest
+	37, // 67: catalog.CatalogService.SearchAlbums:input_type -> catalog.SearchAlbumsRequest
+	38, // 68: catalog.CatalogService.ListGenres:input_type -> catalog.ListGenresRequest
+	40, // 69: catalog.CatalogService.CreateGenre:input_type -> catalog.CreateGenreRequest
+	41, // 70: catalog.CatalogService.GetTrackByGenre:input_type -> catalog.GetTracksByGenreRequest
+	42, // 71: catalog.CatalogService.GetGenre:input_type -> catalog.GetGenreRequest
+	45, // 72: catalog.CatalogService.Health:input_type -> common.Empty
+	7,  // 73: catalog.CatalogService.GetTrack:output_type -> catalog.Track
+	13, // 74: catalog.CatalogService.ListTracks:output_type -> catalog.ListTracksResponse
+	7,  // 75: catalog.CatalogService.CreateTrack:output_type -> catalog.Track
+	7,  // 76: catalog.CatalogService.UpdateTrack:output_type -> catalog.Track
+	45, // 77: catalog.CatalogService.DeleteTrack:output_type -> common.Empty
+	13, // 78: catalog.CatalogService.SearchTracks:output_type -> catalog.ListTracksResponse
+	45, // 79: catalog.CatalogService.IncrementPlaysCount:output_type -> common.Empty
+	13, // 80: catalog.CatalogService.GetTracksByIDs:output_type -> catalog.ListTracksResponse
+	8,  // 81: catalog.CatalogService.GetArtist:output_type -> catalog.Artist
+	22, // 82: catalog.CatalogService.ListArtists:output_type -> catalog.ListArtistsResponse
+	8,  // 83: catalog.CatalogService.CreateArtist:output_type -> catalog.Artist
+	8,  // 84: catalog.CatalogService.UpdateArtist:output_type -> catalog.Artist
+	45, // 85: catalog.CatalogService.DeleteArtist:output_type -> common.Empty
+	21, // 86: catalog.CatalogService.SearchArtists:output_type -> catalog.ListArtistsRequest
+	13, // 87: catalog.CatalogService.GetArtistTracks:output_type -> catalog.ListTracksResponse
+	32, // 88: catalog.CatalogService.GetArtistAlbums:output_type -> catalog.ListAlbumsResponse
+	22, // 89: catalog.CatalogService.GetArtistsByIDs:output_type -> catalog.ListArtistsResponse
+	9,  // 90: catalog.CatalogService.GetAlbum:output_type -> catalog.Album
+	32, // 91: catalog.CatalogService.ListAlbums:output_type -> catalog.ListAlbumsResponse
+	9,  // 92: catalog.CatalogService.CreateAlbum:output_type -> catalog.Album
+	9,  // 93: catalog.CatalogService.UpdateAlbum:output_type -> catalog.Album
+	45, // 94: catalog.CatalogService.DeleteAlbum:output_type -> common.Empty
+	32, // 95: catalog.CatalogService.GetAlbumWithTracks:output_type -> catalog.ListAlbumsResponse
+	32, // 96: catalog.CatalogService.SearchAlbums:output_type -> catalog.ListAlbumsResponse
+	39, // 97: catalog.CatalogService.ListGenres:output_type -> catalog.ListGenresResponse
+	10, // 98: catalog.CatalogService.CreateGenre:output_type -> catalog.Genre
+	39, // 99: catalog.CatalogService.GetTrackByGenre:output_type -> catalog.ListGenresResponse
+	10, // 100: catalog.CatalogService.GetGenre:output_type -> catalog.Genre
+	46, // 101: catalog.CatalogService.Health:output_type -> common.HealthyCheckResponse
+	73, // [73:102] is the sub-list for method output_type
+	44, // [44:73] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_catalog_proto_init() }

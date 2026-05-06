@@ -59,9 +59,9 @@ func (s *CatalogService) ListTracks(ctx context.Context, req *catalogpb.ListTrac
 	)
 
 	filter := &models.TrackFilter{
-		Page: page,
-		PageSize: pageSize,
-		SortBy: convertTrackSortBy(req.SortBy),
+		Page:      page,
+		PageSize:  pageSize,
+		SortBy:    convertTrackSortBy(req.SortBy),
 		SortOrder: convertSortOrder(req.SortOder),
 	}
 
@@ -89,12 +89,19 @@ func (s *CatalogService) ListTracks(ctx context.Context, req *catalogpb.ListTrac
 
 	tracks := convertTracksToProto(result.Tracks)
 
+	p := &commonpb.PaginationResponse{}
+	if req.Pagination != nil {
+		if req.Pagination.Page > 0 {
+			p.Page = req.Pagination.Page
+		}
+		if req.Pagination.PageSize > 0 {
+			p.PageSize = req.Pagination.PageSize
+		}
+	}
+
 	return &catalogpb.ListTracksResponse{
-		Track: tracks,
-		Pagination: &commonpb.PaginationResponse{
-			Page: int32(result.Page),
-			PageSize: int32(result.PageSize),
-		},
+		Tracks:     tracks,
+		Pagination: p,
 	}, nil
 }
 
@@ -110,15 +117,15 @@ func (s *CatalogService) CreateTrack(ctx context.Context, req *catalogpb.CreateT
 	}
 
 	params := &models.CreateTrackParams{
-		Title: req.Title,
-		Duration: int(req.Duration),
-		Year: int(req.Year),
-		ArtistID: req.ArtistId,
-		FileID: req.FileId,
-		GenreIDs: req.GenreIds,
+		Title:        req.Title,
+		Duration:     int(req.Duration),
+		Year:         int(req.Year),
+		ArtistID:     req.ArtistId,
+		FileID:       req.FileId,
+		GenreIDs:     req.GenreIds,
 		CoverImageID: req.CoverImageId,
-		TrackNumber: req.TrackNumber,
-		Lyrics: req.Lyrics,
+		TrackNumber:  req.TrackNumber,
+		Lyrics:       req.Lyrics,
 	}
 
 	if req.AlbumId != "" {
@@ -140,15 +147,15 @@ func (s *CatalogService) UpdateTrack(ctx context.Context, req *catalogpb.UpdateT
 	}
 
 	params := &models.UpdateTrackParams{
-		Title: req.Title,
-		Duration: req.Duration,
-		Year: req.Year,
-		ArtistID: req.ArtistId,
-		AlbumID: req.AlbumId,
-		FileID: req.FileId,
+		Title:        req.Title,
+		Duration:     req.Duration,
+		Year:         req.Year,
+		ArtistID:     req.ArtistId,
+		AlbumID:      req.AlbumId,
+		FileID:       req.FileId,
 		CoverImageID: req.CoverImageId,
-		TrackNumber: req.TrackNumber,
-		Lyrics: req.Lyrycs,
+		TrackNumber:  req.TrackNumber,
+		Lyrics:       req.Lyrycs,
 	}
 
 	if len(req.GenresId) > 0 {
@@ -189,13 +196,17 @@ func (s *CatalogService) SearchTracks(ctx context.Context, req *catalogpb.Search
 	}
 
 	opts := &models.SearchTracksOptions{
-		Limit: 20,
+		Limit:         20,
 		IncludeArtist: req.IncludeArtist,
-		IncludeAlbum: req.IncludeAlbum,
+		IncludeAlbum:  req.IncludeAlbum,
 	}
 
+	p := &commonpb.PaginationResponse{
+		PageSize: int32(opts.Limit),
+	}
 	if req.Pagination != nil && req.Pagination.PageSize > 0 {
 		opts.Limit = int(req.Pagination.PageSize)
+		p.PageSize = req.Pagination.PageSize
 	}
 
 	tracks, err := s.repo.SearchTracks(ctx, req.Query, opts)
@@ -207,22 +218,19 @@ func (s *CatalogService) SearchTracks(ctx context.Context, req *catalogpb.Search
 	pbTracks := convertTracksToProto(tracks)
 
 	return &catalogpb.ListTracksResponse{
-		Track: pbTracks,
-		Pagination: &commonpb.PaginationResponse{
-			Page: req.Pagination.Page,
-			PageSize: req.Pagination.PageSize,
-		},
+		Tracks:     pbTracks,
+		Pagination: p,
 	}, nil
 }
 
-func (s *CatalogService) IncrementPlays(ctx context.Context, req *catalogpb.IncrementPlaysCountRequest) (*commonpb.Empty, error) {
+func (s *CatalogService) IncrementTrackPlaysCount(ctx context.Context, req *catalogpb.IncrementPlaysCountRequest) (*commonpb.Empty, error) {
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "track id is required")
 	}
 
 	incrementBy := int64(1)
 	if req.IncrementBy > 0 {
-		incrementBy= int64(req.IncrementBy)
+		incrementBy = int64(req.IncrementBy)
 	}
 
 	if err := s.repo.IncrementPlays(ctx, req.Id, incrementBy); err != nil {
@@ -236,7 +244,7 @@ func (s *CatalogService) IncrementPlays(ctx context.Context, req *catalogpb.Incr
 	return &commonpb.Empty{}, nil
 }
 
-func (s *CatalogService) GetTrackByIDs(ctx context.Context, ids []string, opts *models.GetTrackOptions) ([]*models.Track, error) {
+func (s *CatalogService) GetTracksByIDs(ctx context.Context, ids []string, opts *models.GetTrackOptions) ([]*models.Track, error) {
 	if len(ids) == 0 {
 		return []*models.Track{}, nil
 	}
@@ -248,6 +256,246 @@ func (s *CatalogService) GetTrackByIDs(ctx context.Context, ids []string, opts *
 	}
 
 	return tracks, err
+}
+
+func (s *CatalogService) IncrementPlaysCount(ctx context.Context, req *catalogpb.IncrementPlaysCountRequest) (*commonpb.Empty, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "track id is required")
+	}
+
+	incrementBy := int64(req.IncrementBy)
+	if incrementBy < 1 {
+		incrementBy = 1
+	}
+
+	track, err := s.repo.GetTrackByID(ctx, req.Id, nil)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "track not found")
+		}
+		s.log.Error("get track failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	if err := s.repo.IncrementPlays(ctx, req.Id, incrementBy); err != nil {
+		s.log.Error("increment plays failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	if err := s.repo.UpdateArtistStats(ctx, track.ArtistID, incrementBy); err != nil {
+		s.log.Warn("update artist stats failed", "artist_id", track.ArtistID, "error", err)
+	}
+
+	return &commonpb.Empty{}, nil
+}
+
+// Artist
+
+func (s *CatalogService) GetArtist(ctx context.Context, req *catalogpb.GetArtistRequest) (*catalogpb.Artist, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "artist id is required")
+	}
+
+	artist, err := s.repo.GetArtistByID(ctx, req.Id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "artitst not found")
+		}
+		s.log.Error("get artist failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertArtistToProto(artist), nil
+}
+
+func (s *CatalogService) ListArtists(ctx context.Context, req *catalogpb.ListArtistsRequest) (*catalogpb.ListArtistsResponse, error) {
+	page, pageSize := s.paginationDefaults(
+		int(req.GetPagination().GetPage()),
+		int(req.GetPagination().GetPageSize()),
+	)
+
+	filter := &models.ArtistFilter{
+		Page:      page,
+		PageSize:  pageSize,
+		SortBy:    convertArtistSortBy(req.SortBy),
+		SortOrder: convertSortOrder(req.SortOrder),
+	}
+
+	if req.Country != nil {
+		filter.Country = *req.Country
+	}
+	if len(req.GenresId) > 0 {
+		filter.GenreIDs = req.GenresId
+	}
+
+	result, err := s.repo.ListArtists(ctx, filter)
+	if err != nil {
+		s.log.Error("list artists failed", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	p := &commonpb.PaginationResponse{}
+	if req.Pagination != nil {
+		if req.Pagination.Page > 0 {
+			p.Page = req.Pagination.Page
+		}
+		if req.Pagination.PageSize > 0 {
+			p.PageSize = req.Pagination.PageSize
+		}
+	}
+
+	return &catalogpb.ListArtistsResponse{
+		Artists:    convertArtistsToProto(result.Artists),
+		Pagination: p,
+	}, nil
+}
+
+func (s *CatalogService) CreateArtist(ctx context.Context, req *catalogpb.CreateArtistRequest) (*catalogpb.Artist, error) {
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "name is required")
+	}
+
+	params := &models.CreateArtistParams{
+		Name:          req.Name,
+		Country:       req.Country,
+		AvatarImageID: req.AvatarImageId,
+		GenreIDs:      req.GenreIds,
+	}
+
+	artist, err := s.repo.CreateArtist(ctx, params)
+	if err != nil {
+		s.log.Error("create artist failed", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertArtistToProto(artist), nil
+}
+
+func (s *CatalogService) UpdateArtist(ctx context.Context, req *catalogpb.UpdateArtistRequest) (*catalogpb.Artist, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "artist id is required")
+	}
+
+	params := &models.UpdateArtistParams{
+		Name:          req.Name,
+		Country:       req.Country,
+		AvatarImageID: req.AvatarImageId,
+	}
+
+	if len(req.GenreIds) > 0 {
+		params.GenreIDs = &req.GenreIds
+	}
+
+	artist, err := s.repo.UpdateArtist(ctx, req.Id, params)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "artist not found")
+		}
+		s.log.Error("update artist failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertArtistToProto(artist), nil
+}
+
+func (s *CatalogService) DeleteArtist(ctx context.Context, req *catalogpb.DeleteArtistRequest) (*commonpb.Empty, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "artist id is required")
+	}
+
+	if err := s.repo.DeleteArtistByID(ctx, req.Id); err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "artist not found")
+		}
+		s.log.Error("delete artist failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &commonpb.Empty{}, nil
+}
+
+func (s *CatalogService) SearchArtists(ctx context.Context, req *catalogpb.SearchArtistsRequest) (*catalogpb.ListArtistsResponse, error) {
+	if req.Query == "" {
+		return &catalogpb.ListArtistsResponse{}, nil
+	}
+
+	limit := 20
+	p := &commonpb.PaginationResponse{
+		PageSize: 20,
+	}
+	if req.Pagination != nil && req.Pagination.PageSize > 0 {
+		limit = int(req.Pagination.PageSize)
+		p.PageSize = req.Pagination.PageSize
+	}
+
+	artists, err := s.repo.SearchArtists(ctx, req.Query, limit)
+	if err != nil {
+		s.log.Error("search artists failed", "query", req.Query, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListArtistsResponse{
+		Artists:    convertArtistsToProto(artists),
+		Pagination: p,
+	}, nil
+}
+
+func (s *CatalogService) GetArtistTracks(ctx context.Context, req *catalogpb.GetArtistTracksRequest) (*catalogpb.ListTracksResponse, error) {
+	if req.ArtistId == "" {
+		return nil, status.Error(codes.InvalidArgument, "artist_id is required")
+	}
+
+	limit := 20
+	p := &commonpb.PaginationResponse{
+		PageSize: int32(limit),
+	}
+	if req.Pagination != nil && req.Pagination.PageSize > 0 {
+		limit = int(req.Pagination.PageSize)
+		p.PageSize = req.Pagination.PageSize
+	}
+
+	tracks, err := s.repo.GetArtistTracks(ctx, req.ArtistId, limit)
+	if err != nil {
+		s.log.Error("get artist tracks failed", "artist_id", req.ArtistId, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListTracksResponse{
+		Tracks:     convertTracksToProto(tracks),
+		Pagination: p,
+	}, nil
+}
+
+func (s *CatalogService) GetArtistAlbums(ctx context.Context, req *catalogpb.GetArtistAlbumsRequest) (*catalogpb.ListAlbumsResponse, error) {
+	if req.ArtistId == "" {
+		return nil, status.Error(codes.InvalidArgument, "artist_id is required")
+	}
+
+	albums, err := s.repo.GetArtistAlbums(ctx, req.ArtistId)
+	if err != nil {
+		s.log.Error("get artist albums failed", "artist_id", req.ArtistId, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListAlbumsResponse{
+		Albums: convertAlbumsToproto(albums),
+	}, nil
+}
+
+func (s *CatalogService) GetArtistsByIDs(ctx context.Context, req *catalogpb.GetArtistsByIDsRequest) (*catalogpb.ListArtistsResponse, error) {
+	if len(req.Ids) == 0 {
+		return &catalogpb.ListArtistsResponse{}, nil
+	}
+
+	artists, err := s.repo.GetArtistByIDs(ctx, req.Ids)
+	if err != nil {
+		s.log.Error("get artists by ids failed", "count", len(req.Ids), "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListArtistsResponse{
+		Artists: convertArtistsToProto(artists),
+	}, nil
 }
 
 func (s *CatalogService) paginationDefaults(page, pageSize int) (int, int) {

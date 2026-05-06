@@ -53,8 +53,8 @@ service CatalogService {
     // Delete artist
     rpc DeleteArtist(DeleteArtistRequest) returns (common.Empty);
 
-    // Artist search
-    rpc SearchArtist(SearchArtistsRequest) returns (ListArtistsRequest);
+    // Artists search
+    rpc SearchArtists(SearchArtistsRequest) returns (ListArtistsRequest);
 
     // Get artists tracks
     rpc GetArtistTracks(GetArtistTracksRequest) returns (ListTracksResponse);
@@ -83,7 +83,7 @@ service CatalogService {
     rpc DeleteAlbum(DeleteAlbumRequest) returns (common.Empty);
     
     // Get album with tracks
-    rpc GetAlbumWithTracks(GetAlbumTracksRequest) returns (ListAlbumsRequest);
+    rpc GetAlbumWithTracks(GetAlbumTracksRequest) returns (ListAlbumsResponse);
 
     // Get album with tracks
     rpc SearchAlbums(SearchAlbumsRequest) returns (ListAlbumsResponse);
@@ -360,6 +360,9 @@ message ListAlbumsRequest {
     optional int32 year_from = 4;
     optional int32 year_to = 5;
     optional AlbumType type = 6;
+
+    AlbumSortBy sort_by = 7;
+    SortOrder sort_order = 8;
 }
 
 message ListAlbumsResponse {
