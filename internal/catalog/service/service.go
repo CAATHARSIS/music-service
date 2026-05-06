@@ -524,9 +524,9 @@ func (s *CatalogService) ListAlbums(ctx context.Context, req *catalogpb.ListAlbu
 	)
 
 	filter := &models.AlbumFilter{
-		Page: page,
-		PageSize: pageSize,
-		SortBy: convertAlbumSortBy(req.SortBy),
+		Page:      page,
+		PageSize:  pageSize,
+		SortBy:    convertAlbumSortBy(req.SortBy),
 		SortOrder: convertSortOrder(req.SortOrder),
 	}
 
@@ -558,7 +558,7 @@ func (s *CatalogService) ListAlbums(ctx context.Context, req *catalogpb.ListAlbu
 	return &catalogpb.ListAlbumsResponse{
 		Albums: convertAlbumsToproto(result.Albums),
 		Pagination: &commonpb.PaginationResponse{
-			Page: int32(result.Page),
+			Page:     int32(result.Page),
 			PageSize: int32(result.PageSize),
 		},
 	}, nil
@@ -573,12 +573,12 @@ func (s *CatalogService) CreateAlbum(ctx context.Context, req *catalogpb.CreateA
 	}
 
 	params := &models.CreateAlbumParams{
-		Title: req.Title,
-		Year: int(req.Year),
-		ArtistID: req.ArtistId,
-		AlbumType: convertAlbumTypeFromProto(req.Type),
+		Title:        req.Title,
+		Year:         int(req.Year),
+		ArtistID:     req.ArtistId,
+		AlbumType:    convertAlbumTypeFromProto(req.Type),
 		CoverImageID: req.CoverImageId,
-		GenresIDs: req.GenreIds,
+		GenresIDs:    req.GenreIds,
 	}
 
 	album, err := s.repo.CreateAlbum(ctx, params)
@@ -598,11 +598,11 @@ func (s *CatalogService) UpdateAlbum(ctx context.Context, req *catalogpb.UpdateA
 	albumType := convertAlbumTypeFromProto(req.GetType())
 
 	params := &models.UpdateAlbumParams{
-		Title: req.Title,
-		Year: req.Year,
-		ArtistID: req.ArtistId,
+		Title:        req.Title,
+		Year:         req.Year,
+		ArtistID:     req.ArtistId,
 		CoverImageID: req.CoverImageId,
-		AlbumType: &albumType,
+		AlbumType:    &albumType,
 	}
 
 	if len(req.GenreIds) > 0 {
@@ -625,7 +625,7 @@ func (s *CatalogService) DeleteAlbum(ctx context.Context, req *catalogpb.DeleteA
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "album id is required")
 	}
-	
+
 	if err := s.repo.DeleteAlbum(ctx, req.Id); err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "album not found")
@@ -652,7 +652,7 @@ func (s *CatalogService) GetAlbumWithTracks(ctx context.Context, req *catalogpb.
 	}
 
 	return &catalogpb.AlbumWithTracks{
-		Album: convertAlbumToProto(albumWithTracks.Album),
+		Album:  convertAlbumToProto(albumWithTracks.Album),
 		Tracks: convertTracksToProto(albumWithTracks.Tracks),
 		Genres: convertGenresToProto(albumWithTracks.Genres),
 	}, nil
@@ -664,7 +664,7 @@ func (s *CatalogService) SearchAlbums(ctx context.Context, req *catalogpb.Search
 	}
 
 	opts := &models.SearchAlbumsOptions{
-		Limit: 20,
+		Limit:         20,
 		IncludeArtist: req.IncludeArtist,
 	}
 
@@ -685,6 +685,93 @@ func (s *CatalogService) SearchAlbums(ctx context.Context, req *catalogpb.Search
 		},
 	}, nil
 }
+
+// Genres
+
+func (s *CatalogService) GetGenre(ctx context.Context, req *catalogpb.GetGenreRequest) (*catalogpb.Genre, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "genre id is required")
+	}
+
+	genre, err := s.repo.GetGenreByID(ctx, req.Id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "genre not found")
+		}
+		s.log.Error("get genre failed", "id", req.Id, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertGenreToProto(genre), nil
+}
+
+func (s *CatalogService) ListGenres(ctx context.Context, req *catalogpb.ListGenresRequest) (*catalogpb.ListGenresResponse, error) {
+	genres, err := s.repo.ListGenres(ctx)
+	if err != nil {
+		s.log.Error("list genres failed", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListGenresResponse{
+		Genres: convertGenresToProto(genres),
+	}, nil
+}
+
+func (s *CatalogService) CreateGenre(ctx context.Context, req *catalogpb.CreateGenreRequest) (*catalogpb.Genre, error) {
+	if req.Name == "" {
+		return nil, status.Error(codes.InvalidArgument, "name is required")
+	}
+
+	params := &models.CreateGenreParams{
+		Name: req.Name,
+		Description: req.Description,
+	}
+
+	genre, err := s.repo.CreateGenre(ctx, params)
+	if err != nil {
+		s.log.Error("create genre failed", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return convertGenreToProto(genre), nil
+}
+
+func (s *CatalogService) GetTrackByGenre(ctx context.Context, req *catalogpb.GetTracksByGenreRequest) (*catalogpb.ListTracksResponse, error) {
+	if req.GenreId == "" {
+		return nil, status.Error(codes.InvalidArgument, "genre_id is required")
+	}
+
+	limit := 20
+	if req.Pagination != nil && req.Pagination.PageSize > 0 {
+		limit = int(req.Pagination.PageSize)
+	}
+
+	tracks, err := s.repo.GetTracksByGenre(ctx, req.GenreId, limit)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "genre not found or no tracks")
+		}
+		s.log.Error("get tracks by genre failed", "genre_id", req.GenreId, "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	return &catalogpb.ListTracksResponse{
+		Tracks: convertTracksToProto(tracks),
+		Pagination: &commonpb.PaginationResponse{
+			PageSize: int32(limit),
+		},
+	}, nil
+}
+
+// Heath
+
+func (s *CatalogService) Health(ctx context.Context, req *commonpb.Empty) (*commonpb.HealthyCheckResponse, error) {
+	return &commonpb.HealthyCheckResponse{
+		Status: "Serving",
+	}, nil
+}
+
+// Helpers
 
 func (s *CatalogService) paginationDefaults(page, pageSize int) (int, int) {
 	if page <= 0 {

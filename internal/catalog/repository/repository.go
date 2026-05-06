@@ -19,8 +19,6 @@ var (
 	ErrNotFound = errors.New("resource not found")
 )
 
-// Валидцию таблиц и колонок вынести в service!!!
-
 var allowedTables = map[string]bool{
 	"track_genres":  true,
 	"artist_genres": true,
@@ -489,20 +487,6 @@ func (r *repository) ListTracks(ctx context.Context, filter *models.TrackFilter)
 	if filter == nil {
 		filter = &models.TrackFilter{}
 	}
-
-	// Вынести в service!!!
-	if filter.Page <= 0 {
-		filter.Page = 1
-	}
-
-	if filter.PageSize <= 0 {
-		filter.PageSize = 20
-	}
-
-	if filter.PageSize > 100 {
-		filter.PageSize = 100
-	}
-	//!!!
 
 	wherePart := []string{"1=1"}
 	args := []interface{}{}
@@ -973,20 +957,6 @@ func (r *repository) ListArtists(ctx context.Context, filter *models.ArtistFilte
 	if filter == nil {
 		filter = &models.ArtistFilter{}
 	}
-
-	// Вынести в service!!!
-	if filter.Page <= 0 {
-		filter.Page = 1
-	}
-
-	if filter.PageSize <= 0 {
-		filter.PageSize = 20
-	}
-
-	if filter.PageSize > 100 {
-		filter.PageSize = 100
-	}
-	//!!!
 
 	whereParts := []string{"1=1"}
 	args := []interface{}{}
@@ -1486,20 +1456,6 @@ func (r *repository) ListAlbums(ctx context.Context, filter *models.AlbumFilter)
 	if filter == nil {
         filter = &models.AlbumFilter{}
     }
-    
-	// Вынести в сервисный слой
-    if filter.Page <= 0 {
-        filter.Page = 1
-    }
-
-    if filter.PageSize <= 0 {
-        filter.PageSize = 20
-    }
-
-    if filter.PageSize > 100 {
-        filter.PageSize = 100
-    }
-	// !!!
     
     whereParts := []string{"1=1"}
     args := []interface{}{}

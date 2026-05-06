@@ -431,7 +431,6 @@ message ListGenresRequest {
 
 message ListGenresResponse {
     repeated Genre genres = 1;
-    common.PaginationResponse pagination = 2;
 }
 
 message CreateGenreRequest {
