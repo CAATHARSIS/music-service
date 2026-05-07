@@ -54,7 +54,7 @@ service CatalogService {
     rpc DeleteArtist(DeleteArtistRequest) returns (common.Empty);
 
     // Artists search
-    rpc SearchArtists(SearchArtistsRequest) returns (ListArtistsRequest);
+    rpc SearchArtists(SearchArtistsRequest) returns (ListArtistsResponse);
 
     // Get artists tracks
     rpc GetArtistTracks(GetArtistTracksRequest) returns (ListTracksResponse);
@@ -97,7 +97,7 @@ service CatalogService {
     rpc CreateGenre(CreateGenreRequest) returns (Genre);
 
     // Get tracks by genre
-    rpc GetTrackByGenre(GetTracksByGenreRequest) returns (ListGenresResponse);
+    rpc GetTrackByGenre(GetTracksByGenreRequest) returns (ListTracksResponse);
 
     // Get genre by id
     rpc GetGenre(GetGenreRequest) returns (Genre);
@@ -196,7 +196,7 @@ message ListTracksRequest {
     optional int32 year_to = 6;
 
     TrackSortBy sort_by = 7;
-    SortOrder sort_oder = 8;
+    SortOrder sort_order = 8;
 }
 
 message ListTracksResponse {
@@ -255,7 +255,7 @@ enum SearchField {
     SEARCH_FIELD_TITLE = 1;
     SEARCH_FIELD_ARTIST = 2;
     SEARCH_FIELD_ALBUM = 3;
-    SEARCH_FILED_LYRICS = 4;
+    SEARCH_FIELD_LYRICS = 4;
     SEARCH_FIELD_ALL = 5;
 }
 

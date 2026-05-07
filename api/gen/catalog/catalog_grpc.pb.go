@@ -87,7 +87,7 @@ type CatalogServiceClient interface {
 	// Delete artist
 	DeleteArtist(ctx context.Context, in *DeleteArtistRequest, opts ...grpc.CallOption) (*common.Empty, error)
 	// Artists search
-	SearchArtists(ctx context.Context, in *SearchArtistsRequest, opts ...grpc.CallOption) (*ListArtistsRequest, error)
+	SearchArtists(ctx context.Context, in *SearchArtistsRequest, opts ...grpc.CallOption) (*ListArtistsResponse, error)
 	// Get artists tracks
 	GetArtistTracks(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Get artists albums
@@ -113,7 +113,7 @@ type CatalogServiceClient interface {
 	// Create new genre
 	CreateGenre(ctx context.Context, in *CreateGenreRequest, opts ...grpc.CallOption) (*Genre, error)
 	// Get tracks by genre
-	GetTrackByGenre(ctx context.Context, in *GetTracksByGenreRequest, opts ...grpc.CallOption) (*ListGenresResponse, error)
+	GetTrackByGenre(ctx context.Context, in *GetTracksByGenreRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Get genre by id
 	GetGenre(ctx context.Context, in *GetGenreRequest, opts ...grpc.CallOption) (*Genre, error)
 	// Heath check
@@ -258,9 +258,9 @@ func (c *catalogServiceClient) DeleteArtist(ctx context.Context, in *DeleteArtis
 	return out, nil
 }
 
-func (c *catalogServiceClient) SearchArtists(ctx context.Context, in *SearchArtistsRequest, opts ...grpc.CallOption) (*ListArtistsRequest, error) {
+func (c *catalogServiceClient) SearchArtists(ctx context.Context, in *SearchArtistsRequest, opts ...grpc.CallOption) (*ListArtistsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListArtistsRequest)
+	out := new(ListArtistsResponse)
 	err := c.cc.Invoke(ctx, CatalogService_SearchArtists_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -388,9 +388,9 @@ func (c *catalogServiceClient) CreateGenre(ctx context.Context, in *CreateGenreR
 	return out, nil
 }
 
-func (c *catalogServiceClient) GetTrackByGenre(ctx context.Context, in *GetTracksByGenreRequest, opts ...grpc.CallOption) (*ListGenresResponse, error) {
+func (c *catalogServiceClient) GetTrackByGenre(ctx context.Context, in *GetTracksByGenreRequest, opts ...grpc.CallOption) (*ListTracksResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListGenresResponse)
+	out := new(ListTracksResponse)
 	err := c.cc.Invoke(ctx, CatalogService_GetTrackByGenre_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -451,7 +451,7 @@ type CatalogServiceServer interface {
 	// Delete artist
 	DeleteArtist(context.Context, *DeleteArtistRequest) (*common.Empty, error)
 	// Artists search
-	SearchArtists(context.Context, *SearchArtistsRequest) (*ListArtistsRequest, error)
+	SearchArtists(context.Context, *SearchArtistsRequest) (*ListArtistsResponse, error)
 	// Get artists tracks
 	GetArtistTracks(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error)
 	// Get artists albums
@@ -477,7 +477,7 @@ type CatalogServiceServer interface {
 	// Create new genre
 	CreateGenre(context.Context, *CreateGenreRequest) (*Genre, error)
 	// Get tracks by genre
-	GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListGenresResponse, error)
+	GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListTracksResponse, error)
 	// Get genre by id
 	GetGenre(context.Context, *GetGenreRequest) (*Genre, error)
 	// Heath check
@@ -531,7 +531,7 @@ func (UnimplementedCatalogServiceServer) UpdateArtist(context.Context, *UpdateAr
 func (UnimplementedCatalogServiceServer) DeleteArtist(context.Context, *DeleteArtistRequest) (*common.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteArtist not implemented")
 }
-func (UnimplementedCatalogServiceServer) SearchArtists(context.Context, *SearchArtistsRequest) (*ListArtistsRequest, error) {
+func (UnimplementedCatalogServiceServer) SearchArtists(context.Context, *SearchArtistsRequest) (*ListArtistsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchArtists not implemented")
 }
 func (UnimplementedCatalogServiceServer) GetArtistTracks(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error) {
@@ -570,7 +570,7 @@ func (UnimplementedCatalogServiceServer) ListGenres(context.Context, *ListGenres
 func (UnimplementedCatalogServiceServer) CreateGenre(context.Context, *CreateGenreRequest) (*Genre, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateGenre not implemented")
 }
-func (UnimplementedCatalogServiceServer) GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListGenresResponse, error) {
+func (UnimplementedCatalogServiceServer) GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListTracksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTrackByGenre not implemented")
 }
 func (UnimplementedCatalogServiceServer) GetGenre(context.Context, *GetGenreRequest) (*Genre, error) {

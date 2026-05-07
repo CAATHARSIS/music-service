@@ -84,7 +84,7 @@ const (
 	SearchField_SEARCH_FIELD_TITLE       SearchField = 1
 	SearchField_SEARCH_FIELD_ARTIST      SearchField = 2
 	SearchField_SEARCH_FIELD_ALBUM       SearchField = 3
-	SearchField_SEARCH_FILED_LYRICS      SearchField = 4
+	SearchField_SEARCH_FIELD_LYRICS      SearchField = 4
 	SearchField_SEARCH_FIELD_ALL         SearchField = 5
 )
 
@@ -95,7 +95,7 @@ var (
 		1: "SEARCH_FIELD_TITLE",
 		2: "SEARCH_FIELD_ARTIST",
 		3: "SEARCH_FIELD_ALBUM",
-		4: "SEARCH_FILED_LYRICS",
+		4: "SEARCH_FIELD_LYRICS",
 		5: "SEARCH_FIELD_ALL",
 	}
 	SearchField_value = map[string]int32{
@@ -103,7 +103,7 @@ var (
 		"SEARCH_FIELD_TITLE":       1,
 		"SEARCH_FIELD_ARTIST":      2,
 		"SEARCH_FIELD_ALBUM":       3,
-		"SEARCH_FILED_LYRICS":      4,
+		"SEARCH_FIELD_LYRICS":      4,
 		"SEARCH_FIELD_ALL":         5,
 	}
 )
@@ -936,7 +936,7 @@ type ListTracksRequest struct {
 	YearFrom      *int32                    `protobuf:"varint,5,opt,name=year_from,json=yearFrom,proto3,oneof" json:"year_from,omitempty"`
 	YearTo        *int32                    `protobuf:"varint,6,opt,name=year_to,json=yearTo,proto3,oneof" json:"year_to,omitempty"`
 	SortBy        TrackSortBy               `protobuf:"varint,7,opt,name=sort_by,json=sortBy,proto3,enum=catalog.TrackSortBy" json:"sort_by,omitempty"`
-	SortOder      SortOrder                 `protobuf:"varint,8,opt,name=sort_oder,json=sortOder,proto3,enum=catalog.SortOrder" json:"sort_oder,omitempty"`
+	SortOrder     SortOrder                 `protobuf:"varint,8,opt,name=sort_order,json=sortOrder,proto3,enum=catalog.SortOrder" json:"sort_order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1020,9 +1020,9 @@ func (x *ListTracksRequest) GetSortBy() TrackSortBy {
 	return TrackSortBy_TRACK_SORT_BY_UNSPECIFIED
 }
 
-func (x *ListTracksRequest) GetSortOder() SortOrder {
+func (x *ListTracksRequest) GetSortOrder() SortOrder {
 	if x != nil {
-		return x.SortOder
+		return x.SortOrder
 	}
 	return SortOrder_SORT_ORDER_UNSPECIFIED
 }
@@ -3063,7 +3063,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
 	"\x0einclude_artist\x18\x02 \x01(\bR\rincludeArtist\x12#\n" +
 	"\rinclude_album\x18\x03 \x01(\bR\fincludeAlbum\x12%\n" +
-	"\x0einclude_genres\x18\x04 \x01(\bR\rincludeGenres\"\x82\x03\n" +
+	"\x0einclude_genres\x18\x04 \x01(\bR\rincludeGenres\"\x84\x03\n" +
 	"\x11ListTracksRequest\x129\n" +
 	"\n" +
 	"pagination\x18\x01 \x01(\v2\x19.common.PaginationRequestR\n" +
@@ -3073,8 +3073,9 @@ const file_catalog_proto_rawDesc = "" +
 	"\tgenre_ids\x18\x04 \x03(\tR\bgenreIds\x12 \n" +
 	"\tyear_from\x18\x05 \x01(\x05H\x02R\byearFrom\x88\x01\x01\x12\x1c\n" +
 	"\ayear_to\x18\x06 \x01(\x05H\x03R\x06yearTo\x88\x01\x01\x12-\n" +
-	"\asort_by\x18\a \x01(\x0e2\x14.catalog.TrackSortByR\x06sortBy\x12/\n" +
-	"\tsort_oder\x18\b \x01(\x0e2\x12.catalog.SortOrderR\bsortOderB\f\n" +
+	"\asort_by\x18\a \x01(\x0e2\x14.catalog.TrackSortByR\x06sortBy\x121\n" +
+	"\n" +
+	"sort_order\x18\b \x01(\x0e2\x12.catalog.SortOrderR\tsortOrderB\f\n" +
 	"\n" +
 	"_artist_idB\v\n" +
 	"\t_album_idB\f\n" +
@@ -3305,7 +3306,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\x12SEARCH_FIELD_TITLE\x10\x01\x12\x17\n" +
 	"\x13SEARCH_FIELD_ARTIST\x10\x02\x12\x16\n" +
 	"\x12SEARCH_FIELD_ALBUM\x10\x03\x12\x17\n" +
-	"\x13SEARCH_FILED_LYRICS\x10\x04\x12\x14\n" +
+	"\x13SEARCH_FIELD_LYRICS\x10\x04\x12\x14\n" +
 	"\x10SEARCH_FIELD_ALL\x10\x05*w\n" +
 	"\vTrackSortBy\x12\x1d\n" +
 	"\x19TRACK_SORT_BY_UNSPECIFIED\x10\x00\x12\x17\n" +
@@ -3327,7 +3328,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\tSortOrder\x12\x1a\n" +
 	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +
-	"\x0fSORT_ORDER_DESC\x10\x022\xb0\x0f\n" +
+	"\x0fSORT_ORDER_DESC\x10\x022\xb1\x0f\n" +
 	"\x0eCatalogService\x124\n" +
 	"\bGetTrack\x12\x18.catalog.GetTrackRequest\x1a\x0e.catalog.Track\x12E\n" +
 	"\n" +
@@ -3342,8 +3343,8 @@ const file_catalog_proto_rawDesc = "" +
 	"\vListArtists\x12\x1b.catalog.ListArtistsRequest\x1a\x1c.catalog.ListArtistsResponse\x12=\n" +
 	"\fCreateArtist\x12\x1c.catalog.CreateArtistRequest\x1a\x0f.catalog.Artist\x12=\n" +
 	"\fUpdateArtist\x12\x1c.catalog.UpdateArtistRequest\x1a\x0f.catalog.Artist\x12;\n" +
-	"\fDeleteArtist\x12\x1c.catalog.DeleteArtistRequest\x1a\r.common.Empty\x12K\n" +
-	"\rSearchArtists\x12\x1d.catalog.SearchArtistsRequest\x1a\x1b.catalog.ListArtistsRequest\x12O\n" +
+	"\fDeleteArtist\x12\x1c.catalog.DeleteArtistRequest\x1a\r.common.Empty\x12L\n" +
+	"\rSearchArtists\x12\x1d.catalog.SearchArtistsRequest\x1a\x1c.catalog.ListArtistsResponse\x12O\n" +
 	"\x0fGetArtistTracks\x12\x1f.catalog.GetArtistTracksRequest\x1a\x1b.catalog.ListTracksResponse\x12O\n" +
 	"\x0fGetArtistAlbums\x12\x1f.catalog.GetArtistAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\x12P\n" +
 	"\x0fGetArtistsByIDs\x12\x1f.catalog.GetArtistsByIDsRequest\x1a\x1c.catalog.ListArtistsResponse\x124\n" +
@@ -3358,7 +3359,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\n" +
 	"ListGenres\x12\x1a.catalog.ListGenresRequest\x1a\x1b.catalog.ListGenresResponse\x12:\n" +
 	"\vCreateGenre\x12\x1b.catalog.CreateGenreRequest\x1a\x0e.catalog.Genre\x12P\n" +
-	"\x0fGetTrackByGenre\x12 .catalog.GetTracksByGenreRequest\x1a\x1b.catalog.ListGenresResponse\x124\n" +
+	"\x0fGetTrackByGenre\x12 .catalog.GetTracksByGenreRequest\x1a\x1b.catalog.ListTracksResponse\x124\n" +
 	"\bGetGenre\x12\x18.catalog.GetGenreRequest\x1a\x0e.catalog.Genre\x125\n" +
 	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB?Z=github.com/CAATHARSIS/music-service/api/gen/catalog;catalogpbb\x06proto3"
 
@@ -3439,7 +3440,7 @@ var file_catalog_proto_depIdxs = []int32{
 	10, // 9: catalog.AlbumWithTracks.genres:type_name -> catalog.Genre
 	44, // 10: catalog.ListTracksRequest.pagination:type_name -> common.PaginationRequest
 	2,  // 11: catalog.ListTracksRequest.sort_by:type_name -> catalog.TrackSortBy
-	6,  // 12: catalog.ListTracksRequest.sort_oder:type_name -> catalog.SortOrder
+	6,  // 12: catalog.ListTracksRequest.sort_order:type_name -> catalog.SortOrder
 	7,  // 13: catalog.ListTracksResponse.tracks:type_name -> catalog.Track
 	45, // 14: catalog.ListTracksResponse.pagination:type_name -> common.PaginationResponse
 	1,  // 15: catalog.SearchTrackRequest.fields:type_name -> catalog.SearchField
@@ -3514,7 +3515,7 @@ var file_catalog_proto_depIdxs = []int32{
 	8,  // 84: catalog.CatalogService.CreateArtist:output_type -> catalog.Artist
 	8,  // 85: catalog.CatalogService.UpdateArtist:output_type -> catalog.Artist
 	46, // 86: catalog.CatalogService.DeleteArtist:output_type -> common.Empty
-	22, // 87: catalog.CatalogService.SearchArtists:output_type -> catalog.ListArtistsRequest
+	23, // 87: catalog.CatalogService.SearchArtists:output_type -> catalog.ListArtistsResponse
 	14, // 88: catalog.CatalogService.GetArtistTracks:output_type -> catalog.ListTracksResponse
 	33, // 89: catalog.CatalogService.GetArtistAlbums:output_type -> catalog.ListAlbumsResponse
 	23, // 90: catalog.CatalogService.GetArtistsByIDs:output_type -> catalog.ListArtistsResponse
@@ -3527,7 +3528,7 @@ var file_catalog_proto_depIdxs = []int32{
 	33, // 97: catalog.CatalogService.SearchAlbums:output_type -> catalog.ListAlbumsResponse
 	40, // 98: catalog.CatalogService.ListGenres:output_type -> catalog.ListGenresResponse
 	10, // 99: catalog.CatalogService.CreateGenre:output_type -> catalog.Genre
-	40, // 100: catalog.CatalogService.GetTrackByGenre:output_type -> catalog.ListGenresResponse
+	14, // 100: catalog.CatalogService.GetTrackByGenre:output_type -> catalog.ListTracksResponse
 	10, // 101: catalog.CatalogService.GetGenre:output_type -> catalog.Genre
 	47, // 102: catalog.CatalogService.Health:output_type -> common.HealthyCheckResponse
 	74, // [74:103] is the sub-list for method output_type

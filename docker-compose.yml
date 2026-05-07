@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres-catalog:
+    image: postgres:18-alpine
+    container_name: music-catalog-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: catalog_user
+      POSTGRES_PASSWORD: catalog_pass
+      POSTGRES_DB: catalog_db
+    volumes:
+      - postgres_catalog_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catalog_user -d catalog_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - music-network
+  catalog-service:
+    build:
+      context: .  
+      dockerfile: cmd/catalog-service/Dockerfile
+    container_name: music-service-catalog
+    environment:
+      CATALOG_DB_HOST: postgres-catalog
+    env_file:
+      - .env
+    ports:
+      - "50053:50053"
+    depends_on:
+      - postgres-catalog
+    networks:
+      - music-network
+    restart: unless-stopped
+
+networks:
+  music-network:
+    driver: bridge
+
+volumes:
+  postgres_catalog_data:

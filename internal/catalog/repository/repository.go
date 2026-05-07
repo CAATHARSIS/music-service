@@ -68,6 +68,7 @@ type Repository interface {
 	GetGenreByID(ctx context.Context, id string) (*models.Genre, error)
 	ListGenres(ctx context.Context) ([]*models.Genre, error)
 	GetTracksByGenre(ctx context.Context, genreID string, limit int) ([]*models.Track, error)
+	GetGenresByArtist(ctx context.Context, trackID string) ([]*models.Genre, error)
 }
 
 type repository struct {
@@ -290,10 +291,10 @@ func (r *repository) buildGetTracksByIDsQuery(opts *models.GetTrackOptions) stri
 
 	if opts.IncludeAlbum {
 		selectParts = append(selectParts,
-			"al.id as \"album_id\"",
-			"al.title as \"album_title\"",
-			"al.year as \"album_year\"",
-			"al.cover_image_id as \"cover_image_id\"",
+			"al.id as \"album.id\"",
+			"al.title as \"album.title\"",
+			"al.year as \"album.year\"",
+			"al.cover_image_id as \"album.cover_image_id\"",
 		)
 		fromPart += " LEFT JOIN albums al ON t.album_id = al.id"
 	}
@@ -338,7 +339,7 @@ func (r *repository) getTracksGenresBatch(ctx context.Context, trackIDs []string
 
 		err := rows.Scan(
 			&trackID,
-			&genre.ID, genre.Name, genre.Description,
+			&genre.ID, &genre.Name, &genre.Description,
 			&genre.CreatedAt, &genre.UpdatedAt,
 		)
 		if err != nil {
@@ -672,64 +673,71 @@ func (r *repository) searchTracksFuzzy(ctx context.Context, query string, opts *
 }
 
 func (r *repository) buildSearchTracksQuery(isFullText bool, opts *models.SearchTracksOptions) string {
-	selectPart := []string{
-		"t.id",
-		"t.title",
-		"t.duration",
-		"t.year",
-		"t.file_id",
-		"t.cover_image_id",
-		"t.track_number",
-		"t.lyrics",
-		"t.plays_count",
-		"t.created_at",
-		"t.updated_at",
-		"t.artist_id",
-		"t.album_id",
+	innerCols := []string{
+		"t.id", "t.title", "t.duration", "t.year", "t.file_id", "t.cover_image_id",
+		"t.track_number", "t.lyrics", "t.plays_count", "t.created_at", "t.updated_at",
+		"t.artist_id", "t.album_id",
 	}
 
-	fromPart := "FROM tracks t"
-	wherePart := ""
-	orderByPart := ""
+	outerCols := []string{
+		"id", "title", "duration", "year", "file_id", "cover_image_id",
+		"track_number", "lyrics", "plays_count", "created_at", "updated_at",
+		"artist_id", "album_id",
+	}
+
+	fromClause := "FROM tracks t"
 
 	if opts.IncludeArtist {
-		selectPart = append(selectPart,
-			"a.id as \"artist.id\"",
-			"a.name as \"artist.name\"",
-			"a.country as \"artist.country\"",
-			"a.avatar_image_id as \"artist.avatar_image_id\"",
-			"a.total_plays as \"artist.total_plays\"",
+		innerCols = append(innerCols,
+			`a.id AS "artist.id"`, `a.name AS "artist.name"`, `a.country AS "artist.country"`,
+			`a.avatar_image_id AS "artist.avatar_image_id"`, `a.total_plays AS "artist.total_plays"`,
 		)
-		fromPart += " JOIN artists a ON t.artist_id = a.id"
+		outerCols = append(outerCols,
+			`"artist.id"`, `"artist.name"`, `"artist.country"`,
+			`"artist.avatar_image_id"`, `"artist.total_plays"`,
+		)
+		fromClause += " JOIN artists a ON t.artist_id = a.id"
 	}
 
 	if opts.IncludeAlbum {
-		selectPart = append(selectPart,
-			"al.id as \"album.id\"",
-			"al.title as \"album.title\"",
-			"al.year as \"album.year\"",
-			"al.cover_image_id as \"album.cover_image_id\"",
+		innerCols = append(innerCols,
+			`al.id AS "album.id"`, `al.title AS "album.title"`,
+			`al.year AS "album.year"`, `al.cover_image_id AS "album.cover_image_id"`,
 		)
-		fromPart += " LEFT JOIN albums al ON t.album_id = al.id"
+		outerCols = append(outerCols,
+			`"album.id"`, `"album.title"`, `"album.year"`, `"album.cover_image_id"`,
+		)
+		fromClause += " LEFT JOIN albums al ON t.album_id = al.id"
 	}
 
+	var metricCol, metricAlias, whereClause, orderByClause string
 	if isFullText {
-		wherePart = "WHERE t.search_vector @@ to_tsquery('simple', $1)"
-		selectPart = append(selectPart, "ts_rank(t.search_vector, to_tsquery('simple', $1)) as rank")
-		orderByPart = "ORDER BY rank DESC"
+		metricCol = "ts_rank(t.search_vector, to_tsquery('simple', $1))"
+		metricAlias = "rank"
+		whereClause = "WHERE t.search_vector @@ to_tsquery('simple', $1)"
+		orderByClause = "ORDER BY rank DESC"
 	} else {
-		wherePart = "WHERE t.title % $1"
-		selectPart = append(selectPart, "similarity(t.title, $1) as sim")
-		orderByPart = "ORDER BY sim DESC"
+		metricCol = "similarity(t.title, $1)"
+		metricAlias = "sim"
+		whereClause = "WHERE t.title % $1"
+		orderByClause = "ORDER BY sim DESC"
 	}
 
 	return fmt.Sprintf(`
 		SELECT %s
-		%s
-		%s
-		%s
-		LIMIT $2
-	`, strings.Join(selectPart, ", "), fromPart, wherePart, orderByPart)
+		FROM (
+			SELECT %s, %s AS %s
+			%s
+			%s
+			%s
+			LIMIT $2
+		) AS sub
+	`,
+		strings.Join(outerCols, ", "),
+		strings.Join(innerCols, ", "),
+		metricCol, metricAlias,
+		fromClause, whereClause, orderByClause,
+	)
 }
 
 // Artists
@@ -757,6 +765,7 @@ func (r *repository) CreateArtist(ctx context.Context, params *models.CreateArti
 			name,
 			country,
 			avatar_image_id,
+			total_plays,
 			created_at,
 			updated_at
 
@@ -937,7 +946,7 @@ func (r *repository) UpdateArtist(ctx context.Context, id string, params *models
 }
 
 func (r *repository) DeleteArtistByID(ctx context.Context, id string) error {
-	result, err := r.db.ExecContext(ctx, "DELETE FROM artist WHERE id = $1", id)
+	result, err := r.db.ExecContext(ctx, "DELETE FROM artists WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
@@ -1127,56 +1136,77 @@ func (r *repository) UpdateArtistStats(ctx context.Context, artistID string, inc
 
 func (r *repository) SearchArtists(ctx context.Context, query string, limit int) ([]*models.Artist, error) {
 	safeQuery := sanitizeTSQuery(query)
+	var artists []*models.Artist
+	var err error
 
 	if safeQuery != "" {
 		sql := `
-            SELECT 
-                id,
+            SELECT
+				id,
 				name,
 				country,
 				avatar_image_id,
-                total_plays,
+				total_plays,
 				created_at,
-				updated_at,
-                ts_rank(search_vector, to_tsquery('simple', $1)) as rank
-            FROM
-				artists
-            WHERE
-				search_vector @@ to_tsquery('simple', $1)
+				updated_at
+            FROM (
+                SELECT
+					id,
+					name,
+					country,
+					avatar_image_id,
+					total_plays,
+					created_at,
+					updated_at,
+                    ts_rank(search_vector, to_tsquery('simple', $1)) as rank
+                FROM
+					artists
+                WHERE
+					search_vector @@ to_tsquery('simple', $1)
+            ) AS t
             ORDER BY
 				rank DESC
-            LIMIT $2
+            LIMIT
+				$2
         `
 
-		var artists []*models.Artist
-		err := r.db.SelectContext(ctx, &artists, sql, safeQuery, limit)
-
+		err = r.db.SelectContext(ctx, &artists, sql, safeQuery, limit)
 		if err == nil && len(artists) >= 3 {
 			return artists, nil
 		}
 	}
 
 	fuzzySQL := `
-        SELECT 
-            id,
+        SELECT
+			id,
 			name,
 			country,
 			avatar_image_id,
-            total_plays,
+			total_plays,
 			created_at,
-			updated_at,
-            similarity(name, $1) as sim
-        FROM
-			artists
-        WHERE
-			name % $1
+			updated_at
+        FROM (
+            SELECT
+				id,
+				name,
+				country,
+				avatar_image_id,
+				total_plays,
+				created_at,
+				updated_at,
+                similarity(name, $1) as sim
+            FROM
+				artists
+            WHERE
+				name % $1
+        ) AS t
         ORDER BY
 			sim DESC
-        LIMIT $2
+        LIMIT
+			$2
     `
 
-	var artists []*models.Artist
-	err := r.db.SelectContext(ctx, &artists, fuzzySQL, query, limit)
+	err = r.db.SelectContext(ctx, &artists, fuzzySQL, query, limit)
 	return artists, err
 }
 
@@ -1323,7 +1353,7 @@ func (r *repository) GetAlbumWithTracksByID(ctx context.Context, id string) (*mo
 			t.file_id,
 			t.cover_image_id,
             t.track_number,
-			t.lyrics
+			t.lyrics,
 			t.plays_count,
 			t.created_at,
 			t.updated_at
@@ -1454,72 +1484,72 @@ func (r *repository) DeleteAlbum(ctx context.Context, id string) error {
 
 func (r *repository) ListAlbums(ctx context.Context, filter *models.AlbumFilter) (*models.AlbumListResult, error) {
 	if filter == nil {
-        filter = &models.AlbumFilter{}
-    }
-    
-    whereParts := []string{"1=1"}
-    args := []interface{}{}
-    argIdx := 1
-    
-    if filter.ArtistID != "" {
-        whereParts = append(whereParts, fmt.Sprintf("al.artist_id = $%d", argIdx))
-        args = append(args, filter.ArtistID)
-        argIdx++
-    }
-    
-    if len(filter.GenreIDs) > 0 {
-        whereParts = append(whereParts, fmt.Sprintf(`
+		filter = &models.AlbumFilter{}
+	}
+
+	whereParts := []string{"1=1"}
+	args := []interface{}{}
+	argIdx := 1
+
+	if filter.ArtistID != "" {
+		whereParts = append(whereParts, fmt.Sprintf("al.artist_id = $%d", argIdx))
+		args = append(args, filter.ArtistID)
+		argIdx++
+	}
+
+	if len(filter.GenreIDs) > 0 {
+		whereParts = append(whereParts, fmt.Sprintf(`
             EXISTS (
                 SELECT 1 FROM album_genres ag 
                 WHERE ag.album_id = al.id AND ag.genre_id = ANY($%d)
             )
         `, argIdx))
-        args = append(args, pq.Array(filter.GenreIDs))
-        argIdx++
-    }
-    
-    if filter.YearFrom > 0 {
-        whereParts = append(whereParts, fmt.Sprintf("al.year >= $%d", argIdx))
-        args = append(args, filter.YearFrom)
-        argIdx++
-    }
-    
-    if filter.YearTo > 0 {
-        whereParts = append(whereParts, fmt.Sprintf("al.year <= $%d", argIdx))
-        args = append(args, filter.YearTo)
-        argIdx++
-    }
-    
-    if filter.AlbumType != "" {
-        whereParts = append(whereParts, fmt.Sprintf("al.album_type = $%d", argIdx))
-        args = append(args, filter.AlbumType)
-        argIdx++
-    }
-    
-    whereClause := strings.Join(whereParts, " AND ")
-    
-    countQuery := fmt.Sprintf("SELECT COUNT(*) FROM albums al WHERE %s", whereClause)
-    var totalCount int64
-    err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&totalCount)
-    if err != nil {
-        return nil, fmt.Errorf("count albums: %w", err)
-    }
+		args = append(args, pq.Array(filter.GenreIDs))
+		argIdx++
+	}
 
-    orderBy := "al.created_at DESC"
-    switch filter.SortBy {
-    case models.SortAlbumByTitle:
-        orderBy = "al.title"
-    case models.SortAlbumByYear:
-        orderBy = "al.year"
-    }
-    
-    if filter.SortOrder == models.SortOrderDesc {
-        orderBy += " DESC"
-    } else {
-        orderBy += " ASC"
-    }
-    
-    query := fmt.Sprintf(`
+	if filter.YearFrom > 0 {
+		whereParts = append(whereParts, fmt.Sprintf("al.year >= $%d", argIdx))
+		args = append(args, filter.YearFrom)
+		argIdx++
+	}
+
+	if filter.YearTo > 0 {
+		whereParts = append(whereParts, fmt.Sprintf("al.year <= $%d", argIdx))
+		args = append(args, filter.YearTo)
+		argIdx++
+	}
+
+	if filter.AlbumType != "" {
+		whereParts = append(whereParts, fmt.Sprintf("al.album_type = $%d", argIdx))
+		args = append(args, filter.AlbumType)
+		argIdx++
+	}
+
+	whereClause := strings.Join(whereParts, " AND ")
+
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM albums al WHERE %s", whereClause)
+	var totalCount int64
+	err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&totalCount)
+	if err != nil {
+		return nil, fmt.Errorf("count albums: %w", err)
+	}
+
+	orderBy := "al.created_at DESC"
+	switch filter.SortBy {
+	case models.SortAlbumByTitle:
+		orderBy = "al.title"
+	case models.SortAlbumByYear:
+		orderBy = "al.year"
+	}
+
+	if filter.SortOrder == models.SortOrderDesc {
+		orderBy += " DESC"
+	} else {
+		orderBy += " ASC"
+	}
+
+	query := fmt.Sprintf(`
         SELECT 
             al.id,
 			al.title,
@@ -1527,9 +1557,6 @@ func (r *repository) ListAlbums(ctx context.Context, filter *models.AlbumFilter)
 			al.artist_id,
 			al.cover_image_id,
             al.album_type,
-			al.total_tracks,
-			al.total_duration,
-			al.total_plays,
             al.created_at,
 			al.updated_at,
             a.id as "artist.id",
@@ -1545,96 +1572,113 @@ func (r *repository) ListAlbums(ctx context.Context, filter *models.AlbumFilter)
         LIMIT $%d
 		OFFSET $%d
     `, whereClause, orderBy, argIdx, argIdx+1)
-    
-    args = append(args, filter.PageSize, (filter.Page-1)*filter.PageSize)
-    
-    var albums []*models.Album
-    err = r.db.SelectContext(ctx, &albums, query, args...)
-    if err != nil {
-        return nil, fmt.Errorf("list albums: %w", err)
-    }
-    
-    return &models.AlbumListResult{
-        Albums:     albums,
-        Page:       filter.Page,
-        PageSize:   filter.PageSize,
-    }, nil
+
+	args = append(args, filter.PageSize, (filter.Page-1)*filter.PageSize)
+
+	var albums []*models.Album
+	err = r.db.SelectContext(ctx, &albums, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("list albums: %w", err)
+	}
+
+	return &models.AlbumListResult{
+		Albums:   albums,
+		Page:     filter.Page,
+		PageSize: filter.PageSize,
+	}, nil
 }
 
 func (r *repository) SearchAlbums(ctx context.Context, query string, opts *models.SearchAlbumsOptions) ([]*models.Album, error) {
-    if opts == nil {
-        opts = &models.SearchAlbumsOptions{Limit: 20}
-    }
-    
-    safeQuery := sanitizeTSQuery(query)
-    if safeQuery != "" {
-        albums, err := r.searchAlbumsFullText(ctx, safeQuery, opts)
-        if err == nil && len(albums) >= 3 {
-            return albums, nil
-        }
-    }
-    
-    return r.searchAlbumsFuzzy(ctx, query, opts)
+	if opts == nil {
+		opts = &models.SearchAlbumsOptions{Limit: 20}
+	}
+
+	safeQuery := sanitizeTSQuery(query)
+	if safeQuery != "" {
+		albums, err := r.searchAlbumsFullText(ctx, safeQuery, opts)
+		if err == nil && len(albums) >= 1 {
+			return albums, nil
+		}
+	}
+
+	return r.searchAlbumsFuzzy(ctx, query, opts)
 }
 
 func (r *repository) searchAlbumsFullText(ctx context.Context, safeQuery string, opts *models.SearchAlbumsOptions) ([]*models.Album, error) {
-    sql := r.buildSearchAlbumsQuery(true, opts)
-    
-    var albums []*models.Album
-    err := r.db.SelectContext(ctx, &albums, sql, safeQuery, opts.Limit)
-    return albums, err
+	sql := r.buildSearchAlbumsQuery(true, opts)
+
+	var albums []*models.Album
+	err := r.db.SelectContext(ctx, &albums, sql, safeQuery, opts.Limit)
+	return albums, err
 }
 
 func (r *repository) searchAlbumsFuzzy(ctx context.Context, query string, opts *models.SearchAlbumsOptions) ([]*models.Album, error) {
-    sql := r.buildSearchAlbumsQuery(false, opts)
-    
-    var albums []*models.Album
-    err := r.db.SelectContext(ctx, &albums, sql, query, opts.Limit)
-    return albums, err
+	sql := r.buildSearchAlbumsQuery(false, opts)
+
+	var albums []*models.Album
+	err := r.db.SelectContext(ctx, &albums, sql, query, opts.Limit)
+	return albums, err
 }
 
 func (r *repository) buildSearchAlbumsQuery(isFullText bool, opts *models.SearchAlbumsOptions) string {
-    selectParts := []string{
-        "al.id",
-        "al.title",
-        "al.year",
-        "al.cover_image_id",
-        "al.album_type",
-        "al.total_tracks",
-        "al.created_at",
+	innerCols := []string{
+		"al.id",
+		"al.title",
+		"al.year",
+		"al.cover_image_id",
+		"al.album_type",
+		"al.created_at",
 		"al.updated_at",
-    }
-    
-    fromClause := "FROM albums al"
-    
-    if opts.IncludeArtist {
-        selectParts = append(selectParts,
-            "a.id as \"artist.id\"",
-            "a.name as \"artist.name\"",
-        )
-        fromClause += " JOIN artists a ON al.artist_id = a.id"
-    }
-    
-    whereClause := ""
-    orderByClause := ""
-    
-    if isFullText {
-        whereClause = "WHERE al.search_vector @@ to_tsquery('simple', $1)"
-        selectParts = append(selectParts, "ts_rank(al.search_vector, to_tsquery('simple', $1)) as rank")
-        orderByClause = "ORDER BY rank DESC"
-    } else {
-        whereClause = "WHERE al.title % $1"
-        selectParts = append(selectParts, "similarity(al.title, $1) as sim")
-        orderByClause = "ORDER BY sim DESC"
-    }
-    
-    return fmt.Sprintf(`
-        SELECT %s
-        %s
-        %s
-        %s
-        LIMIT $2
-    `, strings.Join(selectParts, ", "), fromClause, whereClause, orderByClause)
+	}
+
+	outerCols := []string{
+		"id",
+		"title",
+		"year",
+		"cover_image_id",
+		"album_type",
+		"created_at",
+		"updated_at",
+	}
+
+	if opts.IncludeArtist {
+		innerCols = append(innerCols, `a.id AS "artist.id"`, `a.name AS "artist.name"`)
+		outerCols = append(outerCols, `"artist.id"`, `"artist.name"`)
+	}
+
+	fromClause := "FROM albums al"
+	if opts.IncludeArtist {
+		fromClause += " JOIN artists a ON al.artist_id = a.id"
+	}
+
+	var metricCol, metricAlias, whereClause, orderByClause string
+	if isFullText {
+		metricCol = "ts_rank(al.search_vector, to_tsquery('simple', $1))"
+		metricAlias = "rank"
+		whereClause = "WHERE al.search_vector @@ to_tsquery('simple', $1)"
+		orderByClause = "ORDER BY rank DESC"
+	} else {
+		metricCol = "similarity(al.title, $1)"
+		metricAlias = "sim"
+		whereClause = "WHERE al.title % $1"
+		orderByClause = "ORDER BY sim DESC"
+	}
+
+	return fmt.Sprintf(`
+		SELECT %s
+		FROM (
+			SELECT %s, %s AS %s
+			%s
+			%s
+			%s
+			LIMIT $2
+		) AS t
+	`,
+		strings.Join(outerCols, ", "),
+		strings.Join(innerCols, ", "),
+		metricCol, metricAlias,
+		fromClause, whereClause, orderByClause,
+	)
 }
 
 // Genre Methods
@@ -1692,7 +1736,7 @@ func (r *repository) addGenres(ctx context.Context, table, column, id string, ge
 		INSERT INTO %s (%s, GENRE_ID)
 		VALUES %s
 		ON CONFLICT DO NOTHING
-	`, table, id, strings.Join(valueStrings, ","))
+	`, table, column, strings.Join(valueStrings, ","))
 
 	_, err := r.db.ExecContext(ctx, query, valueArgs...)
 	return err
@@ -1764,7 +1808,6 @@ func (r *repository) CreateGenre(ctx context.Context, params *models.CreateGenre
 			$1, 
 			$2,
 			$3,
-			$4,
 			NOW(),
 			NOW()
 		)
@@ -1775,31 +1818,31 @@ func (r *repository) CreateGenre(ctx context.Context, params *models.CreateGenre
 			created_at,
 			updated_at
     `
-    
-    genre := &models.Genre{
-        ID:        uuid.New().String(),
-        CreatedAt: time.Now(),
-        UpdatedAt: time.Now(),
-    }
-    
-    err := r.db.QueryRowContext(ctx, query,
-        genre.ID,
+
+	genre := &models.Genre{
+		ID:        uuid.New().String(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	err := r.db.QueryRowContext(ctx, query,
+		genre.ID,
 		params.Name,
 		params.Description,
-    ).Scan(
-        &genre.ID,
+	).Scan(
+		&genre.ID,
 		&genre.Name,
 		&genre.Description,
-        &genre.CreatedAt,
+		&genre.CreatedAt,
 		&genre.UpdatedAt,
-    )
-    
-    if err != nil {
-        r.log.Error("failed to create genre", "error", err)
-        return nil, fmt.Errorf("create genre: %w", err)
-    }
-    
-    return genre, nil
+	)
+
+	if err != nil {
+		r.log.Error("failed to create genre", "error", err)
+		return nil, fmt.Errorf("create genre: %w", err)
+	}
+
+	return genre, nil
 }
 
 func (r *repository) GetGenreByID(ctx context.Context, id string) (*models.Genre, error) {
@@ -1815,7 +1858,7 @@ func (r *repository) GetGenreByID(ctx context.Context, id string) (*models.Genre
 		WHERE
 			id = $1
 	`
-	
+
 	var genre models.Genre
 	err := r.db.GetContext(ctx, &genre, query, id)
 
@@ -1878,7 +1921,7 @@ func (r *repository) GetTracksByGenre(ctx context.Context, genreID string, limit
 		LEFT JOIN
 			albums al ON t.album_id = al.id
 		JOIN
-			tracks_genres tg ON t.id = tg.track_id
+			track_genres tg ON t.id = tg.track_id
 		WHERE
 			tg.genre_id = $1
 		ORDER BY
@@ -1898,6 +1941,34 @@ func (r *repository) GetTracksByGenre(ctx context.Context, genreID string, limit
 	}
 
 	return tracks, nil
+}
+
+func (r *repository) GetGenresByArtist(ctx context.Context, trackID string) ([]*models.Genre, error) {
+	query := `
+		SELECT
+			g.id,
+			g.name,
+			g.description,
+			g.created_at,
+			g.updated_at
+		FROM
+			artist_genres ag
+		JOIN
+			genres g ON g.id = ag.genre_id 
+		WHERE
+			ag.artist_id = $1
+	`
+
+	var genres []*models.Genre
+	err := r.db.SelectContext(ctx, &genres, query, trackID)
+	if err != nil {
+		return nil, err
+	}
+	if len(genres) == 0 {
+		return nil, ErrNotFound
+	}
+
+	return genres, nil
 }
 
 // Help Functions
@@ -1920,7 +1991,6 @@ func sanitizeTSQuery(query string) string {
 
 	return strings.Join(words, " & ")
 }
-
 
 func (r *repository) checkWhiteList(table, column string) error {
 	if _, ok := allowedTables[table]; !ok {

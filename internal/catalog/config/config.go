@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 )
@@ -22,14 +23,14 @@ type Config struct {
 
 func Load(log *slog.Logger) *Config {
 	cfg := &Config{
-		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "5432"),
-		DBUser:     getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", "postgres"),
-		DBName:     getEnv("DB_NAME", "catalog-service-test"),
-		DBSSLMode:  getEnv("DB_SSL_MODE", "disable"),
+		DBHost:     getEnv("CATALOG_DB_HOST", "localhost"),
+		DBPort:     getEnv("CATALOG_DB_PORT", "5432"),
+		DBUser:     getEnv("CATALOG_DB_USER", "postgres"),
+		DBPassword: getEnv("CATALOG_DB_PASSWORD", "postgres"),
+		DBName:     getEnv("CATALOG_DB_NAME", "catalog-service-test"),
+		DBSSLMode:  getEnv("CATALOG_DB_SSL_MODE", "disable"),
 
-		GRPCPort: getEnv("GRPC_PORT", "50053"),
+		GRPCPort: getEnv("CATALOG_GRPC_PORT", "50053"),
 
 		AuthServiceAddr:     getEnv("AUTH_SERVICE_ADDR", "localhost:50051"),
 		FileServiceAddr:     getEnv("FILE_SERVICE_ADDR", "localhost:50052"),
@@ -51,4 +52,16 @@ func getEnv(key, defaultValue string) string {
 	}
 
 	return defaultValue
+}
+
+func (c *Config) DatabaseURL() string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		c.DBUser,
+		c.DBPassword,
+		c.DBHost,
+		c.DBPort,
+		c.DBName,
+		c.DBSSLMode,
+	)
 }

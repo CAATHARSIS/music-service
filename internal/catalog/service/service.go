@@ -62,7 +62,7 @@ func (s *CatalogService) ListTracks(ctx context.Context, req *catalogpb.ListTrac
 		Page:      page,
 		PageSize:  pageSize,
 		SortBy:    convertTrackSortBy(req.SortBy),
-		SortOrder: convertSortOrder(req.SortOder),
+		SortOrder: convertSortOrder(req.SortOrder),
 	}
 
 	if req.ArtistId != nil {
@@ -244,18 +244,26 @@ func (s *CatalogService) IncrementTrackPlaysCount(ctx context.Context, req *cata
 	return &commonpb.Empty{}, nil
 }
 
-func (s *CatalogService) GetTracksByIDs(ctx context.Context, ids []string, opts *models.GetTrackOptions) ([]*models.Track, error) {
-	if len(ids) == 0 {
-		return []*models.Track{}, nil
+func (s *CatalogService) GetTracksByIDs(ctx context.Context, req *catalogpb.GetTracksByIDsRequest) (*catalogpb.ListTracksResponse, error) {
+	if len(req.Ids) == 0 {
+		return &catalogpb.ListTracksResponse{}, nil
 	}
 
-	tracks, err := s.repo.GetTracksByIDs(ctx, ids, opts)
+	opts := &models.GetTrackOptions{
+		IncludeArtist: req.IncludeArtist,
+		IncludeAlbum: req.IncludeAlbum,
+		IncludeGenres: req.IncludeGenres,
+	}
+
+	tracks, err := s.repo.GetTracksByIDs(ctx, req.Ids, opts)
 	if err != nil {
-		s.log.Error("get tracks by ids failed", "ids_count", len(ids), "error", err)
+		s.log.Error("get tracks by ids failed", "ids_count", len(req.Ids), "error", err)
 		return nil, fmt.Errorf("get tracks by ids: %w", err)
 	}
 
-	return tracks, err
+	return &catalogpb.ListTracksResponse{
+		Tracks: convertTracksToProto(tracks),
+	}, err
 }
 
 func (s *CatalogService) IncrementPlaysCount(ctx context.Context, req *catalogpb.IncrementPlaysCountRequest) (*commonpb.Empty, error) {
@@ -303,6 +311,18 @@ func (s *CatalogService) GetArtist(ctx context.Context, req *catalogpb.GetArtist
 		}
 		s.log.Error("get artist failed", "id", req.Id, "error", err)
 		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	if req.IncludeGenres {
+		genres, err := s.repo.GetGenresByArtist(ctx, artist.ID)
+		if err != nil {
+			if errors.Is(err, repository.ErrNotFound) {
+				s.log.Warn("get artist without genres", "id", req.Id, "error", repository.ErrNotFound)
+			} else {
+				s.log.Warn("get artist without genres", "id", req.Id, "error", err)
+			}
+		}
+		artist.Genres = genres
 	}
 
 	return convertArtistToProto(artist), nil
