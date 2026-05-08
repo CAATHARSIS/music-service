@@ -6,3 +6,5 @@ require (
 	github.com/CAATHARSIS/music-service v0.0.0-20260414121833-4bca8d1b8389
 	github.com/lib/pq v1.12.3
 )
+
+require github.com/golang-migrate/migrate/v4 v4.19.1 // indirect
