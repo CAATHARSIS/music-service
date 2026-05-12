@@ -5,16 +5,11 @@ import (
 	"log/slog"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/CAATHARSIS/music-service/internal/auth/config"
+	_ "github.com/lib/pq"
 )
 
-func NewPostgresDB(log *slog.Logger, cfg *config.Config) (*sqlx.DB, error) {
-	conStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBSSLMode,
-	)
-
-	db, err := sqlx.Open("postgres", conStr)
+func NewPostgresDB(log *slog.Logger, databaseURL string) (*sqlx.DB, error) {
+	db, err := sqlx.Open("postgres", databaseURL)
 	if err != nil {
 		log.Info("database connection", "status", "fail", "error", err)
 		return nil, fmt.Errorf("Failed to open database: %v", err)

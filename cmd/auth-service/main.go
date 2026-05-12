@@ -2,14 +2,22 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"log/slog"
+	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
+	_ "github.com/lib/pq"
+	authpb "github.com/CAATHARSIS/music-service/api/gen/auth"
 	"github.com/CAATHARSIS/music-service/internal/auth/config"
-	"github.com/CAATHARSIS/music-service/internal/auth/database"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/CAATHARSIS/music-service/internal/auth/repository"
+	"github.com/CAATHARSIS/music-service/internal/auth/service"
+	"github.com/CAATHARSIS/music-service/pkg/database"
+	"github.com/CAATHARSIS/music-service/pkg/interceptor"
+	"github.com/CAATHARSIS/music-service/pkg/migrate"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 //go:embed migrations/*.sql
@@ -20,7 +28,7 @@ func main() {
 
 	cfg := config.Load(logger)
 
-	db, err := database.NewPostgresDB(logger, cfg)
+	db, err := database.NewPostgresDB(logger, cfg.DatabaseURL())
 	if err != nil {
 		logger.Error("failed to open database", "error", err)
 		os.Exit(1)
@@ -29,38 +37,40 @@ func main() {
 
 	logger.Info("database connection", "status", "ok")
 
-	if err := runMigrations(cfg, logger); err != nil {
+	if err := migrate.Run(migrationsFS, cfg.DatabaseURL(), logger); err != nil {
 		logger.Error("migrations failed", "error", err)
 		os.Exit(1)
 	}
-}
 
-func runMigrations(cfg *config.Config, log *slog.Logger) error {
-	log.Info("preparing migrations...")
+	repo := repository.NewRepository(db, logger)
+	srv := service.NewAuthService(repo, cfg, logger)
 
-	sourceDriver, err := iofs.New(migrationsFS, "migrations")
+	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
-		return fmt.Errorf("failed to create iofs source: %w", err)
+		logger.Error("failed to listen", "error", err)
+		os.Exit(1)
 	}
 
-	m, err := migrate.NewWithSourceInstance("iofs", sourceDriver, cfg.DatabaseURL())
-	if err != nil {
-		return fmt.Errorf("failed to create migrate instance: %w", err)
-	}
-	defer m.Close()
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(interceptor.Logging(logger)),
+	)
 
-	log.Info("running database migrations...")
+	authpb.RegisterAuthServiceServer(grpcServer, srv)
+	reflection.Register(grpcServer)
 
-	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
+	logger.Info("Auth Service starting", "port", cfg.GRPCPort)
 
-	if err == migrate.ErrNoChange {
-		log.Info("no new migrations to apply")
-	} else {
-		log.Info("migrations applied successfully")
-	}
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			logger.Error("failed to serve", "error", err)
+			os.Exit(1)
+		}
+	}()
 
-	return nil
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	logger.Info("shutting down auth service...")
+	grpcServer.GracefulStop()
 }
