@@ -22,6 +22,12 @@ var (
 
 type Repository interface {
 	CreateUser(ctx context.Context, username, email, password string) (*models.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
+	GetUserByID(ctx context.Context, id string) (*models.User, error)
+	VerifyPassword(user *models.User, password string) bool
+	SaveRefreshToken(ctx context.Context, userID, tokenHash string, expiresAt time.Time) error
+	GetRefreshToken(ctx context.Context, tokenHash string) (*models.RefreshToken, error)
+	DeleteRefreshToken(ctx context.Context, id string) error
 }
 
 type repository struct {
