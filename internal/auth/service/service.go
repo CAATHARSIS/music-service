@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -50,7 +51,7 @@ func (s *AuthService) Register(ctx context.Context, req *authpb.RegisterRequest)
 
 	token, err := s.generateAccessToken(user)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to generate token")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to generate token: %v", err))
 	}
 
 	refreshToken, err := s.generateRefreshToken(ctx, user)
@@ -177,7 +178,7 @@ func (s *AuthService) generateAccessToken(user *models.User) (string, error) {
 		"sub":  user.ID,
 		"role": user.Role,
 		"exp":  time.Now().Add(duration).Unix(),
-		"iat":  time.Now().Unix,
+		"iat":  time.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

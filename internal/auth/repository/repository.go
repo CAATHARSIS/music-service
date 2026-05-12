@@ -121,7 +121,7 @@ func (r *repository) GetUserByEmail(ctx context.Context, email string) (*models.
 
 	var user models.User
 	err := r.db.GetContext(ctx, &user, query, email)
-	if err != sql.ErrNoRows {
+	if err == sql.ErrNoRows {
 		return nil, ErrNotFound
 	}
 	if err != nil {
