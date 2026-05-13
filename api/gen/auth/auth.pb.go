@@ -557,6 +557,102 @@ func (x *GetProfileRequest) GetUserId() string {
 	return ""
 }
 
+type GetAvatarURLRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AvatarImageId string                 `protobuf:"bytes,1,opt,name=avatar_image_id,json=avatarImageId,proto3" json:"avatar_image_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAvatarURLRequest) Reset() {
+	*x = GetAvatarURLRequest{}
+	mi := &file_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAvatarURLRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAvatarURLRequest) ProtoMessage() {}
+
+func (x *GetAvatarURLRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAvatarURLRequest.ProtoReflect.Descriptor instead.
+func (*GetAvatarURLRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetAvatarURLRequest) GetAvatarImageId() string {
+	if x != nil {
+		return x.AvatarImageId
+	}
+	return ""
+}
+
+type AvatarURLResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AvatarURLResponse) Reset() {
+	*x = AvatarURLResponse{}
+	mi := &file_auth_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AvatarURLResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AvatarURLResponse) ProtoMessage() {}
+
+func (x *AvatarURLResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AvatarURLResponse.ProtoReflect.Descriptor instead.
+func (*AvatarURLResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *AvatarURLResponse) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *AvatarURLResponse) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
@@ -604,14 +700,21 @@ const file_auth_proto_rawDesc = "" +
 	"\x13RefreshTokenRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\",\n" +
 	"\x11GetProfileRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId2\xef\x02\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"=\n" +
+	"\x13GetAvatarURLRequest\x12&\n" +
+	"\x0favatar_image_id\x18\x01 \x01(\tR\ravatarImageId\"D\n" +
+	"\x11AvatarURLResponse\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x02 \x01(\x03R\texpiresAt2\xb3\x03\n" +
 	"\vAuthService\x125\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x12.auth.AuthResponse\x12/\n" +
 	"\x05Login\x12\x12.auth.LoginRequest\x1a\x12.auth.AuthResponse\x12H\n" +
 	"\rValidateToken\x12\x1a.auth.ValidateTokenRequest\x1a\x1b.auth.ValidateTokenResponse\x12=\n" +
 	"\fRefreshToken\x12\x19.auth.RefreshTokenRequest\x1a\x12.auth.AuthResponse\x128\n" +
 	"\n" +
-	"GetProfile\x12\x17.auth.GetProfileRequest\x1a\x11.auth.UserProfile\x125\n" +
+	"GetProfile\x12\x17.auth.GetProfileRequest\x1a\x11.auth.UserProfile\x12B\n" +
+	"\fGetAvatarURL\x12\x19.auth.GetAvatarURLRequest\x1a\x17.auth.AvatarURLResponse\x125\n" +
 	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB9Z7github.com/CAATHARSIS/music-service/api/gen/auth;authpbb\x06proto3"
 
 var (
@@ -626,7 +729,7 @@ func file_auth_proto_rawDescGZIP() []byte {
 	return file_auth_proto_rawDescData
 }
 
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_auth_proto_goTypes = []any{
 	(*User)(nil),                        // 0: auth.User
 	(*UserProfile)(nil),                 // 1: auth.UserProfile
@@ -637,8 +740,10 @@ var file_auth_proto_goTypes = []any{
 	(*ValidateTokenResponse)(nil),       // 6: auth.ValidateTokenResponse
 	(*RefreshTokenRequest)(nil),         // 7: auth.RefreshTokenRequest
 	(*GetProfileRequest)(nil),           // 8: auth.GetProfileRequest
-	(*common.Empty)(nil),                // 9: common.Empty
-	(*common.HealthyCheckResponse)(nil), // 10: common.HealthyCheckResponse
+	(*GetAvatarURLRequest)(nil),         // 9: auth.GetAvatarURLRequest
+	(*AvatarURLResponse)(nil),           // 10: auth.AvatarURLResponse
+	(*common.Empty)(nil),                // 11: common.Empty
+	(*common.HealthyCheckResponse)(nil), // 12: common.HealthyCheckResponse
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: auth.AuthResponse.user:type_name -> auth.User
@@ -647,15 +752,17 @@ var file_auth_proto_depIdxs = []int32{
 	5,  // 3: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenRequest
 	7,  // 4: auth.AuthService.RefreshToken:input_type -> auth.RefreshTokenRequest
 	8,  // 5: auth.AuthService.GetProfile:input_type -> auth.GetProfileRequest
-	9,  // 6: auth.AuthService.Health:input_type -> common.Empty
-	4,  // 7: auth.AuthService.Register:output_type -> auth.AuthResponse
-	4,  // 8: auth.AuthService.Login:output_type -> auth.AuthResponse
-	6,  // 9: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
-	4,  // 10: auth.AuthService.RefreshToken:output_type -> auth.AuthResponse
-	1,  // 11: auth.AuthService.GetProfile:output_type -> auth.UserProfile
-	10, // 12: auth.AuthService.Health:output_type -> common.HealthyCheckResponse
-	7,  // [7:13] is the sub-list for method output_type
-	1,  // [1:7] is the sub-list for method input_type
+	9,  // 6: auth.AuthService.GetAvatarURL:input_type -> auth.GetAvatarURLRequest
+	11, // 7: auth.AuthService.Health:input_type -> common.Empty
+	4,  // 8: auth.AuthService.Register:output_type -> auth.AuthResponse
+	4,  // 9: auth.AuthService.Login:output_type -> auth.AuthResponse
+	6,  // 10: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
+	4,  // 11: auth.AuthService.RefreshToken:output_type -> auth.AuthResponse
+	1,  // 12: auth.AuthService.GetProfile:output_type -> auth.UserProfile
+	10, // 13: auth.AuthService.GetAvatarURL:output_type -> auth.AvatarURLResponse
+	12, // 14: auth.AuthService.Health:output_type -> common.HealthyCheckResponse
+	8,  // [8:15] is the sub-list for method output_type
+	1,  // [1:8] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -673,7 +780,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

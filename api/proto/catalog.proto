@@ -102,6 +102,14 @@ service CatalogService {
     // Get genre by id
     rpc GetGenre(GetGenreRequest) returns (Genre);
 
+    // For service integration
+
+    // Get url for track streaming
+    rpc GetTrackStreamURL(GetTrackStreamURLRequest) returns (StreamURLResponse);
+
+    // Get url for cover streaming
+    rpc GetCoverURL(GetCoverURLRequest) returns (StreamURLResponse);
+
     // Service
 
     // Heath check
@@ -452,6 +460,22 @@ message GetGenreRequest {
 enum GenreSortBy {
     GENRE_SORT_BY_UNSPECIFIED = 0;
     GENRE_SORT_BY_NAME = 1;
+}
+
+// For file service
+
+message GetTrackStreamURLRequest {
+    string track_id = 1;
+    int32 expiryseconds = 2;
+}
+
+message GetCoverURLRequest {
+    string cover_image_id = 1;
+}
+
+message StreamURLResponse {
+    string url = 1;
+    int64 expires_at = 2;
 }
 
 // Common

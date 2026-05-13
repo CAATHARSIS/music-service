@@ -17,6 +17,8 @@ type Config struct {
 	GRPCPort      string
 	JWTSecret     string
 	JWTExpiration string
+
+	FileServiceAddr string
 }
 
 func Load(log *slog.Logger) *Config {
@@ -31,6 +33,8 @@ func Load(log *slog.Logger) *Config {
 		GRPCPort:      getEnv("AUTH_GRPC_PORT", "50051"),
 		JWTSecret:     getEnv("AUTH_JWT_SECRET", "super-secret-key"),
 		JWTExpiration: getEnv("AUTH_JWT_EXPIRATION", "24h"),
+
+		FileServiceAddr: getEnv("FILE_SERVICE_ADDR", "localhost:50052"),
 	}
 
 	log.Info("configuarion loaded",

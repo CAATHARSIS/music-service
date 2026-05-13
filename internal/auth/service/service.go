@@ -11,6 +11,7 @@ import (
 
 	authpb "github.com/CAATHARSIS/music-service/api/gen/auth"
 	commonpb "github.com/CAATHARSIS/music-service/api/gen/common"
+	filepb "github.com/CAATHARSIS/music-service/api/gen/file"
 	"github.com/CAATHARSIS/music-service/internal/auth/config"
 	"github.com/CAATHARSIS/music-service/internal/auth/models"
 	"github.com/CAATHARSIS/music-service/internal/auth/repository"
@@ -22,14 +23,16 @@ import (
 
 type AuthService struct {
 	authpb.UnimplementedAuthServiceServer
-	repo repository.Repository
-	cfg  *config.Config
-	log  *slog.Logger
+	repo       repository.Repository
+	fileClient filepb.FileServiceClient
+	cfg        *config.Config
+	log        *slog.Logger
 }
 
-func NewAuthService(repo repository.Repository, cfg *config.Config, log *slog.Logger) *AuthService {
+func NewAuthService(repo repository.Repository, fileClient filepb.FileServiceClient, cfg *config.Config, log *slog.Logger) *AuthService {
 	return &AuthService{
 		repo: repo,
+		fileClient: fileClient,
 		cfg:  cfg,
 		log:  log,
 	}
@@ -165,6 +168,21 @@ func (s *AuthService) GetProfile(ctx context.Context, req *authpb.GetProfileRequ
 	}
 
 	return convertUserToProfileProto(user), nil
+}
+
+func (s *AuthService) GetAvatarURL(ctx context.Context, req *authpb.GetAvatarURLRequest) (*authpb.AvatarURLResponse, error) {
+	resp, err := s.fileClient.GetDownloadURL(ctx, &filepb.GetDownloadURLRequest{
+		FileId: req.AvatarImageId,
+		ExpirySeconds: 86400,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to get avatar URL")
+	}
+
+	return &authpb.AvatarURLResponse{
+		Url: resp.Url,
+		ExpiresAt: resp.ExpiresAt,
+	}, nil
 }
 
 func (s *AuthService) Health(ctx context.Context, req *commonpb.Empty) (*commonpb.HealthyCheckResponse, error) {

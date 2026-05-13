@@ -8,6 +8,7 @@ import (
 
 	catalogpb "github.com/CAATHARSIS/music-service/api/gen/catalog"
 	commonpb "github.com/CAATHARSIS/music-service/api/gen/common"
+	filepb "github.com/CAATHARSIS/music-service/api/gen/file"
 	"github.com/CAATHARSIS/music-service/internal/catalog/models"
 	"github.com/CAATHARSIS/music-service/internal/catalog/repository"
 	"google.golang.org/grpc/codes"
@@ -16,14 +17,16 @@ import (
 
 type CatalogService struct {
 	catalogpb.UnimplementedCatalogServiceServer
-	repo repository.Repository
-	log  *slog.Logger
+	repo       repository.Repository
+	fileClient filepb.FileServiceClient
+	log        *slog.Logger
 }
 
-func NewCatalogService(repo repository.Repository, log *slog.Logger) *CatalogService {
+func NewCatalogService(repo repository.Repository, fileClient filepb.FileServiceClient, log *slog.Logger) *CatalogService {
 	return &CatalogService{
-		repo: repo,
-		log:  log,
+		repo:       repo,
+		fileClient: fileClient,
+		log:        log,
 	}
 }
 
@@ -251,7 +254,7 @@ func (s *CatalogService) GetTracksByIDs(ctx context.Context, req *catalogpb.GetT
 
 	opts := &models.GetTrackOptions{
 		IncludeArtist: req.IncludeArtist,
-		IncludeAlbum: req.IncludeAlbum,
+		IncludeAlbum:  req.IncludeAlbum,
 		IncludeGenres: req.IncludeGenres,
 	}
 
@@ -743,7 +746,7 @@ func (s *CatalogService) CreateGenre(ctx context.Context, req *catalogpb.CreateG
 	}
 
 	params := &models.CreateGenreParams{
-		Name: req.Name,
+		Name:        req.Name,
 		Description: req.Description,
 	}
 
@@ -780,6 +783,48 @@ func (s *CatalogService) GetTrackByGenre(ctx context.Context, req *catalogpb.Get
 		Pagination: &commonpb.PaginationResponse{
 			PageSize: int32(limit),
 		},
+	}, nil
+}
+
+// File Service Integration
+
+func (s *CatalogService) GetTrackStreamURL(ctx context.Context, req *catalogpb.GetTrackStreamURLRequest) (*catalogpb.StreamURLResponse, error) {
+	track, err := s.repo.GetTrackByID(ctx, req.TrackId, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	expiry := int32(3600)
+	if req.Expiryseconds > 0 {
+		expiry = req.Expiryseconds
+	}
+
+	resp, err := s.fileClient.GetDownloadURL(ctx, &filepb.GetDownloadURLRequest{
+		FileId:        track.FileID,
+		ExpirySeconds: expiry,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to get stream URL")
+	}
+
+	return &catalogpb.StreamURLResponse{
+		Url:       resp.Url,
+		ExpiresAt: resp.ExpiresAt,
+	}, nil
+}
+
+func (s *CatalogService) GetCoverURL(ctx context.Context, req *catalogpb.GetCoverURLRequest) (*catalogpb.StreamURLResponse, error) {
+	resp, err := s.fileClient.GetDownloadURL(ctx, &filepb.GetDownloadURLRequest{
+		FileId:        req.CoverImageId,
+		ExpirySeconds: 86400,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to get cover URL")
+	}
+
+	return &catalogpb.StreamURLResponse{
+		Url:       resp.Url,
+		ExpiresAt: resp.ExpiresAt,
 	}, nil
 }
 

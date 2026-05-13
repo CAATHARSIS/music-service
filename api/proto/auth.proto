@@ -24,6 +24,9 @@ service AuthService {
     // User profile
     rpc GetProfile(GetProfileRequest) returns (UserProfile);
 
+    // Get avatar url
+    rpc GetAvatarURL(GetAvatarURLRequest) returns (AvatarURLResponse);
+
     // Health check
     rpc Health(common.Empty) returns (common.HealthyCheckResponse);
 }
@@ -79,4 +82,15 @@ message RefreshTokenRequest {
 
 message GetProfileRequest {
     string user_id = 1;
+}
+
+// File Service Integration
+
+message GetAvatarURLRequest {
+    string avatar_image_id = 1;
+}
+
+message AvatarURLResponse {
+    string url = 1;
+    int64 expires_at = 2;
 }

@@ -8,15 +8,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	_ "github.com/lib/pq"
 	authpb "github.com/CAATHARSIS/music-service/api/gen/auth"
+	filepb "github.com/CAATHARSIS/music-service/api/gen/file"
 	"github.com/CAATHARSIS/music-service/internal/auth/config"
 	"github.com/CAATHARSIS/music-service/internal/auth/repository"
 	"github.com/CAATHARSIS/music-service/internal/auth/service"
 	"github.com/CAATHARSIS/music-service/pkg/database"
 	"github.com/CAATHARSIS/music-service/pkg/interceptor"
 	"github.com/CAATHARSIS/music-service/pkg/migrate"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -42,8 +44,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	fileConn, _ := grpc.NewClient(cfg.FileServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	defer fileConn.Close()
+	fileClient := filepb.NewFileServiceClient(fileConn)
+
 	repo := repository.NewRepository(db, logger)
-	srv := service.NewAuthService(repo, cfg, logger)
+	srv := service.NewAuthService(repo, fileClient, cfg, logger)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {

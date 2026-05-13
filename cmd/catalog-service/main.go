@@ -10,9 +10,11 @@ import (
 
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
 	catalogpb "github.com/CAATHARSIS/music-service/api/gen/catalog"
+	filepb "github.com/CAATHARSIS/music-service/api/gen/file"
 	"github.com/CAATHARSIS/music-service/internal/catalog/config"
 	"github.com/CAATHARSIS/music-service/internal/catalog/repository"
 	"github.com/CAATHARSIS/music-service/internal/catalog/service"
@@ -41,8 +43,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	fileConn, err := grpc.NewClient(
+		cfg.FileServiceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		logger.Error("failed to connect to file service", "error", err)
+		os.Exit(1)
+	}
+	defer fileConn.Close()
+
+	fileClient := filepb.NewFileServiceClient(fileConn)
+
 	repo := repository.NewRepository(catalogDB, logger)
-	srv := service.NewCatalogService(repo, logger)
+	srv := service.NewCatalogService(repo, fileClient, logger)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {

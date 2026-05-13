@@ -51,6 +51,8 @@ const (
 	CatalogService_CreateGenre_FullMethodName         = "/catalog.CatalogService/CreateGenre"
 	CatalogService_GetTrackByGenre_FullMethodName     = "/catalog.CatalogService/GetTrackByGenre"
 	CatalogService_GetGenre_FullMethodName            = "/catalog.CatalogService/GetGenre"
+	CatalogService_GetTrackStreamURL_FullMethodName   = "/catalog.CatalogService/GetTrackStreamURL"
+	CatalogService_GetCoverURL_FullMethodName         = "/catalog.CatalogService/GetCoverURL"
 	CatalogService_Health_FullMethodName              = "/catalog.CatalogService/Health"
 )
 
@@ -116,6 +118,10 @@ type CatalogServiceClient interface {
 	GetTrackByGenre(ctx context.Context, in *GetTracksByGenreRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
 	// Get genre by id
 	GetGenre(ctx context.Context, in *GetGenreRequest, opts ...grpc.CallOption) (*Genre, error)
+	// Get url for track streaming
+	GetTrackStreamURL(ctx context.Context, in *GetTrackStreamURLRequest, opts ...grpc.CallOption) (*StreamURLResponse, error)
+	// Get url for cover streaming
+	GetCoverURL(ctx context.Context, in *GetCoverURLRequest, opts ...grpc.CallOption) (*StreamURLResponse, error)
 	// Heath check
 	Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error)
 }
@@ -408,6 +414,26 @@ func (c *catalogServiceClient) GetGenre(ctx context.Context, in *GetGenreRequest
 	return out, nil
 }
 
+func (c *catalogServiceClient) GetTrackStreamURL(ctx context.Context, in *GetTrackStreamURLRequest, opts ...grpc.CallOption) (*StreamURLResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StreamURLResponse)
+	err := c.cc.Invoke(ctx, CatalogService_GetTrackStreamURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *catalogServiceClient) GetCoverURL(ctx context.Context, in *GetCoverURLRequest, opts ...grpc.CallOption) (*StreamURLResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StreamURLResponse)
+	err := c.cc.Invoke(ctx, CatalogService_GetCoverURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *catalogServiceClient) Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(common.HealthyCheckResponse)
@@ -480,6 +506,10 @@ type CatalogServiceServer interface {
 	GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListTracksResponse, error)
 	// Get genre by id
 	GetGenre(context.Context, *GetGenreRequest) (*Genre, error)
+	// Get url for track streaming
+	GetTrackStreamURL(context.Context, *GetTrackStreamURLRequest) (*StreamURLResponse, error)
+	// Get url for cover streaming
+	GetCoverURL(context.Context, *GetCoverURLRequest) (*StreamURLResponse, error)
 	// Heath check
 	Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error)
 	mustEmbedUnimplementedCatalogServiceServer()
@@ -575,6 +605,12 @@ func (UnimplementedCatalogServiceServer) GetTrackByGenre(context.Context, *GetTr
 }
 func (UnimplementedCatalogServiceServer) GetGenre(context.Context, *GetGenreRequest) (*Genre, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetGenre not implemented")
+}
+func (UnimplementedCatalogServiceServer) GetTrackStreamURL(context.Context, *GetTrackStreamURLRequest) (*StreamURLResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTrackStreamURL not implemented")
+}
+func (UnimplementedCatalogServiceServer) GetCoverURL(context.Context, *GetCoverURLRequest) (*StreamURLResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCoverURL not implemented")
 }
 func (UnimplementedCatalogServiceServer) Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
@@ -1104,6 +1140,42 @@ func _CatalogService_GetGenre_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CatalogService_GetTrackStreamURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTrackStreamURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServiceServer).GetTrackStreamURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CatalogService_GetTrackStreamURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServiceServer).GetTrackStreamURL(ctx, req.(*GetTrackStreamURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CatalogService_GetCoverURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCoverURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServiceServer).GetCoverURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CatalogService_GetCoverURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServiceServer).GetCoverURL(ctx, req.(*GetCoverURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CatalogService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(common.Empty)
 	if err := dec(in); err != nil {
@@ -1240,6 +1312,14 @@ var CatalogService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGenre",
 			Handler:    _CatalogService_GetGenre_Handler,
+		},
+		{
+			MethodName: "GetTrackStreamURL",
+			Handler:    _CatalogService_GetTrackStreamURL_Handler,
+		},
+		{
+			MethodName: "GetCoverURL",
+			Handler:    _CatalogService_GetCoverURL_Handler,
 		},
 		{
 			MethodName: "Health",

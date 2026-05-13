@@ -28,6 +28,7 @@ const (
 	AuthService_ValidateToken_FullMethodName = "/auth.AuthService/ValidateToken"
 	AuthService_RefreshToken_FullMethodName  = "/auth.AuthService/RefreshToken"
 	AuthService_GetProfile_FullMethodName    = "/auth.AuthService/GetProfile"
+	AuthService_GetAvatarURL_FullMethodName  = "/auth.AuthService/GetAvatarURL"
 	AuthService_Health_FullMethodName        = "/auth.AuthService/Health"
 )
 
@@ -45,6 +46,8 @@ type AuthServiceClient interface {
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	// User profile
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*UserProfile, error)
+	// Get avatar url
+	GetAvatarURL(ctx context.Context, in *GetAvatarURLRequest, opts ...grpc.CallOption) (*AvatarURLResponse, error)
 	// Health check
 	Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error)
 }
@@ -107,6 +110,16 @@ func (c *authServiceClient) GetProfile(ctx context.Context, in *GetProfileReques
 	return out, nil
 }
 
+func (c *authServiceClient) GetAvatarURL(ctx context.Context, in *GetAvatarURLRequest, opts ...grpc.CallOption) (*AvatarURLResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AvatarURLResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetAvatarURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(common.HealthyCheckResponse)
@@ -131,6 +144,8 @@ type AuthServiceServer interface {
 	RefreshToken(context.Context, *RefreshTokenRequest) (*AuthResponse, error)
 	// User profile
 	GetProfile(context.Context, *GetProfileRequest) (*UserProfile, error)
+	// Get avatar url
+	GetAvatarURL(context.Context, *GetAvatarURLRequest) (*AvatarURLResponse, error)
 	// Health check
 	Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -157,6 +172,9 @@ func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *RefreshToke
 }
 func (UnimplementedAuthServiceServer) GetProfile(context.Context, *GetProfileRequest) (*UserProfile, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfile not implemented")
+}
+func (UnimplementedAuthServiceServer) GetAvatarURL(context.Context, *GetAvatarURLRequest) (*AvatarURLResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAvatarURL not implemented")
 }
 func (UnimplementedAuthServiceServer) Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
@@ -272,6 +290,24 @@ func _AuthService_GetProfile_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetAvatarURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAvatarURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetAvatarURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetAvatarURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetAvatarURL(ctx, req.(*GetAvatarURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(common.Empty)
 	if err := dec(in); err != nil {
@@ -316,6 +352,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfile",
 			Handler:    _AuthService_GetProfile_Handler,
+		},
+		{
+			MethodName: "GetAvatarURL",
+			Handler:    _AuthService_GetAvatarURL_Handler,
 		},
 		{
 			MethodName: "Health",

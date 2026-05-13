@@ -2995,6 +2995,154 @@ func (x *GetGenreRequest) GetId() string {
 	return ""
 }
 
+type GetTrackStreamURLRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TrackId       string                 `protobuf:"bytes,1,opt,name=track_id,json=trackId,proto3" json:"track_id,omitempty"`
+	Expiryseconds int32                  `protobuf:"varint,2,opt,name=expiryseconds,proto3" json:"expiryseconds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTrackStreamURLRequest) Reset() {
+	*x = GetTrackStreamURLRequest{}
+	mi := &file_catalog_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTrackStreamURLRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTrackStreamURLRequest) ProtoMessage() {}
+
+func (x *GetTrackStreamURLRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_catalog_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTrackStreamURLRequest.ProtoReflect.Descriptor instead.
+func (*GetTrackStreamURLRequest) Descriptor() ([]byte, []int) {
+	return file_catalog_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GetTrackStreamURLRequest) GetTrackId() string {
+	if x != nil {
+		return x.TrackId
+	}
+	return ""
+}
+
+func (x *GetTrackStreamURLRequest) GetExpiryseconds() int32 {
+	if x != nil {
+		return x.Expiryseconds
+	}
+	return 0
+}
+
+type GetCoverURLRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CoverImageId  string                 `protobuf:"bytes,1,opt,name=cover_image_id,json=coverImageId,proto3" json:"cover_image_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCoverURLRequest) Reset() {
+	*x = GetCoverURLRequest{}
+	mi := &file_catalog_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCoverURLRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCoverURLRequest) ProtoMessage() {}
+
+func (x *GetCoverURLRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_catalog_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCoverURLRequest.ProtoReflect.Descriptor instead.
+func (*GetCoverURLRequest) Descriptor() ([]byte, []int) {
+	return file_catalog_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GetCoverURLRequest) GetCoverImageId() string {
+	if x != nil {
+		return x.CoverImageId
+	}
+	return ""
+}
+
+type StreamURLResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamURLResponse) Reset() {
+	*x = StreamURLResponse{}
+	mi := &file_catalog_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamURLResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamURLResponse) ProtoMessage() {}
+
+func (x *StreamURLResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_catalog_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamURLResponse.ProtoReflect.Descriptor instead.
+func (*StreamURLResponse) Descriptor() ([]byte, []int) {
+	return file_catalog_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *StreamURLResponse) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *StreamURLResponse) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
 var File_catalog_proto protoreflect.FileDescriptor
 
 const file_catalog_proto_rawDesc = "" +
@@ -3295,7 +3443,16 @@ const file_catalog_proto_rawDesc = "" +
 	"\n" +
 	"sort_order\x18\x04 \x01(\x0e2\x12.catalog.SortOrderR\tsortOrder\"!\n" +
 	"\x0fGetGenreRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id*g\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"[\n" +
+	"\x18GetTrackStreamURLRequest\x12\x19\n" +
+	"\btrack_id\x18\x01 \x01(\tR\atrackId\x12$\n" +
+	"\rexpiryseconds\x18\x02 \x01(\x05R\rexpiryseconds\":\n" +
+	"\x12GetCoverURLRequest\x12$\n" +
+	"\x0ecover_image_id\x18\x01 \x01(\tR\fcoverImageId\"D\n" +
+	"\x11StreamURLResponse\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x02 \x01(\x03R\texpiresAt*g\n" +
 	"\tAlbumType\x12\x1a\n" +
 	"\x16ALBUM_TYPE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10ALBUM_TYPE_ALBUM\x10\x01\x12\x11\n" +
@@ -3328,7 +3485,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\tSortOrder\x12\x1a\n" +
 	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +
-	"\x0fSORT_ORDER_DESC\x10\x022\xb1\x0f\n" +
+	"\x0fSORT_ORDER_DESC\x10\x022\xcd\x10\n" +
 	"\x0eCatalogService\x124\n" +
 	"\bGetTrack\x12\x18.catalog.GetTrackRequest\x1a\x0e.catalog.Track\x12E\n" +
 	"\n" +
@@ -3360,7 +3517,9 @@ const file_catalog_proto_rawDesc = "" +
 	"ListGenres\x12\x1a.catalog.ListGenresRequest\x1a\x1b.catalog.ListGenresResponse\x12:\n" +
 	"\vCreateGenre\x12\x1b.catalog.CreateGenreRequest\x1a\x0e.catalog.Genre\x12P\n" +
 	"\x0fGetTrackByGenre\x12 .catalog.GetTracksByGenreRequest\x1a\x1b.catalog.ListTracksResponse\x124\n" +
-	"\bGetGenre\x12\x18.catalog.GetGenreRequest\x1a\x0e.catalog.Genre\x125\n" +
+	"\bGetGenre\x12\x18.catalog.GetGenreRequest\x1a\x0e.catalog.Genre\x12R\n" +
+	"\x11GetTrackStreamURL\x12!.catalog.GetTrackStreamURLRequest\x1a\x1a.catalog.StreamURLResponse\x12F\n" +
+	"\vGetCoverURL\x12\x1b.catalog.GetCoverURLRequest\x1a\x1a.catalog.StreamURLResponse\x125\n" +
 	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB?Z=github.com/CAATHARSIS/music-service/api/gen/catalog;catalogpbb\x06proto3"
 
 var (
@@ -3376,7 +3535,7 @@ func file_catalog_proto_rawDescGZIP() []byte {
 }
 
 var file_catalog_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
-var file_catalog_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
+var file_catalog_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
 var file_catalog_proto_goTypes = []any{
 	(AlbumType)(0),                      // 0: catalog.AlbumType
 	(SearchField)(0),                    // 1: catalog.SearchField
@@ -3422,10 +3581,13 @@ var file_catalog_proto_goTypes = []any{
 	(*CreateGenreRequest)(nil),          // 41: catalog.CreateGenreRequest
 	(*GetTracksByGenreRequest)(nil),     // 42: catalog.GetTracksByGenreRequest
 	(*GetGenreRequest)(nil),             // 43: catalog.GetGenreRequest
-	(*common.PaginationRequest)(nil),    // 44: common.PaginationRequest
-	(*common.PaginationResponse)(nil),   // 45: common.PaginationResponse
-	(*common.Empty)(nil),                // 46: common.Empty
-	(*common.HealthyCheckResponse)(nil), // 47: common.HealthyCheckResponse
+	(*GetTrackStreamURLRequest)(nil),    // 44: catalog.GetTrackStreamURLRequest
+	(*GetCoverURLRequest)(nil),          // 45: catalog.GetCoverURLRequest
+	(*StreamURLResponse)(nil),           // 46: catalog.StreamURLResponse
+	(*common.PaginationRequest)(nil),    // 47: common.PaginationRequest
+	(*common.PaginationResponse)(nil),   // 48: common.PaginationResponse
+	(*common.Empty)(nil),                // 49: common.Empty
+	(*common.HealthyCheckResponse)(nil), // 50: common.HealthyCheckResponse
 }
 var file_catalog_proto_depIdxs = []int32{
 	8,  // 0: catalog.Track.artist:type_name -> catalog.Artist
@@ -3438,39 +3600,39 @@ var file_catalog_proto_depIdxs = []int32{
 	9,  // 7: catalog.AlbumWithTracks.album:type_name -> catalog.Album
 	7,  // 8: catalog.AlbumWithTracks.tracks:type_name -> catalog.Track
 	10, // 9: catalog.AlbumWithTracks.genres:type_name -> catalog.Genre
-	44, // 10: catalog.ListTracksRequest.pagination:type_name -> common.PaginationRequest
+	47, // 10: catalog.ListTracksRequest.pagination:type_name -> common.PaginationRequest
 	2,  // 11: catalog.ListTracksRequest.sort_by:type_name -> catalog.TrackSortBy
 	6,  // 12: catalog.ListTracksRequest.sort_order:type_name -> catalog.SortOrder
 	7,  // 13: catalog.ListTracksResponse.tracks:type_name -> catalog.Track
-	45, // 14: catalog.ListTracksResponse.pagination:type_name -> common.PaginationResponse
+	48, // 14: catalog.ListTracksResponse.pagination:type_name -> common.PaginationResponse
 	1,  // 15: catalog.SearchTrackRequest.fields:type_name -> catalog.SearchField
-	44, // 16: catalog.SearchTrackRequest.pagination:type_name -> common.PaginationRequest
-	44, // 17: catalog.ListArtistsRequest.pagination:type_name -> common.PaginationRequest
+	47, // 16: catalog.SearchTrackRequest.pagination:type_name -> common.PaginationRequest
+	47, // 17: catalog.ListArtistsRequest.pagination:type_name -> common.PaginationRequest
 	3,  // 18: catalog.ListArtistsRequest.sort_by:type_name -> catalog.ArtistSortBy
 	6,  // 19: catalog.ListArtistsRequest.sort_order:type_name -> catalog.SortOrder
 	8,  // 20: catalog.ListArtistsResponse.artists:type_name -> catalog.Artist
-	45, // 21: catalog.ListArtistsResponse.pagination:type_name -> common.PaginationResponse
-	44, // 22: catalog.SearchArtistsRequest.pagination:type_name -> common.PaginationRequest
-	44, // 23: catalog.GetArtistTracksRequest.pagination:type_name -> common.PaginationRequest
+	48, // 21: catalog.ListArtistsResponse.pagination:type_name -> common.PaginationResponse
+	47, // 22: catalog.SearchArtistsRequest.pagination:type_name -> common.PaginationRequest
+	47, // 23: catalog.GetArtistTracksRequest.pagination:type_name -> common.PaginationRequest
 	2,  // 24: catalog.GetArtistTracksRequest.sort_by:type_name -> catalog.TrackSortBy
 	6,  // 25: catalog.GetArtistTracksRequest.sort_order:type_name -> catalog.SortOrder
-	44, // 26: catalog.GetArtistAlbumsRequest.pagination:type_name -> common.PaginationRequest
+	47, // 26: catalog.GetArtistAlbumsRequest.pagination:type_name -> common.PaginationRequest
 	4,  // 27: catalog.GetArtistAlbumsRequest.sort_by:type_name -> catalog.AlbumSortBy
 	6,  // 28: catalog.GetArtistAlbumsRequest.sort_order:type_name -> catalog.SortOrder
-	44, // 29: catalog.ListAlbumsRequest.pagination:type_name -> common.PaginationRequest
+	47, // 29: catalog.ListAlbumsRequest.pagination:type_name -> common.PaginationRequest
 	0,  // 30: catalog.ListAlbumsRequest.type:type_name -> catalog.AlbumType
 	4,  // 31: catalog.ListAlbumsRequest.sort_by:type_name -> catalog.AlbumSortBy
 	6,  // 32: catalog.ListAlbumsRequest.sort_order:type_name -> catalog.SortOrder
 	9,  // 33: catalog.ListAlbumsResponse.albums:type_name -> catalog.Album
-	45, // 34: catalog.ListAlbumsResponse.pagination:type_name -> common.PaginationResponse
+	48, // 34: catalog.ListAlbumsResponse.pagination:type_name -> common.PaginationResponse
 	0,  // 35: catalog.CreateAlbumRequest.type:type_name -> catalog.AlbumType
 	0,  // 36: catalog.UpdateAlbumRequest.type:type_name -> catalog.AlbumType
-	44, // 37: catalog.SearchAlbumsRequest.pagination:type_name -> common.PaginationRequest
-	44, // 38: catalog.ListGenresRequest.pagination:type_name -> common.PaginationRequest
+	47, // 37: catalog.SearchAlbumsRequest.pagination:type_name -> common.PaginationRequest
+	47, // 38: catalog.ListGenresRequest.pagination:type_name -> common.PaginationRequest
 	5,  // 39: catalog.ListGenresRequest.sort_by:type_name -> catalog.GenreSortBy
 	6,  // 40: catalog.ListGenresRequest.sort_order:type_name -> catalog.SortOrder
 	10, // 41: catalog.ListGenresResponse.genres:type_name -> catalog.Genre
-	44, // 42: catalog.GetTracksByGenreRequest.pagination:type_name -> common.PaginationRequest
+	47, // 42: catalog.GetTracksByGenreRequest.pagination:type_name -> common.PaginationRequest
 	2,  // 43: catalog.GetTracksByGenreRequest.sort_by:type_name -> catalog.TrackSortBy
 	6,  // 44: catalog.GetTracksByGenreRequest.sort_order:type_name -> catalog.SortOrder
 	12, // 45: catalog.CatalogService.GetTrack:input_type -> catalog.GetTrackRequest
@@ -3501,38 +3663,42 @@ var file_catalog_proto_depIdxs = []int32{
 	41, // 70: catalog.CatalogService.CreateGenre:input_type -> catalog.CreateGenreRequest
 	42, // 71: catalog.CatalogService.GetTrackByGenre:input_type -> catalog.GetTracksByGenreRequest
 	43, // 72: catalog.CatalogService.GetGenre:input_type -> catalog.GetGenreRequest
-	46, // 73: catalog.CatalogService.Health:input_type -> common.Empty
-	7,  // 74: catalog.CatalogService.GetTrack:output_type -> catalog.Track
-	14, // 75: catalog.CatalogService.ListTracks:output_type -> catalog.ListTracksResponse
-	7,  // 76: catalog.CatalogService.CreateTrack:output_type -> catalog.Track
-	7,  // 77: catalog.CatalogService.UpdateTrack:output_type -> catalog.Track
-	46, // 78: catalog.CatalogService.DeleteTrack:output_type -> common.Empty
-	14, // 79: catalog.CatalogService.SearchTracks:output_type -> catalog.ListTracksResponse
-	46, // 80: catalog.CatalogService.IncrementPlaysCount:output_type -> common.Empty
-	14, // 81: catalog.CatalogService.GetTracksByIDs:output_type -> catalog.ListTracksResponse
-	8,  // 82: catalog.CatalogService.GetArtist:output_type -> catalog.Artist
-	23, // 83: catalog.CatalogService.ListArtists:output_type -> catalog.ListArtistsResponse
-	8,  // 84: catalog.CatalogService.CreateArtist:output_type -> catalog.Artist
-	8,  // 85: catalog.CatalogService.UpdateArtist:output_type -> catalog.Artist
-	46, // 86: catalog.CatalogService.DeleteArtist:output_type -> common.Empty
-	23, // 87: catalog.CatalogService.SearchArtists:output_type -> catalog.ListArtistsResponse
-	14, // 88: catalog.CatalogService.GetArtistTracks:output_type -> catalog.ListTracksResponse
-	33, // 89: catalog.CatalogService.GetArtistAlbums:output_type -> catalog.ListAlbumsResponse
-	23, // 90: catalog.CatalogService.GetArtistsByIDs:output_type -> catalog.ListArtistsResponse
-	9,  // 91: catalog.CatalogService.GetAlbum:output_type -> catalog.Album
-	33, // 92: catalog.CatalogService.ListAlbums:output_type -> catalog.ListAlbumsResponse
-	9,  // 93: catalog.CatalogService.CreateAlbum:output_type -> catalog.Album
-	9,  // 94: catalog.CatalogService.UpdateAlbum:output_type -> catalog.Album
-	46, // 95: catalog.CatalogService.DeleteAlbum:output_type -> common.Empty
-	11, // 96: catalog.CatalogService.GetAlbumWithTracks:output_type -> catalog.AlbumWithTracks
-	33, // 97: catalog.CatalogService.SearchAlbums:output_type -> catalog.ListAlbumsResponse
-	40, // 98: catalog.CatalogService.ListGenres:output_type -> catalog.ListGenresResponse
-	10, // 99: catalog.CatalogService.CreateGenre:output_type -> catalog.Genre
-	14, // 100: catalog.CatalogService.GetTrackByGenre:output_type -> catalog.ListTracksResponse
-	10, // 101: catalog.CatalogService.GetGenre:output_type -> catalog.Genre
-	47, // 102: catalog.CatalogService.Health:output_type -> common.HealthyCheckResponse
-	74, // [74:103] is the sub-list for method output_type
-	45, // [45:74] is the sub-list for method input_type
+	44, // 73: catalog.CatalogService.GetTrackStreamURL:input_type -> catalog.GetTrackStreamURLRequest
+	45, // 74: catalog.CatalogService.GetCoverURL:input_type -> catalog.GetCoverURLRequest
+	49, // 75: catalog.CatalogService.Health:input_type -> common.Empty
+	7,  // 76: catalog.CatalogService.GetTrack:output_type -> catalog.Track
+	14, // 77: catalog.CatalogService.ListTracks:output_type -> catalog.ListTracksResponse
+	7,  // 78: catalog.CatalogService.CreateTrack:output_type -> catalog.Track
+	7,  // 79: catalog.CatalogService.UpdateTrack:output_type -> catalog.Track
+	49, // 80: catalog.CatalogService.DeleteTrack:output_type -> common.Empty
+	14, // 81: catalog.CatalogService.SearchTracks:output_type -> catalog.ListTracksResponse
+	49, // 82: catalog.CatalogService.IncrementPlaysCount:output_type -> common.Empty
+	14, // 83: catalog.CatalogService.GetTracksByIDs:output_type -> catalog.ListTracksResponse
+	8,  // 84: catalog.CatalogService.GetArtist:output_type -> catalog.Artist
+	23, // 85: catalog.CatalogService.ListArtists:output_type -> catalog.ListArtistsResponse
+	8,  // 86: catalog.CatalogService.CreateArtist:output_type -> catalog.Artist
+	8,  // 87: catalog.CatalogService.UpdateArtist:output_type -> catalog.Artist
+	49, // 88: catalog.CatalogService.DeleteArtist:output_type -> common.Empty
+	23, // 89: catalog.CatalogService.SearchArtists:output_type -> catalog.ListArtistsResponse
+	14, // 90: catalog.CatalogService.GetArtistTracks:output_type -> catalog.ListTracksResponse
+	33, // 91: catalog.CatalogService.GetArtistAlbums:output_type -> catalog.ListAlbumsResponse
+	23, // 92: catalog.CatalogService.GetArtistsByIDs:output_type -> catalog.ListArtistsResponse
+	9,  // 93: catalog.CatalogService.GetAlbum:output_type -> catalog.Album
+	33, // 94: catalog.CatalogService.ListAlbums:output_type -> catalog.ListAlbumsResponse
+	9,  // 95: catalog.CatalogService.CreateAlbum:output_type -> catalog.Album
+	9,  // 96: catalog.CatalogService.UpdateAlbum:output_type -> catalog.Album
+	49, // 97: catalog.CatalogService.DeleteAlbum:output_type -> common.Empty
+	11, // 98: catalog.CatalogService.GetAlbumWithTracks:output_type -> catalog.AlbumWithTracks
+	33, // 99: catalog.CatalogService.SearchAlbums:output_type -> catalog.ListAlbumsResponse
+	40, // 100: catalog.CatalogService.ListGenres:output_type -> catalog.ListGenresResponse
+	10, // 101: catalog.CatalogService.CreateGenre:output_type -> catalog.Genre
+	14, // 102: catalog.CatalogService.GetTrackByGenre:output_type -> catalog.ListTracksResponse
+	10, // 103: catalog.CatalogService.GetGenre:output_type -> catalog.Genre
+	46, // 104: catalog.CatalogService.GetTrackStreamURL:output_type -> catalog.StreamURLResponse
+	46, // 105: catalog.CatalogService.GetCoverURL:output_type -> catalog.StreamURLResponse
+	50, // 106: catalog.CatalogService.Health:output_type -> common.HealthyCheckResponse
+	76, // [76:107] is the sub-list for method output_type
+	45, // [45:76] is the sub-list for method input_type
 	45, // [45:45] is the sub-list for extension type_name
 	45, // [45:45] is the sub-list for extension extendee
 	0,  // [0:45] is the sub-list for field type_name
@@ -3564,7 +3730,7 @@ func file_catalog_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_catalog_proto_rawDesc), len(file_catalog_proto_rawDesc)),
 			NumEnums:      7,
-			NumMessages:   37,
+			NumMessages:   40,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
