@@ -5,4 +5,91 @@ syntax = "proto3";
 
 package playlist;
 
+import "catalog.proto";
+import "common.proto";
+
 option go_package = "github.com/CAATHARSIS/music-service/api/gen/playlist;playlistpb";
+
+service PlaylistService {
+    rpc CreatePlaylist(CreatePlaylistRequest) returns (Playlist);
+    rpc GetPlaylist(GetPlaylistRequest) returns (Playlist);
+    rpc ListUserPlaylists(ListUserPlaylistsRequest) returns (ListPlaylistsResponse);
+    rpc UpdatePlaylist(UpdatePlaylistRequest) returns (Playlist);
+    rpc DeletePlaylist(DeletePlaylistRequest) returns (common.Empty);
+    rpc AddTrack(AddTrackRequest) returns (Playlist);
+    rpc RemoveTrack(RemoveTrackRequest) returns (Playlist);
+    rpc Health(common.Empty) returns (common.HealthyCheckResponse);
+}
+
+message Playlist {
+    string id = 1;
+    string user_id = 2;
+    string name = 3;
+    string description = 4;
+    bool is_public = 5;
+    PlaylistType type = 6;
+    repeated PlaylistTrack tracks = 7;
+    string created_at = 8;
+    string updated_at = 9;
+}
+
+message PlaylistTrack {
+    string track_id = 1;
+    catalog.Track track_info = 2;
+    int32 position = 3;
+    string added_at = 4;
+}
+
+enum PlaylistType {
+    PLAYLIST_TYPE_UNSPECIFIED = 0;
+    PLAYLIST_TYPE_MANUAL = 1;
+    PLAYLIST_TYPE_GENERATED = 2;
+    PLAYLIST_TYPE_FAVORITES = 3;
+}
+
+message CreatePlaylistRequest {
+    string user_id = 1;
+    string name = 2;
+    string description = 3;
+    bool is_public = 4;
+}
+
+message GetPlaylistRequest {
+    string playlist_id = 1;
+    string user_id = 2;
+}
+
+message ListUserPlaylistsRequest {
+    string user_id = 1;
+    common.PaginationRequest pagination = 2;
+}
+
+message ListPlaylistsResponse {
+    repeated Playlist playlists = 1;
+    common.PaginationResponse pagination = 2;
+}
+
+message UpdatePlaylistRequest {
+    string playlist_id = 1;
+    string user_id = 2;
+    optional string name = 3;
+    optional string description = 4;
+    optional bool is_public = 5;
+}
+
+message DeletePlaylistRequest {
+    string playlist_id = 1;
+    string user_id = 2;
+}
+
+message AddTrackRequest {
+    string playlist_id = 1;
+    string user_id = 2;
+    string track_id = 3;
+}
+
+message RemoveTrackRequest {
+    string playlist_id = 1;
+    string user_id = 2;
+    string track_id = 3;
+}
