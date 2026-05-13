@@ -24,7 +24,7 @@ type minioRepo struct {
 	log    *slog.Logger
 }
 
-func NewMinioRepo(endpoint, accessKey, secretKey, bucket string, useSSL bool, log *slog.Logger) (MinioRepository, error) {
+func NewMinioRepo(ctx context.Context, endpoint, accessKey, secretKey, bucket string, useSSL bool, log *slog.Logger) (MinioRepository, error) {
 	client, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: useSSL,
@@ -33,7 +33,7 @@ func NewMinioRepo(endpoint, accessKey, secretKey, bucket string, useSSL bool, lo
 		return nil, fmt.Errorf("create minio client: %w", err)
 	}
 
-	exists, err := client.BucketExists(context.Background(), bucket)
+	exists, err := client.BucketExists(ctx, bucket)
 	if err != nil {
 		return nil, fmt.Errorf("check bucket exists: %w", err)
 	}
