@@ -25,14 +25,14 @@ type Config struct {
 
 func Load(log *slog.Logger) *Config {
 	cfg := &Config{
-		DBHost:     getEnv("CATALOG_DB_HOST", "localhost"),
-		DBPort:     getEnv("CATALOG_DB_PORT", "5432"),
-		DBUser:     getEnv("CATALOG_DB_USER", "postgres"),
-		DBPassword: getEnv("CATALOG_DB_PASSWORD", "postgres"),
-		DBName:     getEnv("CATALOG_DB_NAME", "catalog-service-test"),
-		DBSSLMode:  getEnv("CATALOG_DB_SSL_MODE", "disable"),
+		DBHost:     getEnv("FILE_DB_HOST", "localhost"),
+		DBPort:     getEnv("FILE_DB_PORT", "5432"),
+		DBUser:     getEnv("FILE_DB_USER", "postgres"),
+		DBPassword: getEnv("FILE_DB_PASSWORD", "postgres"),
+		DBName:     getEnv("FILE_DB_NAME", "catalog-service-test"),
+		DBSSLMode:  getEnv("FILE_DB_SSL_MODE", "disable"),
 
-		GRPCPort: getEnv("CATALOG_GRPC_PORT", "50053"),
+		GRPCPort: getEnv("FILE_GRPC_PORT", "50052"),
 
 		S3Endpoint:  getEnv("S3_ENDPOINT", "localhost:9000"),
 		S3AccessKey: getEnv("S3_ACCESS_KEY", "minioadming"),
