@@ -10,9 +10,11 @@
 package rulespb
 
 import (
+	common "github.com/CAATHARSIS/music-service/api/gen/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -23,19 +25,769 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type RuleCondition struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Genres        []string               `protobuf:"bytes,1,rep,name=genres,proto3" json:"genres,omitempty"`
+	YearFrom      *int32                 `protobuf:"varint,2,opt,name=year_from,json=yearFrom,proto3,oneof" json:"year_from,omitempty"`
+	YearTo        *int32                 `protobuf:"varint,3,opt,name=year_to,json=yearTo,proto3,oneof" json:"year_to,omitempty"`
+	MinDuration   *int32                 `protobuf:"varint,4,opt,name=min_duration,json=minDuration,proto3,oneof" json:"min_duration,omitempty"`
+	MaxDuration   *int32                 `protobuf:"varint,5,opt,name=max_duration,json=maxDuration,proto3,oneof" json:"max_duration,omitempty"`
+	MinPlaysCount *int32                 `protobuf:"varint,6,opt,name=min_plays_count,json=minPlaysCount,proto3,oneof" json:"min_plays_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RuleCondition) Reset() {
+	*x = RuleCondition{}
+	mi := &file_rules_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RuleCondition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RuleCondition) ProtoMessage() {}
+
+func (x *RuleCondition) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RuleCondition.ProtoReflect.Descriptor instead.
+func (*RuleCondition) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *RuleCondition) GetGenres() []string {
+	if x != nil {
+		return x.Genres
+	}
+	return nil
+}
+
+func (x *RuleCondition) GetYearFrom() int32 {
+	if x != nil && x.YearFrom != nil {
+		return *x.YearFrom
+	}
+	return 0
+}
+
+func (x *RuleCondition) GetYearTo() int32 {
+	if x != nil && x.YearTo != nil {
+		return *x.YearTo
+	}
+	return 0
+}
+
+func (x *RuleCondition) GetMinDuration() int32 {
+	if x != nil && x.MinDuration != nil {
+		return *x.MinDuration
+	}
+	return 0
+}
+
+func (x *RuleCondition) GetMaxDuration() int32 {
+	if x != nil && x.MaxDuration != nil {
+		return *x.MaxDuration
+	}
+	return 0
+}
+
+func (x *RuleCondition) GetMinPlaysCount() int32 {
+	if x != nil && x.MinPlaysCount != nil {
+		return *x.MinPlaysCount
+	}
+	return 0
+}
+
+type Rule struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId         string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Name           string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Condition      *RuleCondition         `protobuf:"bytes,4,opt,name=condition,proto3" json:"condition,omitempty"`
+	Limit          int32                  `protobuf:"varint,5,opt,name=limit,proto3" json:"limit,omitempty"`
+	CronSchedule   string                 `protobuf:"bytes,6,opt,name=cron_schedule,json=cronSchedule,proto3" json:"cron_schedule,omitempty"`
+	IsActive       bool                   `protobuf:"varint,7,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	LastExecutedAt string                 `protobuf:"bytes,8,opt,name=last_executed_at,json=lastExecutedAt,proto3" json:"last_executed_at,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt      string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Rule) Reset() {
+	*x = Rule{}
+	mi := &file_rules_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Rule) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Rule) ProtoMessage() {}
+
+func (x *Rule) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Rule.ProtoReflect.Descriptor instead.
+func (*Rule) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Rule) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Rule) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *Rule) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Rule) GetCondition() *RuleCondition {
+	if x != nil {
+		return x.Condition
+	}
+	return nil
+}
+
+func (x *Rule) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *Rule) GetCronSchedule() string {
+	if x != nil {
+		return x.CronSchedule
+	}
+	return ""
+}
+
+func (x *Rule) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+func (x *Rule) GetLastExecutedAt() string {
+	if x != nil {
+		return x.LastExecutedAt
+	}
+	return ""
+}
+
+func (x *Rule) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Rule) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type CreateRuleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Condition     *RuleCondition         `protobuf:"bytes,3,opt,name=condition,proto3" json:"condition,omitempty"`
+	Limit         int32                  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	CronSchedule  string                 `protobuf:"bytes,5,opt,name=cron_schedule,json=cronSchedule,proto3" json:"cron_schedule,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateRuleRequest) Reset() {
+	*x = CreateRuleRequest{}
+	mi := &file_rules_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateRuleRequest) ProtoMessage() {}
+
+func (x *CreateRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateRuleRequest.ProtoReflect.Descriptor instead.
+func (*CreateRuleRequest) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreateRuleRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateRuleRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateRuleRequest) GetCondition() *RuleCondition {
+	if x != nil {
+		return x.Condition
+	}
+	return nil
+}
+
+func (x *CreateRuleRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *CreateRuleRequest) GetCronSchedule() string {
+	if x != nil {
+		return x.CronSchedule
+	}
+	return ""
+}
+
+type GetRuleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RuleId        string                 `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRuleRequest) Reset() {
+	*x = GetRuleRequest{}
+	mi := &file_rules_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRuleRequest) ProtoMessage() {}
+
+func (x *GetRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRuleRequest.ProtoReflect.Descriptor instead.
+func (*GetRuleRequest) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetRuleRequest) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+type ListUserRulesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUserRulesRequest) Reset() {
+	*x = ListUserRulesRequest{}
+	mi := &file_rules_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUserRulesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUserRulesRequest) ProtoMessage() {}
+
+func (x *ListUserRulesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUserRulesRequest.ProtoReflect.Descriptor instead.
+func (*ListUserRulesRequest) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ListUserRulesRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type ListRulesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rules         []*Rule                `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRulesResponse) Reset() {
+	*x = ListRulesResponse{}
+	mi := &file_rules_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRulesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRulesResponse) ProtoMessage() {}
+
+func (x *ListRulesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRulesResponse.ProtoReflect.Descriptor instead.
+func (*ListRulesResponse) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ListRulesResponse) GetRules() []*Rule {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
+type UpdateRuleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RuleId        string                 `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
+	Name          *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	Condition     *RuleCondition         `protobuf:"bytes,3,opt,name=condition,proto3,oneof" json:"condition,omitempty"`
+	Limit         *int32                 `protobuf:"varint,4,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	CronSchedule  *string                `protobuf:"bytes,5,opt,name=cron_schedule,json=cronSchedule,proto3,oneof" json:"cron_schedule,omitempty"`
+	IsActive      *bool                  `protobuf:"varint,6,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRuleRequest) Reset() {
+	*x = UpdateRuleRequest{}
+	mi := &file_rules_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRuleRequest) ProtoMessage() {}
+
+func (x *UpdateRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRuleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateRuleRequest) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UpdateRuleRequest) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+func (x *UpdateRuleRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *UpdateRuleRequest) GetCondition() *RuleCondition {
+	if x != nil {
+		return x.Condition
+	}
+	return nil
+}
+
+func (x *UpdateRuleRequest) GetLimit() int32 {
+	if x != nil && x.Limit != nil {
+		return *x.Limit
+	}
+	return 0
+}
+
+func (x *UpdateRuleRequest) GetCronSchedule() string {
+	if x != nil && x.CronSchedule != nil {
+		return *x.CronSchedule
+	}
+	return ""
+}
+
+func (x *UpdateRuleRequest) GetIsActive() bool {
+	if x != nil && x.IsActive != nil {
+		return *x.IsActive
+	}
+	return false
+}
+
+type DeleteRuleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RuleId        string                 `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRuleRequest) Reset() {
+	*x = DeleteRuleRequest{}
+	mi := &file_rules_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRuleRequest) ProtoMessage() {}
+
+func (x *DeleteRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRuleRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRuleRequest) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DeleteRuleRequest) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+type ExecuteRuleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RuleId        string                 `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExecuteRuleRequest) Reset() {
+	*x = ExecuteRuleRequest{}
+	mi := &file_rules_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExecuteRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecuteRuleRequest) ProtoMessage() {}
+
+func (x *ExecuteRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecuteRuleRequest.ProtoReflect.Descriptor instead.
+func (*ExecuteRuleRequest) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ExecuteRuleRequest) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+type ExecuteRuleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlaylistId    string                 `protobuf:"bytes,1,opt,name=playlist_id,json=playlistId,proto3" json:"playlist_id,omitempty"`
+	TrackCount    int32                  `protobuf:"varint,2,opt,name=track_count,json=trackCount,proto3" json:"track_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExecuteRuleResponse) Reset() {
+	*x = ExecuteRuleResponse{}
+	mi := &file_rules_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExecuteRuleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecuteRuleResponse) ProtoMessage() {}
+
+func (x *ExecuteRuleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rules_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecuteRuleResponse.ProtoReflect.Descriptor instead.
+func (*ExecuteRuleResponse) Descriptor() ([]byte, []int) {
+	return file_rules_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ExecuteRuleResponse) GetPlaylistId() string {
+	if x != nil {
+		return x.PlaylistId
+	}
+	return ""
+}
+
+func (x *ExecuteRuleResponse) GetTrackCount() int32 {
+	if x != nil {
+		return x.TrackCount
+	}
+	return 0
+}
+
 var File_rules_proto protoreflect.FileDescriptor
 
 const file_rules_proto_rawDesc = "" +
 	"\n" +
-	"\vrules.proto\x12\x05rulesB;Z9github.com/CAATHARSIS/music-service/api/gen/rules;rulespbb\x06proto3"
+	"\vrules.proto\x12\x05rules\x1a\fcommon.proto\"\xb4\x02\n" +
+	"\rRuleCondition\x12\x16\n" +
+	"\x06genres\x18\x01 \x03(\tR\x06genres\x12 \n" +
+	"\tyear_from\x18\x02 \x01(\x05H\x00R\byearFrom\x88\x01\x01\x12\x1c\n" +
+	"\ayear_to\x18\x03 \x01(\x05H\x01R\x06yearTo\x88\x01\x01\x12&\n" +
+	"\fmin_duration\x18\x04 \x01(\x05H\x02R\vminDuration\x88\x01\x01\x12&\n" +
+	"\fmax_duration\x18\x05 \x01(\x05H\x03R\vmaxDuration\x88\x01\x01\x12+\n" +
+	"\x0fmin_plays_count\x18\x06 \x01(\x05H\x04R\rminPlaysCount\x88\x01\x01B\f\n" +
+	"\n" +
+	"_year_fromB\n" +
+	"\n" +
+	"\b_year_toB\x0f\n" +
+	"\r_min_durationB\x0f\n" +
+	"\r_max_durationB\x12\n" +
+	"\x10_min_plays_count\"\xb7\x02\n" +
+	"\x04Rule\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x122\n" +
+	"\tcondition\x18\x04 \x01(\v2\x14.rules.RuleConditionR\tcondition\x12\x14\n" +
+	"\x05limit\x18\x05 \x01(\x05R\x05limit\x12#\n" +
+	"\rcron_schedule\x18\x06 \x01(\tR\fcronSchedule\x12\x1b\n" +
+	"\tis_active\x18\a \x01(\bR\bisActive\x12(\n" +
+	"\x10last_executed_at\x18\b \x01(\tR\x0elastExecutedAt\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\n" +
+	" \x01(\tR\tupdatedAt\"\xaf\x01\n" +
+	"\x11CreateRuleRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x122\n" +
+	"\tcondition\x18\x03 \x01(\v2\x14.rules.RuleConditionR\tcondition\x12\x14\n" +
+	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12#\n" +
+	"\rcron_schedule\x18\x05 \x01(\tR\fcronSchedule\")\n" +
+	"\x0eGetRuleRequest\x12\x17\n" +
+	"\arule_id\x18\x01 \x01(\tR\x06ruleId\"/\n" +
+	"\x14ListUserRulesRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"6\n" +
+	"\x11ListRulesResponse\x12!\n" +
+	"\x05rules\x18\x01 \x03(\v2\v.rules.RuleR\x05rules\"\xa6\x02\n" +
+	"\x11UpdateRuleRequest\x12\x17\n" +
+	"\arule_id\x18\x01 \x01(\tR\x06ruleId\x12\x17\n" +
+	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x127\n" +
+	"\tcondition\x18\x03 \x01(\v2\x14.rules.RuleConditionH\x01R\tcondition\x88\x01\x01\x12\x19\n" +
+	"\x05limit\x18\x04 \x01(\x05H\x02R\x05limit\x88\x01\x01\x12(\n" +
+	"\rcron_schedule\x18\x05 \x01(\tH\x03R\fcronSchedule\x88\x01\x01\x12 \n" +
+	"\tis_active\x18\x06 \x01(\bH\x04R\bisActive\x88\x01\x01B\a\n" +
+	"\x05_nameB\f\n" +
+	"\n" +
+	"_conditionB\b\n" +
+	"\x06_limitB\x10\n" +
+	"\x0e_cron_scheduleB\f\n" +
+	"\n" +
+	"_is_active\",\n" +
+	"\x11DeleteRuleRequest\x12\x17\n" +
+	"\arule_id\x18\x01 \x01(\tR\x06ruleId\"-\n" +
+	"\x12ExecuteRuleRequest\x12\x17\n" +
+	"\arule_id\x18\x01 \x01(\tR\x06ruleId\"W\n" +
+	"\x13ExecuteRuleResponse\x12\x1f\n" +
+	"\vplaylist_id\x18\x01 \x01(\tR\n" +
+	"playlistId\x12\x1f\n" +
+	"\vtrack_count\x18\x02 \x01(\x05R\n" +
+	"trackCount2\xa2\x03\n" +
+	"\vRuleService\x123\n" +
+	"\n" +
+	"CreateRule\x12\x18.rules.CreateRuleRequest\x1a\v.rules.Rule\x12-\n" +
+	"\aGetRule\x12\x15.rules.GetRuleRequest\x1a\v.rules.Rule\x12F\n" +
+	"\rListUserRules\x12\x1b.rules.ListUserRulesRequest\x1a\x18.rules.ListRulesResponse\x123\n" +
+	"\n" +
+	"UpdateRule\x12\x18.rules.UpdateRuleRequest\x1a\v.rules.Rule\x125\n" +
+	"\n" +
+	"DeleteRule\x12\x18.rules.DeleteRuleRequest\x1a\r.common.Empty\x12D\n" +
+	"\vExecuteRule\x12\x19.rules.ExecuteRuleRequest\x1a\x1a.rules.ExecuteRuleResponse\x125\n" +
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB;Z9github.com/CAATHARSIS/music-service/api/gen/rules;rulespbb\x06proto3"
 
-var file_rules_proto_goTypes = []any{}
+var (
+	file_rules_proto_rawDescOnce sync.Once
+	file_rules_proto_rawDescData []byte
+)
+
+func file_rules_proto_rawDescGZIP() []byte {
+	file_rules_proto_rawDescOnce.Do(func() {
+		file_rules_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_rules_proto_rawDesc), len(file_rules_proto_rawDesc)))
+	})
+	return file_rules_proto_rawDescData
+}
+
+var file_rules_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_rules_proto_goTypes = []any{
+	(*RuleCondition)(nil),               // 0: rules.RuleCondition
+	(*Rule)(nil),                        // 1: rules.Rule
+	(*CreateRuleRequest)(nil),           // 2: rules.CreateRuleRequest
+	(*GetRuleRequest)(nil),              // 3: rules.GetRuleRequest
+	(*ListUserRulesRequest)(nil),        // 4: rules.ListUserRulesRequest
+	(*ListRulesResponse)(nil),           // 5: rules.ListRulesResponse
+	(*UpdateRuleRequest)(nil),           // 6: rules.UpdateRuleRequest
+	(*DeleteRuleRequest)(nil),           // 7: rules.DeleteRuleRequest
+	(*ExecuteRuleRequest)(nil),          // 8: rules.ExecuteRuleRequest
+	(*ExecuteRuleResponse)(nil),         // 9: rules.ExecuteRuleResponse
+	(*common.Empty)(nil),                // 10: common.Empty
+	(*common.HealthyCheckResponse)(nil), // 11: common.HealthyCheckResponse
+}
 var file_rules_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: rules.Rule.condition:type_name -> rules.RuleCondition
+	0,  // 1: rules.CreateRuleRequest.condition:type_name -> rules.RuleCondition
+	1,  // 2: rules.ListRulesResponse.rules:type_name -> rules.Rule
+	0,  // 3: rules.UpdateRuleRequest.condition:type_name -> rules.RuleCondition
+	2,  // 4: rules.RuleService.CreateRule:input_type -> rules.CreateRuleRequest
+	3,  // 5: rules.RuleService.GetRule:input_type -> rules.GetRuleRequest
+	4,  // 6: rules.RuleService.ListUserRules:input_type -> rules.ListUserRulesRequest
+	6,  // 7: rules.RuleService.UpdateRule:input_type -> rules.UpdateRuleRequest
+	7,  // 8: rules.RuleService.DeleteRule:input_type -> rules.DeleteRuleRequest
+	8,  // 9: rules.RuleService.ExecuteRule:input_type -> rules.ExecuteRuleRequest
+	10, // 10: rules.RuleService.Health:input_type -> common.Empty
+	1,  // 11: rules.RuleService.CreateRule:output_type -> rules.Rule
+	1,  // 12: rules.RuleService.GetRule:output_type -> rules.Rule
+	5,  // 13: rules.RuleService.ListUserRules:output_type -> rules.ListRulesResponse
+	1,  // 14: rules.RuleService.UpdateRule:output_type -> rules.Rule
+	10, // 15: rules.RuleService.DeleteRule:output_type -> common.Empty
+	9,  // 16: rules.RuleService.ExecuteRule:output_type -> rules.ExecuteRuleResponse
+	11, // 17: rules.RuleService.Health:output_type -> common.HealthyCheckResponse
+	11, // [11:18] is the sub-list for method output_type
+	4,  // [4:11] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_rules_proto_init() }
@@ -43,18 +795,21 @@ func file_rules_proto_init() {
 	if File_rules_proto != nil {
 		return
 	}
+	file_rules_proto_msgTypes[0].OneofWrappers = []any{}
+	file_rules_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rules_proto_rawDesc), len(file_rules_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   10,
 			NumExtensions: 0,
-			NumServices:   0,
+			NumServices:   1,
 		},
 		GoTypes:           file_rules_proto_goTypes,
 		DependencyIndexes: file_rules_proto_depIdxs,
+		MessageInfos:      file_rules_proto_msgTypes,
 	}.Build()
 	File_rules_proto = out.File
 	file_rules_proto_goTypes = nil

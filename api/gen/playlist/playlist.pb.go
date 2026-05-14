@@ -565,6 +565,7 @@ func (x *UpdatePlaylistRequest) GetIsPublic() bool {
 type DeletePlaylistRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlaylistId    string                 `protobuf:"bytes,1,opt,name=playlist_id,json=playlistId,proto3" json:"playlist_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -602,6 +603,13 @@ func (*DeletePlaylistRequest) Descriptor() ([]byte, []int) {
 func (x *DeletePlaylistRequest) GetPlaylistId() string {
 	if x != nil {
 		return x.PlaylistId
+	}
+	return ""
+}
+
+func (x *DeletePlaylistRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
 	}
 	return ""
 }
@@ -779,10 +787,11 @@ const file_playlist_proto_rawDesc = "" +
 	"\x05_nameB\x0e\n" +
 	"\f_descriptionB\f\n" +
 	"\n" +
-	"_is_public\"8\n" +
+	"_is_public\"Q\n" +
 	"\x15DeletePlaylistRequest\x12\x1f\n" +
 	"\vplaylist_id\x18\x01 \x01(\tR\n" +
-	"playlistId\"f\n" +
+	"playlistId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"f\n" +
 	"\x0fAddTrackRequest\x12\x1f\n" +
 	"\vplaylist_id\x18\x01 \x01(\tR\n" +
 	"playlistId\x12\x17\n" +
