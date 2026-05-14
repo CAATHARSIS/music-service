@@ -21,3 +21,12 @@ type PlaylistTrack struct {
 	Position   int       `db:"position"`
 	AddedAt    time.Time `db:"added_at"`
 }
+
+type PlaylistType string
+
+const (
+	PlaylistTypeUnspecified = "unspecified"
+	PlaylistTypeFavoriets = "favoriets"
+	PlaylistTypeManual = "manual"
+	PlaylistTypeGenerated = "generated"
+)
