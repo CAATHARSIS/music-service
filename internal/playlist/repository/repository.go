@@ -16,7 +16,7 @@ import (
 var ErrNotFound = errors.New("not found")
 
 type Repository interface {
-	CreatePlaylist(ctx context.Context, userID, name, description string, isPublic bool) (*models.Playlist, error)
+	CreatePlaylist(ctx context.Context, userID, name, description string, isPublic bool, pType models.PlaylistType) (*models.Playlist, error)
 	GetPlaylist(ctx context.Context, id string) (*models.Playlist, error)
 	ListUserPlaylists(ctx context.Context, userID string, page, pageSize int) ([]*models.Playlist, error)
 	UpdatePlaylist(ctx context.Context, id string, name, description *string, isPublic *bool) (*models.Playlist, error)
@@ -38,14 +38,15 @@ func NewRepository(db *sqlx.DB, log *slog.Logger) Repository {
 	}
 }
 
-func (r *repository) CreatePlaylist(ctx context.Context, userID, name, description string, isPublic bool) (*models.Playlist, error) {
+func (r *repository) CreatePlaylist(ctx context.Context, userID, name, description string, isPublic bool, pType models.PlaylistType) (*models.Playlist, error) {
 	query := `
 		INSERT INTO playlists (
 			id,
 			user_id,
 			name,
-			descritption,
+			description,
 			is_public,
+			type,
 			created_at,
 			updated_at
 		)
@@ -55,6 +56,7 @@ func (r *repository) CreatePlaylist(ctx context.Context, userID, name, descripti
 			$3,
 			$4,
 			$5,
+			$6,
 			NOW(),
 			NOW()
 		)
@@ -62,14 +64,15 @@ func (r *repository) CreatePlaylist(ctx context.Context, userID, name, descripti
 			id,
 			user_id,
 			name,
-			descritpion,
+			description,
 			is_public,
+			type,
 			created_at,
 			updated_at
 	`
 
 	p := &models.Playlist{ID: uuid.New().String()}
-	err := r.db.QueryRowContext(ctx, query, p.ID, userID, name, description, isPublic).Scan(
+	err := r.db.QueryRowContext(ctx, query, p.ID, userID, name, description, isPublic, pType).Scan(
 		&p.ID,
 		&p.UserID,
 		&p.Name,
@@ -171,8 +174,9 @@ func (r *repository) UpdatePlaylist(ctx context.Context, id string, name, descri
 			id,
 			user_id,
 			name,
-			descritpion,
+			description,
 			is_public,
+			type,
 			created_at,
 			updated_at
 	`, strings.Join(setParts, ", "))

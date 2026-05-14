@@ -52,6 +52,7 @@ message CreatePlaylistRequest {
     string name = 2;
     string description = 3;
     bool is_public = 4;
+    PlaylistType pType = 5;
 }
 
 message GetPlaylistRequest {

@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 
 	catalogpb "github.com/CAATHARSIS/music-service/api/gen/catalog"
 	commonpb "github.com/CAATHARSIS/music-service/api/gen/common"
 	playlistpb "github.com/CAATHARSIS/music-service/api/gen/playlist"
+	"github.com/CAATHARSIS/music-service/internal/playlist/models"
 	"github.com/CAATHARSIS/music-service/internal/playlist/repository"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -33,7 +35,19 @@ func (s *PlaylistService) CreatePlaylist(ctx context.Context, req *playlistpb.Cr
 		return nil, status.Error(codes.InvalidArgument, "user_id and name are required")
 	}
 
-	p, err := s.repo.CreatePlaylist(ctx, req.UserId, req.Name, req.Description, req.IsPublic)
+	var pType models.PlaylistType
+	switch req.PType {
+	case playlistpb.PlaylistType_PLAYLIST_TYPE_FAVORITES:
+		pType = models.PlaylistTypeFavoriets
+	case playlistpb.PlaylistType_PLAYLIST_TYPE_GENERATED:
+		pType = models.PlaylistTypeGenerated
+	case playlistpb.PlaylistType_PLAYLIST_TYPE_MANUAL:
+		pType = models.PlaylistTypeManual
+	default:
+		pType = models.PlaylistTypeUnspecified
+	}
+
+	p, err := s.repo.CreatePlaylist(ctx, req.UserId, req.Name, req.Description, req.IsPublic, pType)
 	if err != nil {
 		s.log.Error("create playlist failed", "error", err)
 		return nil, status.Error(codes.Internal, "create failed")
@@ -118,7 +132,7 @@ func (s *PlaylistService) ListUserPlaylists(ctx context.Context, req *playlistpb
 	return &playlistpb.ListPlaylistsResponse{
 		Playlists: pbPlaylists,
 		Pagination: &commonpb.PaginationResponse{
-			Page: int32(page),
+			Page:     int32(page),
 			PageSize: int32(pageSize),
 		},
 	}, nil
@@ -134,7 +148,7 @@ func (s *PlaylistService) UpdatePlaylist(ctx context.Context, req *playlistpb.Up
 		if errors.Is(err, repository.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "not found")
 		}
-		return nil, status.Error(codes.Internal, "update failed")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("update failed: %v", err))
 	}
 
 	return convertPlaylistToProto(p), nil
@@ -184,14 +198,14 @@ func (s *PlaylistService) Health(ctx context.Context, req *commonpb.Empty) (*com
 }
 
 func paginationDefaults(pb *commonpb.PaginationRequest) (int, int) {
-    page, pageSize := 1, 20
-    if pb != nil {
-        if pb.Page > 0 {
-            page = int(pb.Page)
-        }
-        if pb.PageSize > 0 && pb.PageSize <= 100 {
-            pageSize = int(pb.PageSize)
-        }
-    }
-    return page, pageSize
+	page, pageSize := 1, 20
+	if pb != nil {
+		if pb.Page > 0 {
+			page = int(pb.Page)
+		}
+		if pb.PageSize > 0 && pb.PageSize <= 100 {
+			pageSize = int(pb.PageSize)
+		}
+	}
+	return page, pageSize
 }

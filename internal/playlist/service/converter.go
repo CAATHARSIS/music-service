@@ -23,8 +23,10 @@ func convertPlaylistToProto(p *models.Playlist) *playlistpb.Playlist {
         pb.Type = playlistpb.PlaylistType_PLAYLIST_TYPE_GENERATED
     case models.PlaylistTypeFavoriets:
         pb.Type = playlistpb.PlaylistType_PLAYLIST_TYPE_FAVORITES
-    default:
+    case models.PlaylistTypeManual:
         pb.Type = playlistpb.PlaylistType_PLAYLIST_TYPE_MANUAL
+	default:
+		pb.Type = playlistpb.PlaylistType_PLAYLIST_TYPE_UNSPECIFIED
     }
 
     return pb

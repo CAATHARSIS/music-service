@@ -120,6 +120,42 @@ services:
     networks:
       - music-network
     restart: unless-stopped
+  postgres-playlist:
+    image: postgres:18-alpine
+    container_name: music-playlist-db
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_USER: playlist_user
+      POSTGRES_PASSWORD: playlist_pass
+      POSTGRES_DB: playlist_db
+    volumes:
+      - postgres_playlist_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U playlist_user -d playlist_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - music-network
+
+  playlist-service:
+    build:
+      context: .
+      dockerfile: cmd/playlist-service/Dockerfile
+    container_name: music-playlist-service
+    environment:
+      PLAYLIST_DB_HOST: postgres-playlist
+    env_file:
+      - .env
+    ports:
+      - "50054:50054"
+    depends_on:
+      postgres-playlist:
+        condition: service_healthy
+    networks:
+      - music-network
+    restart: unless-stopped
 networks:
   music-network:
     driver: bridge
@@ -129,3 +165,4 @@ volumes:
   postgres_auth_data:
   postgres_file_data:
   minio_data:
+  postgres_playlist_data:
