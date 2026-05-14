@@ -1,0 +1,5 @@
+DROP INDEX IF EXISTS idx_rules_user_id;
+
+DROP TABLE IF EXISTS rules;
+
+DROP EXTENSION IF EXISTS "uuid-ossp";
