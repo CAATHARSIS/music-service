@@ -15,17 +15,17 @@ type RuleCondition struct {
 }
 
 type Rule struct {
-	ID             string        `db:"id"`
-	UserID         string        `db:"user_id"`
-	Name           string        `db:"name"`
-	Condition      RuleCondition `db:"-"`
-	ConditionJSON  []byte        `db:"condition"`
-	TrackLimit     int           `db:"track_limit"`
-	CronSchedule   *string       `db:"cron_schedule"`
-	IsActive       bool          `db:"is_active"`
-	LastExecutedAt *time.Time    `db:"last_executed_at"`
-	CreatedAt      time.Time     `db:"created_at"`
-	UpdatedAt      time.Time     `db:"updated_at"`
+	ID            string        `db:"id"`
+	UserID        string        `db:"user_id"`
+	Name          string        `db:"name"`
+	Condition     RuleCondition `db:"-"`
+	ConditionJSON []byte        `db:"condition"`
+	TrackLimit    int           `db:"track_limit"`
+	CronSchedule  *string       `db:"cron_schedule"`
+	IsActive      bool          `db:"is_active"`
+	LastExecuted  *time.Time    `db:"last_executed_at"`
+	CreatedAt     time.Time     `db:"created_at"`
+	UpdatedAt     time.Time     `db:"updated_at"`
 }
 
 func (r *Rule) MarshalCondition() error {
