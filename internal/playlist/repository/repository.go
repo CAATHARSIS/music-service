@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/CAATHARSIS/music-service/internal/playlist/models"
-	"github.com/go-sqlx/sqlx"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 var ErrNotFound = errors.New("not found")
@@ -191,7 +191,7 @@ func (r *repository) UpdatePlaylist(ctx context.Context, id string, name, descri
 	if err == sql.ErrNoRows {
 		return nil, ErrNotFound
 	}
-	
+
 	return &p, err
 }
 
