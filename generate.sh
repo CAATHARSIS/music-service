@@ -4,7 +4,6 @@ set -e
 PROTO_DIR="api/proto"
 BASE_OUT_DIR="api/gen"
 GOPATH_BIN="$(go env GOPATH)/bin"
-
 PROTOC="protoc"
 GO_PLUGIN="$GOPATH_BIN/protoc-gen-go.exe"
 GRPC_PLUGIN="$GOPATH_BIN/protoc-gen-go-grpc.exe"
