@@ -190,14 +190,22 @@ func (r *repository) UpdateRule(ctx context.Context, rule *models.Rule) error {
 			id = $1
 	`
 
-	result, _ := r.db.ExecContext(ctx, query,
+	result, err := r.db.ExecContext(ctx, query,
 		rule.ID,
 		rule.Name,
-		rule.Condition,
+		rule.ConditionJSON,
 		rule.TrackLimit,
 		rule.CronSchedule,
 		rule.IsActive,
 	)
+	if err != nil {
+		r.log.Error("failed to execute UPDATE query", 
+			"rule_id", rule.ID, 
+			"error", err,
+		)
+		return fmt.Errorf("exec update query: %w", err)
+	}
+
 	rows, _ := result.RowsAffected()
 	if rows == 0 {
 		return ErrNotFound

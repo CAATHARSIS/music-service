@@ -23,7 +23,7 @@ type Rule struct {
 	TrackLimit    int           `db:"track_limit"`
 	CronSchedule  *string       `db:"cron_schedule"`
 	IsActive      bool          `db:"is_active"`
-	LastExecuted  *time.Time    `db:"last_executed_at"`
+	LastExecuted  *time.Time    `db:"last_executed"`
 	CreatedAt     time.Time     `db:"created_at"`
 	UpdatedAt     time.Time     `db:"updated_at"`
 }

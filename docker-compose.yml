@@ -156,6 +156,41 @@ services:
     networks:
       - music-network
     restart: unless-stopped
+  postgres-rules:
+    image: postgres:18-alpine
+    container_name: music-rules-db
+    ports:
+      - "5437:5432"
+    environment:
+      POSTGRES_USER: rules_user
+      POSTGRES_PASSWORD: rules_pass
+      POSTGRES_DB: rules_db
+    volumes:
+      - postgres_rules_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rules_user -d rules_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - music-network
+  rules-service:
+    build:
+      context: .
+      dockerfile: cmd/rules-service/Dockerfile
+    container_name: music-rules-service
+    environment:
+      RULES_DB_HOST: postgres-rules
+    env_file:
+      - .env
+    ports:
+      - "50055:50055"
+    depends_on:
+      postgres-rules:
+        condition: service_healthy
+    networks:
+      - music-network
+    restart: unless-stopped
 networks:
   music-network:
     driver: bridge
@@ -166,3 +201,4 @@ volumes:
   postgres_file_data:
   minio_data:
   postgres_playlist_data:
+  postgres_rules_data:
