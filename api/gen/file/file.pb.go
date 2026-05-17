@@ -11,6 +11,7 @@ package filepb
 
 import (
 	common "github.com/CAATHARSIS/music-service/api/gen/common"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -472,7 +473,7 @@ var File_file_proto protoreflect.FileDescriptor
 const file_file_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"file.proto\x12\x04file\x1a\fcommon.proto\"\xda\x01\n" +
+	"file.proto\x12\x04file\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xda\x01\n" +
 	"\bFileInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
 	"\roriginal_name\x18\x02 \x01(\tR\foriginalName\x12\x16\n" +
@@ -504,15 +505,15 @@ const file_file_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\x03R\texpiresAt\",\n" +
 	"\x11DeleteFileRequest\x12\x17\n" +
-	"\afile_id\x18\x01 \x01(\tR\x06fileId2\xb6\x02\n" +
-	"\vFileService\x127\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId2\xcd\x03\n" +
+	"\vFileService\x12T\n" +
 	"\n" +
-	"UploadFile\x12\x17.file.UploadFileRequest\x1a\x0e.file.FileInfo(\x01\x127\n" +
-	"\vGetFileInfo\x12\x18.file.GetFileInfoRequest\x1a\x0e.file.FileInfo\x12H\n" +
-	"\x0eGetDownloadURL\x12\x1b.file.GetDownloadURLRequest\x1a\x19.file.DownloadURLResponse\x124\n" +
+	"UploadFile\x12\x17.file.UploadFileRequest\x1a\x0e.file.FileInfo\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/files/upload(\x01\x12T\n" +
+	"\vGetFileInfo\x12\x18.file.GetFileInfoRequest\x1a\x0e.file.FileInfo\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/files/{file_id}\x12n\n" +
+	"\x0eGetDownloadURL\x12\x1b.file.GetDownloadURLRequest\x1a\x19.file.DownloadURLResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/v1/files/{file_id}/download\x12Q\n" +
 	"\n" +
-	"DeleteFile\x12\x17.file.DeleteFileRequest\x1a\r.common.Empty\x125\n" +
-	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB9Z7github.com/CAATHARSIS/music-service/api/gen/file;filepbb\x06proto3"
+	"DeleteFile\x12\x17.file.DeleteFileRequest\x1a\r.common.Empty\"\x1b\x82\xd3\xe4\x93\x02\x15*\x13/v1/files/{file_id}\x12O\n" +
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/files/healthB9Z7github.com/CAATHARSIS/music-service/api/gen/file;filepbb\x06proto3"
 
 var (
 	file_file_proto_rawDescOnce sync.Once

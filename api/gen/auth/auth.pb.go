@@ -11,6 +11,7 @@ package authpb
 
 import (
 	common "github.com/CAATHARSIS/music-service/api/gen/common"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -658,7 +659,7 @@ var File_auth_proto protoreflect.FileDescriptor
 const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"auth.proto\x12\x04auth\x1a\fcommon.proto\"\x9a\x01\n" +
+	"auth.proto\x12\x04auth\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\x9a\x01\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
@@ -706,16 +707,15 @@ const file_auth_proto_rawDesc = "" +
 	"\x11AvatarURLResponse\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
-	"expires_at\x18\x02 \x01(\x03R\texpiresAt2\xb3\x03\n" +
-	"\vAuthService\x125\n" +
-	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x12.auth.AuthResponse\x12/\n" +
-	"\x05Login\x12\x12.auth.LoginRequest\x1a\x12.auth.AuthResponse\x12H\n" +
-	"\rValidateToken\x12\x1a.auth.ValidateTokenRequest\x1a\x1b.auth.ValidateTokenResponse\x12=\n" +
-	"\fRefreshToken\x12\x19.auth.RefreshTokenRequest\x1a\x12.auth.AuthResponse\x128\n" +
+	"expires_at\x18\x02 \x01(\x03R\texpiresAt2\x99\x04\n" +
+	"\vAuthService\x12S\n" +
+	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x12.auth.AuthResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/auth/register\x12J\n" +
+	"\x05Login\x12\x12.auth.LoginRequest\x1a\x12.auth.AuthResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12f\n" +
+	"\rValidateToken\x12\x1a.auth.ValidateTokenRequest\x1a\x1b.auth.ValidateTokenResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/auth/validate\x12Z\n" +
+	"\fRefreshToken\x12\x19.auth.RefreshTokenRequest\x1a\x12.auth.AuthResponse\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/auth/refresh\x12U\n" +
 	"\n" +
-	"GetProfile\x12\x17.auth.GetProfileRequest\x1a\x11.auth.UserProfile\x12B\n" +
-	"\fGetAvatarURL\x12\x19.auth.GetAvatarURLRequest\x1a\x17.auth.AvatarURLResponse\x125\n" +
-	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB9Z7github.com/CAATHARSIS/music-service/api/gen/auth;authpbb\x06proto3"
+	"GetProfile\x12\x17.auth.GetProfileRequest\x1a\x11.auth.UserProfile\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/users/{user_id}\x12N\n" +
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/auth/healthB9Z7github.com/CAATHARSIS/music-service/api/gen/auth;authpbb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -752,17 +752,15 @@ var file_auth_proto_depIdxs = []int32{
 	5,  // 3: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenRequest
 	7,  // 4: auth.AuthService.RefreshToken:input_type -> auth.RefreshTokenRequest
 	8,  // 5: auth.AuthService.GetProfile:input_type -> auth.GetProfileRequest
-	9,  // 6: auth.AuthService.GetAvatarURL:input_type -> auth.GetAvatarURLRequest
-	11, // 7: auth.AuthService.Health:input_type -> common.Empty
-	4,  // 8: auth.AuthService.Register:output_type -> auth.AuthResponse
-	4,  // 9: auth.AuthService.Login:output_type -> auth.AuthResponse
-	6,  // 10: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
-	4,  // 11: auth.AuthService.RefreshToken:output_type -> auth.AuthResponse
-	1,  // 12: auth.AuthService.GetProfile:output_type -> auth.UserProfile
-	10, // 13: auth.AuthService.GetAvatarURL:output_type -> auth.AvatarURLResponse
-	12, // 14: auth.AuthService.Health:output_type -> common.HealthyCheckResponse
-	8,  // [8:15] is the sub-list for method output_type
-	1,  // [1:8] is the sub-list for method input_type
+	11, // 6: auth.AuthService.Health:input_type -> common.Empty
+	4,  // 7: auth.AuthService.Register:output_type -> auth.AuthResponse
+	4,  // 8: auth.AuthService.Login:output_type -> auth.AuthResponse
+	6,  // 9: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
+	4,  // 10: auth.AuthService.RefreshToken:output_type -> auth.AuthResponse
+	1,  // 11: auth.AuthService.GetProfile:output_type -> auth.UserProfile
+	12, // 12: auth.AuthService.Health:output_type -> common.HealthyCheckResponse
+	7,  // [7:13] is the sub-list for method output_type
+	1,  // [1:7] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name

@@ -5,115 +5,218 @@ syntax = "proto3";
 package catalog;
 
 import "common.proto";
+import "google/api/annotations.proto";
+
 
 option go_package = "github.com/CAATHARSIS/music-service/api/gen/catalog;catalogpb";
 
 // Catalog Service - main service for managing music-service
 service CatalogService {
-    // Tracks
+    // TRACKS
 
-    // Get track by id
-    rpc GetTrack(GetTrackRequest) returns (Track);
+    rpc GetTrack(GetTrackRequest) returns (Track) {
+        option (google.api.http) = {
+            get: "/v1/tracks/{id}"
+        };
+    }
 
-    // List tracks with filtration and pagination
-    rpc ListTracks(ListTracksRequest) returns (ListTracksResponse);
+    rpc ListTracks(ListTracksRequest) returns (ListTracksResponse) {
+        option (google.api.http) = {
+            get: "/v1/tracks"
+        };
+    }
 
-    // Create new track
-    rpc CreateTrack(CreateTrackRequest) returns (Track);
+    rpc CreateTrack(CreateTrackRequest) returns (Track) {
+        option (google.api.http) = {
+            post: "/v1/tracks"
+            body: "*"
+        };
+    }
 
-    // Update existed track
-    rpc UpdateTrack(UpdateTrackRequest) returns (Track);
+    rpc UpdateTrack(UpdateTrackRequest) returns (Track) {
+        option (google.api.http) = {
+            put: "/v1/tracks/{id}"
+            body: "*"
+        };
+    }
 
-    // Delete track
-    rpc DeleteTrack(DeleteTrackRequest) returns (common.Empty);
+    rpc DeleteTrack(DeleteTrackRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/tracks/{track_id}"
+        };
+    }
 
-    // Search tracks by parametres
-    rpc SearchTracks(SearchTrackRequest) returns (ListTracksResponse);
+    rpc SearchTracks(SearchTrackRequest) returns (ListTracksResponse) {
+        option (google.api.http) = {
+            get: "/v1/tracks/search"
+        };
+    }
 
-    // Increment plays count by value
-    rpc IncrementPlaysCount(IncrementPlaysCountRequest) returns (common.Empty);
+    rpc IncrementPlaysCount(IncrementPlaysCountRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            post: "/v1/tracks/{id}/plays"
+            body: "*"
+        };
+    }
 
-    // Get tracks by IDs (batch)
-    rpc GetTracksByIDs(GetTracksByIDsRequest) returns (ListTracksResponse);
+    rpc GetTracksByIDs(GetTracksByIDsRequest) returns (ListTracksResponse) {
+        option (google.api.http) = {
+            get: "/v1/tracks/batch"
+        };
+    }
 
-    // Artists
+    // ARTISTS
 
-    // Get artist by id
-    rpc GetArtist(GetArtistRequest) returns (Artist);
+    rpc GetArtist(GetArtistRequest) returns (Artist) {
+        option (google.api.http) = {
+            get: "/v1/artists/{id}"
+        };
+    }
 
-    // List artists
-    rpc ListArtists(ListArtistsRequest) returns (ListArtistsResponse);
+    rpc ListArtists(ListArtistsRequest) returns (ListArtistsResponse) {
+        option (google.api.http) = {
+            get: "/v1/artists"
+        };
+    }
 
-    // Create new artist
-    rpc CreateArtist(CreateArtistRequest) returns (Artist);
+    rpc CreateArtist(CreateArtistRequest) returns (Artist) {
+        option (google.api.http) = {
+            post: "/v1/artists"
+            body: "*"
+        };
+    }
 
-    // Update existed artist
-    rpc UpdateArtist(UpdateArtistRequest) returns (Artist);
+    rpc UpdateArtist(UpdateArtistRequest) returns (Artist) {
+        option (google.api.http) = {
+            put: "/v1/artists/{id}"
+            body: "*"
+        };
+    }
 
-    // Delete artist
-    rpc DeleteArtist(DeleteArtistRequest) returns (common.Empty);
+    rpc DeleteArtist(DeleteArtistRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/artists/{id}"
+        };
+    }
 
-    // Artists search
-    rpc SearchArtists(SearchArtistsRequest) returns (ListArtistsResponse);
+    rpc SearchArtists(SearchArtistsRequest) returns (ListArtistsResponse) {
+        option (google.api.http) = {
+            get: "/v1/artists/search"
+        };
+    }
 
-    // Get artists tracks
-    rpc GetArtistTracks(GetArtistTracksRequest) returns (ListTracksResponse);
+    rpc GetArtistTracks(GetArtistTracksRequest) returns (ListTracksResponse) {
+        option (google.api.http) = {
+            get: "/v1/artists/{artist_id}/tracks"
+        };
+    }
 
-    // Get artists albums
-    rpc GetArtistAlbums(GetArtistAlbumsRequest) returns (ListAlbumsResponse);
+    rpc GetArtistAlbums(GetArtistAlbumsRequest) returns (ListAlbumsResponse) {
+        option (google.api.http) = {
+            get: "/v1/artists/{artist_id}/albums"
+        };
+    }
 
-    // Get artists by IDs (batch)
-    rpc GetArtistsByIDs(GetArtistsByIDsRequest) returns (ListArtistsResponse);
+    rpc GetArtistsByIDs(GetArtistsByIDsRequest) returns (ListArtistsResponse) {
+        option (google.api.http) = {
+            get: "/v1/artists/batch"
+        };
+    }
 
-    // Albums
+    // ALBUMS
 
-    // Get album by id
-    rpc GetAlbum(GetAlbumRequest) returns (Album);
+    rpc GetAlbum(GetAlbumRequest) returns (Album) {
+        option (google.api.http) = {
+            get: "/v1/albums/{id}"
+        };
+    }
 
-    // List albums
-    rpc ListAlbums(ListAlbumsRequest) returns (ListAlbumsResponse);
+    rpc ListAlbums(ListAlbumsRequest) returns (ListAlbumsResponse) {
+        option (google.api.http) = {
+            get: "/v1/albums"
+        };
+    }
 
-    // Create album
-    rpc CreateAlbum(CreateAlbumRequest) returns (Album);
+    rpc CreateAlbum(CreateAlbumRequest) returns (Album) {
+        option (google.api.http) = {
+            post: "/v1/albums"
+            body: "*"
+        };
+    }
 
-    // Update existed album
-    rpc UpdateAlbum(UpdateAlbumRequest) returns (Album);
+    rpc UpdateAlbum(UpdateAlbumRequest) returns (Album) {
+        option (google.api.http) = {
+            put: "/v1/albums/{id}"
+            body: "*"
+        };
+    }
 
-    // Delete album
-    rpc DeleteAlbum(DeleteAlbumRequest) returns (common.Empty);
+    rpc DeleteAlbum(DeleteAlbumRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/albums/{id}"
+        };
+    }
     
-    // Get album with tracks
-    rpc GetAlbumWithTracks(GetAlbumTracksRequest) returns (AlbumWithTracks);
+    rpc GetAlbumWithTracks(GetAlbumTracksRequest) returns (AlbumWithTracks) {
+        option (google.api.http) = {
+            get: "/v1/albums/{id}/tracks"
+        };
+    }
 
-    // Get album with tracks
-    rpc SearchAlbums(SearchAlbumsRequest) returns (ListAlbumsResponse);
+    rpc SearchAlbums(SearchAlbumsRequest) returns (ListAlbumsResponse) {
+        option (google.api.http) = {
+            get: "/v1/albums/search"
+        };
+    }
 
-    // Genres
+    // GENRES
 
-    // List genres
-    rpc ListGenres(ListGenresRequest) returns (ListGenresResponse);
+    rpc ListGenres(ListGenresRequest) returns (ListGenresResponse) {
+        option (google.api.http) = {
+            get: "/v1/genres"
+        };
+    }
     
-    // Create new genre
-    rpc CreateGenre(CreateGenreRequest) returns (Genre);
+    rpc CreateGenre(CreateGenreRequest) returns (Genre) {
+        option (google.api.http) = {
+            post: "/v1/genres"
+            body: "*"
+        };
+    }
 
-    // Get tracks by genre
-    rpc GetTrackByGenre(GetTracksByGenreRequest) returns (ListTracksResponse);
+    rpc GetTrackByGenre(GetTracksByGenreRequest) returns (ListTracksResponse) {
+        option (google.api.http) = {
+            get: "/v1/genres/{genre_id}/tracks"
+        };
+    }
 
-    // Get genre by id
-    rpc GetGenre(GetGenreRequest) returns (Genre);
+    rpc GetGenre(GetGenreRequest) returns (Genre) {
+        option (google.api.http) = {
+            get: "/v1/genres/{id}"
+        };
+    }
 
-    // For service integration
+    // SERVICE INTEGRATION
 
-    // Get url for track streaming
-    rpc GetTrackStreamURL(GetTrackStreamURLRequest) returns (StreamURLResponse);
+    rpc GetTrackStreamURL(GetTrackStreamURLRequest) returns (StreamURLResponse) {
+        option (google.api.http) = {
+            get: "/v1/tracks/{track_id}/stream"
+        };
+    }
 
-    // Get url for cover streaming
-    rpc GetCoverURL(GetCoverURLRequest) returns (StreamURLResponse);
+    rpc GetCoverURL(GetCoverURLRequest) returns (StreamURLResponse) {
+        option (google.api.http) = {
+            get: "/v1/covers/{cover_image_id}"
+        };
+    }
 
-    // Service
+    // HEALTH
 
-    // Heath check
-    rpc Health(common.Empty) returns (common.HealthyCheckResponse);
+    rpc Health(common.Empty) returns (common.HealthyCheckResponse) {
+        option (google.api.http) = {
+            get: "/v1/catalog/health"
+        };
+    }
 }
 
 message Track {

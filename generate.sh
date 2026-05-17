@@ -5,8 +5,10 @@ PROTO_DIR="api/proto"
 BASE_OUT_DIR="api/gen"
 GOPATH_BIN="$(go env GOPATH)/bin"
 PROTOC="protoc"
+
 GO_PLUGIN="$GOPATH_BIN/protoc-gen-go.exe"
 GRPC_PLUGIN="$GOPATH_BIN/protoc-gen-go-grpc.exe"
+GRPC_GATEWAY_PLUGIN="$GOPATH_BIN/protoc-gen-grpc-gateway.exe"
 
 if [ $# -eq 0 ]; then
     echo ".proto файлы не указаны"
@@ -29,10 +31,13 @@ for arg in "$@"; do
 
     $PROTOC \
       --proto_path="$PROTO_DIR" \
+      --proto_path="$PROTO_DIR/google" \
       --plugin=protoc-gen-go="$GO_PLUGIN" \
       --go_out="$FILE_OUT_DIR" --go_opt=paths=source_relative \
       --plugin=protoc-gen-go-grpc="$GRPC_PLUGIN" \
       --go-grpc_out="$FILE_OUT_DIR" --go-grpc_opt=paths=source_relative \
+      --plugin=protoc-gen-grpc-gateway="$GRPC_GATEWAY_PLUGIN" \
+      --grpc-gateway_out="$FILE_OUT_DIR" --grpc-gateway_opt=paths=source_relative \
       "$FILE"
 
     echo "$NAME.proto готов"

@@ -5,19 +5,56 @@ syntax = "proto3";
 
 package rules;
 import "common.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/CAATHARSIS/music-service/api/gen/rules;rulespb";
 
 service RuleService {
-    rpc CreateRule(CreateRuleRequest) returns (Rule);
-    rpc GetRule(GetRuleRequest) returns (Rule);
-    rpc ListUserRules(ListUserRulesRequest) returns (ListRulesResponse);
-    rpc UpdateRule(UpdateRuleRequest) returns (Rule);
-    rpc DeleteRule(DeleteRuleRequest) returns (common.Empty);
-    rpc ExecuteRule(ExecuteRuleRequest) returns (ExecuteRuleResponse);
-    rpc Health(common.Empty) returns (common.HealthyCheckResponse);
+    rpc CreateRule(CreateRuleRequest) returns (Rule) {
+        option (google.api.http) = {
+            post: "/v1/rules"
+            body: "*"
+        };
+    }
+    
+    rpc GetRule(GetRuleRequest) returns (Rule) {
+        option (google.api.http) = {
+            get: "/v1/rules/{rule_id}"
+        };
+    }
+    
+    rpc ListUserRules(ListUserRulesRequest) returns (ListRulesResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}/rules"
+        };
+    }
+    
+    rpc UpdateRule(UpdateRuleRequest) returns (Rule) {
+        option (google.api.http) = {
+            put: "/v1/rules/{rule_id}"
+            body: "*"
+        };
+    }
+    
+    rpc DeleteRule(DeleteRuleRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/rules/{rule_id}"
+        };
+    }
+    
+    rpc ExecuteRule(ExecuteRuleRequest) returns (ExecuteRuleResponse) {
+        option (google.api.http) = {
+            post: "/v1/rules/{rule_id}/execute"
+            body: "*"
+        };
+    }
+    
+    rpc Health(common.Empty) returns (common.HealthyCheckResponse) {
+        option (google.api.http) = {
+            get: "/v1/rules/health"
+        };
+    }
 }
-
 message RuleCondition {
     repeated string genres = 1;
     optional int32 year_from = 2;

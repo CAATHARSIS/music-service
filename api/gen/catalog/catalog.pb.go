@@ -11,6 +11,7 @@ package catalogpb
 
 import (
 	common "github.com/CAATHARSIS/music-service/api/gen/common"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -3147,7 +3148,7 @@ var File_catalog_proto protoreflect.FileDescriptor
 
 const file_catalog_proto_rawDesc = "" +
 	"\n" +
-	"\rcatalog.proto\x12\acatalog\x1a\fcommon.proto\"\xeb\x03\n" +
+	"\rcatalog.proto\x12\acatalog\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xeb\x03\n" +
 	"\x05Track\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
@@ -3485,42 +3486,48 @@ const file_catalog_proto_rawDesc = "" +
 	"\tSortOrder\x12\x1a\n" +
 	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +
-	"\x0fSORT_ORDER_DESC\x10\x022\xcd\x10\n" +
-	"\x0eCatalogService\x124\n" +
-	"\bGetTrack\x12\x18.catalog.GetTrackRequest\x1a\x0e.catalog.Track\x12E\n" +
+	"\x0fSORT_ORDER_DESC\x10\x022\xad\x17\n" +
+	"\x0eCatalogService\x12M\n" +
+	"\bGetTrack\x12\x18.catalog.GetTrackRequest\x1a\x0e.catalog.Track\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/tracks/{id}\x12Y\n" +
 	"\n" +
-	"ListTracks\x12\x1a.catalog.ListTracksRequest\x1a\x1b.catalog.ListTracksResponse\x12:\n" +
-	"\vCreateTrack\x12\x1b.catalog.CreateTrackRequest\x1a\x0e.catalog.Track\x12:\n" +
-	"\vUpdateTrack\x12\x1b.catalog.UpdateTrackRequest\x1a\x0e.catalog.Track\x129\n" +
-	"\vDeleteTrack\x12\x1b.catalog.DeleteTrackRequest\x1a\r.common.Empty\x12H\n" +
-	"\fSearchTracks\x12\x1b.catalog.SearchTrackRequest\x1a\x1b.catalog.ListTracksResponse\x12I\n" +
-	"\x13IncrementPlaysCount\x12#.catalog.IncrementPlaysCountRequest\x1a\r.common.Empty\x12M\n" +
-	"\x0eGetTracksByIDs\x12\x1e.catalog.GetTracksByIDsRequest\x1a\x1b.catalog.ListTracksResponse\x127\n" +
-	"\tGetArtist\x12\x19.catalog.GetArtistRequest\x1a\x0f.catalog.Artist\x12H\n" +
-	"\vListArtists\x12\x1b.catalog.ListArtistsRequest\x1a\x1c.catalog.ListArtistsResponse\x12=\n" +
-	"\fCreateArtist\x12\x1c.catalog.CreateArtistRequest\x1a\x0f.catalog.Artist\x12=\n" +
-	"\fUpdateArtist\x12\x1c.catalog.UpdateArtistRequest\x1a\x0f.catalog.Artist\x12;\n" +
-	"\fDeleteArtist\x12\x1c.catalog.DeleteArtistRequest\x1a\r.common.Empty\x12L\n" +
-	"\rSearchArtists\x12\x1d.catalog.SearchArtistsRequest\x1a\x1c.catalog.ListArtistsResponse\x12O\n" +
-	"\x0fGetArtistTracks\x12\x1f.catalog.GetArtistTracksRequest\x1a\x1b.catalog.ListTracksResponse\x12O\n" +
-	"\x0fGetArtistAlbums\x12\x1f.catalog.GetArtistAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\x12P\n" +
-	"\x0fGetArtistsByIDs\x12\x1f.catalog.GetArtistsByIDsRequest\x1a\x1c.catalog.ListArtistsResponse\x124\n" +
-	"\bGetAlbum\x12\x18.catalog.GetAlbumRequest\x1a\x0e.catalog.Album\x12E\n" +
+	"ListTracks\x12\x1a.catalog.ListTracksRequest\x1a\x1b.catalog.ListTracksResponse\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
+	"/v1/tracks\x12Q\n" +
+	"\vCreateTrack\x12\x1b.catalog.CreateTrackRequest\x1a\x0e.catalog.Track\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
+	"/v1/tracks\x12V\n" +
+	"\vUpdateTrack\x12\x1b.catalog.UpdateTrackRequest\x1a\x0e.catalog.Track\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\x1a\x0f/v1/tracks/{id}\x12X\n" +
+	"\vDeleteTrack\x12\x1b.catalog.DeleteTrackRequest\x1a\r.common.Empty\"\x1d\x82\xd3\xe4\x93\x02\x17*\x15/v1/tracks/{track_id}\x12c\n" +
+	"\fSearchTracks\x12\x1b.catalog.SearchTrackRequest\x1a\x1b.catalog.ListTracksResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/tracks/search\x12k\n" +
+	"\x13IncrementPlaysCount\x12#.catalog.IncrementPlaysCountRequest\x1a\r.common.Empty\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/v1/tracks/{id}/plays\x12g\n" +
+	"\x0eGetTracksByIDs\x12\x1e.catalog.GetTracksByIDsRequest\x1a\x1b.catalog.ListTracksResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/tracks/batch\x12Q\n" +
+	"\tGetArtist\x12\x19.catalog.GetArtistRequest\x1a\x0f.catalog.Artist\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/artists/{id}\x12]\n" +
+	"\vListArtists\x12\x1b.catalog.ListArtistsRequest\x1a\x1c.catalog.ListArtistsResponse\"\x13\x82\xd3\xe4\x93\x02\r\x12\v/v1/artists\x12U\n" +
+	"\fCreateArtist\x12\x1c.catalog.CreateArtistRequest\x1a\x0f.catalog.Artist\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/artists\x12Z\n" +
+	"\fUpdateArtist\x12\x1c.catalog.UpdateArtistRequest\x1a\x0f.catalog.Artist\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\x1a\x10/v1/artists/{id}\x12U\n" +
+	"\fDeleteArtist\x12\x1c.catalog.DeleteArtistRequest\x1a\r.common.Empty\"\x18\x82\xd3\xe4\x93\x02\x12*\x10/v1/artists/{id}\x12h\n" +
+	"\rSearchArtists\x12\x1d.catalog.SearchArtistsRequest\x1a\x1c.catalog.ListArtistsResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/artists/search\x12w\n" +
+	"\x0fGetArtistTracks\x12\x1f.catalog.GetArtistTracksRequest\x1a\x1b.catalog.ListTracksResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/artists/{artist_id}/tracks\x12w\n" +
+	"\x0fGetArtistAlbums\x12\x1f.catalog.GetArtistAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/artists/{artist_id}/albums\x12k\n" +
+	"\x0fGetArtistsByIDs\x12\x1f.catalog.GetArtistsByIDsRequest\x1a\x1c.catalog.ListArtistsResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/artists/batch\x12M\n" +
+	"\bGetAlbum\x12\x18.catalog.GetAlbumRequest\x1a\x0e.catalog.Album\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/albums/{id}\x12Y\n" +
 	"\n" +
-	"ListAlbums\x12\x1a.catalog.ListAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\x12:\n" +
-	"\vCreateAlbum\x12\x1b.catalog.CreateAlbumRequest\x1a\x0e.catalog.Album\x12:\n" +
-	"\vUpdateAlbum\x12\x1b.catalog.UpdateAlbumRequest\x1a\x0e.catalog.Album\x129\n" +
-	"\vDeleteAlbum\x12\x1b.catalog.DeleteAlbumRequest\x1a\r.common.Empty\x12N\n" +
-	"\x12GetAlbumWithTracks\x12\x1e.catalog.GetAlbumTracksRequest\x1a\x18.catalog.AlbumWithTracks\x12I\n" +
-	"\fSearchAlbums\x12\x1c.catalog.SearchAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\x12E\n" +
+	"ListAlbums\x12\x1a.catalog.ListAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
+	"/v1/albums\x12Q\n" +
+	"\vCreateAlbum\x12\x1b.catalog.CreateAlbumRequest\x1a\x0e.catalog.Album\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
+	"/v1/albums\x12V\n" +
+	"\vUpdateAlbum\x12\x1b.catalog.UpdateAlbumRequest\x1a\x0e.catalog.Album\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\x1a\x0f/v1/albums/{id}\x12R\n" +
+	"\vDeleteAlbum\x12\x1b.catalog.DeleteAlbumRequest\x1a\r.common.Empty\"\x17\x82\xd3\xe4\x93\x02\x11*\x0f/v1/albums/{id}\x12n\n" +
+	"\x12GetAlbumWithTracks\x12\x1e.catalog.GetAlbumTracksRequest\x1a\x18.catalog.AlbumWithTracks\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/v1/albums/{id}/tracks\x12d\n" +
+	"\fSearchAlbums\x12\x1c.catalog.SearchAlbumsRequest\x1a\x1b.catalog.ListAlbumsResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/albums/search\x12Y\n" +
 	"\n" +
-	"ListGenres\x12\x1a.catalog.ListGenresRequest\x1a\x1b.catalog.ListGenresResponse\x12:\n" +
-	"\vCreateGenre\x12\x1b.catalog.CreateGenreRequest\x1a\x0e.catalog.Genre\x12P\n" +
-	"\x0fGetTrackByGenre\x12 .catalog.GetTracksByGenreRequest\x1a\x1b.catalog.ListTracksResponse\x124\n" +
-	"\bGetGenre\x12\x18.catalog.GetGenreRequest\x1a\x0e.catalog.Genre\x12R\n" +
-	"\x11GetTrackStreamURL\x12!.catalog.GetTrackStreamURLRequest\x1a\x1a.catalog.StreamURLResponse\x12F\n" +
-	"\vGetCoverURL\x12\x1b.catalog.GetCoverURLRequest\x1a\x1a.catalog.StreamURLResponse\x125\n" +
-	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB?Z=github.com/CAATHARSIS/music-service/api/gen/catalog;catalogpbb\x06proto3"
+	"ListGenres\x12\x1a.catalog.ListGenresRequest\x1a\x1b.catalog.ListGenresResponse\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
+	"/v1/genres\x12Q\n" +
+	"\vCreateGenre\x12\x1b.catalog.CreateGenreRequest\x1a\x0e.catalog.Genre\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
+	"/v1/genres\x12v\n" +
+	"\x0fGetTrackByGenre\x12 .catalog.GetTracksByGenreRequest\x1a\x1b.catalog.ListTracksResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/v1/genres/{genre_id}/tracks\x12M\n" +
+	"\bGetGenre\x12\x18.catalog.GetGenreRequest\x1a\x0e.catalog.Genre\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/genres/{id}\x12x\n" +
+	"\x11GetTrackStreamURL\x12!.catalog.GetTrackStreamURLRequest\x1a\x1a.catalog.StreamURLResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/v1/tracks/{track_id}/stream\x12k\n" +
+	"\vGetCoverURL\x12\x1b.catalog.GetCoverURLRequest\x1a\x1a.catalog.StreamURLResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/covers/{cover_image_id}\x12Q\n" +
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/catalog/healthB?Z=github.com/CAATHARSIS/music-service/api/gen/catalog;catalogpbb\x06proto3"
 
 var (
 	file_catalog_proto_rawDescOnce sync.Once

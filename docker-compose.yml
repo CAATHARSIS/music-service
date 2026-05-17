@@ -191,6 +191,24 @@ services:
     networks:
       - music-network
     restart: unless-stopped
+  gateway:
+    build:
+      context: .
+      dockerfile: cmd/gateway/Dockerfile
+    container_name: music-gateway
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - catalog-service
+      - auth-service
+      - file-service
+      - playlist-service
+      - rules-service
+    networks:
+      - music-network
+    restart: unless-stopped
 networks:
   music-network:
     driver: bridge

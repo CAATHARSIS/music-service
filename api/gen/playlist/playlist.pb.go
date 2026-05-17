@@ -12,6 +12,7 @@ package playlistpb
 import (
 	catalog "github.com/CAATHARSIS/music-service/api/gen/catalog"
 	common "github.com/CAATHARSIS/music-service/api/gen/common"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -738,7 +739,7 @@ var File_playlist_proto protoreflect.FileDescriptor
 
 const file_playlist_proto_rawDesc = "" +
 	"\n" +
-	"\x0eplaylist.proto\x12\bplaylist\x1a\rcatalog.proto\x1a\fcommon.proto\"\xa1\x02\n" +
+	"\x0eplaylist.proto\x12\bplaylist\x1a\rcatalog.proto\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xa1\x02\n" +
 	"\bPlaylist\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
@@ -806,16 +807,16 @@ const file_playlist_proto_rawDesc = "" +
 	"\x19PLAYLIST_TYPE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14PLAYLIST_TYPE_MANUAL\x10\x01\x12\x1b\n" +
 	"\x17PLAYLIST_TYPE_GENERATED\x10\x02\x12\x1b\n" +
-	"\x17PLAYLIST_TYPE_FAVORITES\x10\x032\xaf\x04\n" +
-	"\x0fPlaylistService\x12E\n" +
-	"\x0eCreatePlaylist\x12\x1f.playlist.CreatePlaylistRequest\x1a\x12.playlist.Playlist\x12?\n" +
-	"\vGetPlaylist\x12\x1c.playlist.GetPlaylistRequest\x1a\x12.playlist.Playlist\x12X\n" +
-	"\x11ListUserPlaylists\x12\".playlist.ListUserPlaylistsRequest\x1a\x1f.playlist.ListPlaylistsResponse\x12E\n" +
-	"\x0eUpdatePlaylist\x12\x1f.playlist.UpdatePlaylistRequest\x1a\x12.playlist.Playlist\x12@\n" +
-	"\x0eDeletePlaylist\x12\x1f.playlist.DeletePlaylistRequest\x1a\r.common.Empty\x129\n" +
-	"\bAddTrack\x12\x19.playlist.AddTrackRequest\x1a\x12.playlist.Playlist\x12?\n" +
-	"\vRemoveTrack\x12\x1c.playlist.RemoveTrackRequest\x1a\x12.playlist.Playlist\x125\n" +
-	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseBAZ?github.com/CAATHARSIS/music-service/api/gen/playlist;playlistpbb\x06proto3"
+	"\x17PLAYLIST_TYPE_FAVORITES\x10\x032\xe6\x06\n" +
+	"\x0fPlaylistService\x12_\n" +
+	"\x0eCreatePlaylist\x12\x1f.playlist.CreatePlaylistRequest\x1a\x12.playlist.Playlist\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/v1/playlists\x12d\n" +
+	"\vGetPlaylist\x12\x1c.playlist.GetPlaylistRequest\x1a\x12.playlist.Playlist\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/playlists/{playlist_id}\x12\x7f\n" +
+	"\x11ListUserPlaylists\x12\".playlist.ListUserPlaylistsRequest\x1a\x1f.playlist.ListPlaylistsResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/users/{user_id}/playlists\x12m\n" +
+	"\x0eUpdatePlaylist\x12\x1f.playlist.UpdatePlaylistRequest\x1a\x12.playlist.Playlist\"&\x82\xd3\xe4\x93\x02 :\x01*\x1a\x1b/v1/playlists/{playlist_id}\x12e\n" +
+	"\x0eDeletePlaylist\x12\x1f.playlist.DeletePlaylistRequest\x1a\r.common.Empty\"#\x82\xd3\xe4\x93\x02\x1d*\x1b/v1/playlists/{playlist_id}\x12h\n" +
+	"\bAddTrack\x12\x19.playlist.AddTrackRequest\x1a\x12.playlist.Playlist\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/v1/playlists/{playlist_id}/tracks\x12v\n" +
+	"\vRemoveTrack\x12\x1c.playlist.RemoveTrackRequest\x1a\x12.playlist.Playlist\"5\x82\xd3\xe4\x93\x02/*-/v1/playlists/{playlist_id}/tracks/{track_id}\x12S\n" +
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/playlists/healthBAZ?github.com/CAATHARSIS/music-service/api/gen/playlist;playlistpbb\x06proto3"
 
 var (
 	file_playlist_proto_rawDescOnce sync.Once

@@ -7,18 +7,61 @@ package playlist;
 
 import "catalog.proto";
 import "common.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/CAATHARSIS/music-service/api/gen/playlist;playlistpb";
 
 service PlaylistService {
-    rpc CreatePlaylist(CreatePlaylistRequest) returns (Playlist);
-    rpc GetPlaylist(GetPlaylistRequest) returns (Playlist);
-    rpc ListUserPlaylists(ListUserPlaylistsRequest) returns (ListPlaylistsResponse);
-    rpc UpdatePlaylist(UpdatePlaylistRequest) returns (Playlist);
-    rpc DeletePlaylist(DeletePlaylistRequest) returns (common.Empty);
-    rpc AddTrack(AddTrackRequest) returns (Playlist);
-    rpc RemoveTrack(RemoveTrackRequest) returns (Playlist);
-    rpc Health(common.Empty) returns (common.HealthyCheckResponse);
+    rpc CreatePlaylist(CreatePlaylistRequest) returns (Playlist) {
+        option (google.api.http) = {
+            post: "/v1/playlists"
+            body: "*"
+        };
+    }
+    
+    rpc GetPlaylist(GetPlaylistRequest) returns (Playlist) {
+        option (google.api.http) = {
+            get: "/v1/playlists/{playlist_id}"
+        };
+    }
+    
+    rpc ListUserPlaylists(ListUserPlaylistsRequest) returns (ListPlaylistsResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}/playlists"
+        };
+    }
+    
+    rpc UpdatePlaylist(UpdatePlaylistRequest) returns (Playlist) {
+        option (google.api.http) = {
+            put: "/v1/playlists/{playlist_id}"
+            body: "*"
+        };
+    }
+    
+    rpc DeletePlaylist(DeletePlaylistRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/playlists/{playlist_id}"
+        };
+    }
+    
+    rpc AddTrack(AddTrackRequest) returns (Playlist) {
+        option (google.api.http) = {
+            post: "/v1/playlists/{playlist_id}/tracks"
+            body: "*"
+        };
+    }
+    
+    rpc RemoveTrack(RemoveTrackRequest) returns (Playlist) {
+        option (google.api.http) = {
+            delete: "/v1/playlists/{playlist_id}/tracks/{track_id}"
+        };
+    }
+    
+    rpc Health(common.Empty) returns (common.HealthyCheckResponse) {
+        option (google.api.http) = {
+            get: "/v1/playlists/health"
+        };
+    }
 }
 
 message Playlist {

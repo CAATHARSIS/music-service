@@ -5,30 +5,50 @@ syntax = "proto3";
 
 package auth;
 import "common.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/CAATHARSIS/music-service/api/gen/auth;authpb";
 
 service AuthService {
-    // Regtistration
-    rpc Register(RegisterRequest) returns (AuthResponse);
-
-    // Entry
-    rpc Login(LoginRequest) returns (AuthResponse);
-
-    // Check token (for other services)
-    rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
-
-    // Update token
-    rpc RefreshToken(RefreshTokenRequest) returns (AuthResponse);
-
-    // User profile
-    rpc GetProfile(GetProfileRequest) returns (UserProfile);
-
-    // Get avatar url
-    rpc GetAvatarURL(GetAvatarURLRequest) returns (AvatarURLResponse);
-
-    // Health check
-    rpc Health(common.Empty) returns (common.HealthyCheckResponse);
+    rpc Register(RegisterRequest) returns (AuthResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/register"
+            body: "*"
+        };
+    }
+    
+    rpc Login(LoginRequest) returns (AuthResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/login"
+            body: "*"
+        };
+    }
+    
+    rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/validate"
+            body: "*"
+        };
+    }
+    
+    rpc RefreshToken(RefreshTokenRequest) returns (AuthResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/refresh"
+            body: "*"
+        };
+    }
+    
+    rpc GetProfile(GetProfileRequest) returns (UserProfile) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}"
+        };
+    }
+    
+    rpc Health(common.Empty) returns (common.HealthyCheckResponse) {
+        option (google.api.http) = {
+            get: "/v1/auth/health"
+        };
+    }
 }
 
 message User {

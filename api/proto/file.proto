@@ -6,15 +6,41 @@ syntax = "proto3";
 package file;
 
 import "common.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/CAATHARSIS/music-service/api/gen/file;filepb";
 
 service FileService {
-    rpc UploadFile(stream UploadFileRequest) returns (FileInfo);
-    rpc GetFileInfo(GetFileInfoRequest) returns (FileInfo);
-    rpc GetDownloadURL(GetDownloadURLRequest) returns (DownloadURLResponse);
-    rpc DeleteFile(DeleteFileRequest) returns (common.Empty);
-    rpc Health(common.Empty) returns (common.HealthyCheckResponse);
+    rpc UploadFile(stream UploadFileRequest) returns (FileInfo) {
+        option (google.api.http) = {
+            post: "/v1/files/upload"
+            body: "*"
+        };
+    }
+    
+    rpc GetFileInfo(GetFileInfoRequest) returns (FileInfo) {
+        option (google.api.http) = {
+            get: "/v1/files/{file_id}"
+        };
+    }
+    
+    rpc GetDownloadURL(GetDownloadURLRequest) returns (DownloadURLResponse) {
+        option (google.api.http) = {
+            get: "/v1/files/{file_id}/download"
+        };
+    }
+    
+    rpc DeleteFile(DeleteFileRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/files/{file_id}"
+        };
+    }
+    
+    rpc Health(common.Empty) returns (common.HealthyCheckResponse) {
+        option (google.api.http) = {
+            get: "/v1/files/health"
+        };
+    }
 }
 
 message FileInfo {

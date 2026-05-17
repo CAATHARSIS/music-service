@@ -62,67 +62,36 @@ const (
 //
 // Catalog Service - main service for managing music-service
 type CatalogServiceClient interface {
-	// Get track by id
 	GetTrack(ctx context.Context, in *GetTrackRequest, opts ...grpc.CallOption) (*Track, error)
-	// List tracks with filtration and pagination
 	ListTracks(ctx context.Context, in *ListTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
-	// Create new track
 	CreateTrack(ctx context.Context, in *CreateTrackRequest, opts ...grpc.CallOption) (*Track, error)
-	// Update existed track
 	UpdateTrack(ctx context.Context, in *UpdateTrackRequest, opts ...grpc.CallOption) (*Track, error)
-	// Delete track
 	DeleteTrack(ctx context.Context, in *DeleteTrackRequest, opts ...grpc.CallOption) (*common.Empty, error)
-	// Search tracks by parametres
 	SearchTracks(ctx context.Context, in *SearchTrackRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
-	// Increment plays count by value
 	IncrementPlaysCount(ctx context.Context, in *IncrementPlaysCountRequest, opts ...grpc.CallOption) (*common.Empty, error)
-	// Get tracks by IDs (batch)
 	GetTracksByIDs(ctx context.Context, in *GetTracksByIDsRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
-	// Get artist by id
 	GetArtist(ctx context.Context, in *GetArtistRequest, opts ...grpc.CallOption) (*Artist, error)
-	// List artists
 	ListArtists(ctx context.Context, in *ListArtistsRequest, opts ...grpc.CallOption) (*ListArtistsResponse, error)
-	// Create new artist
 	CreateArtist(ctx context.Context, in *CreateArtistRequest, opts ...grpc.CallOption) (*Artist, error)
-	// Update existed artist
 	UpdateArtist(ctx context.Context, in *UpdateArtistRequest, opts ...grpc.CallOption) (*Artist, error)
-	// Delete artist
 	DeleteArtist(ctx context.Context, in *DeleteArtistRequest, opts ...grpc.CallOption) (*common.Empty, error)
-	// Artists search
 	SearchArtists(ctx context.Context, in *SearchArtistsRequest, opts ...grpc.CallOption) (*ListArtistsResponse, error)
-	// Get artists tracks
 	GetArtistTracks(ctx context.Context, in *GetArtistTracksRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
-	// Get artists albums
 	GetArtistAlbums(ctx context.Context, in *GetArtistAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
-	// Get artists by IDs (batch)
 	GetArtistsByIDs(ctx context.Context, in *GetArtistsByIDsRequest, opts ...grpc.CallOption) (*ListArtistsResponse, error)
-	// Get album by id
 	GetAlbum(ctx context.Context, in *GetAlbumRequest, opts ...grpc.CallOption) (*Album, error)
-	// List albums
 	ListAlbums(ctx context.Context, in *ListAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
-	// Create album
 	CreateAlbum(ctx context.Context, in *CreateAlbumRequest, opts ...grpc.CallOption) (*Album, error)
-	// Update existed album
 	UpdateAlbum(ctx context.Context, in *UpdateAlbumRequest, opts ...grpc.CallOption) (*Album, error)
-	// Delete album
 	DeleteAlbum(ctx context.Context, in *DeleteAlbumRequest, opts ...grpc.CallOption) (*common.Empty, error)
-	// Get album with tracks
 	GetAlbumWithTracks(ctx context.Context, in *GetAlbumTracksRequest, opts ...grpc.CallOption) (*AlbumWithTracks, error)
-	// Get album with tracks
 	SearchAlbums(ctx context.Context, in *SearchAlbumsRequest, opts ...grpc.CallOption) (*ListAlbumsResponse, error)
-	// List genres
 	ListGenres(ctx context.Context, in *ListGenresRequest, opts ...grpc.CallOption) (*ListGenresResponse, error)
-	// Create new genre
 	CreateGenre(ctx context.Context, in *CreateGenreRequest, opts ...grpc.CallOption) (*Genre, error)
-	// Get tracks by genre
 	GetTrackByGenre(ctx context.Context, in *GetTracksByGenreRequest, opts ...grpc.CallOption) (*ListTracksResponse, error)
-	// Get genre by id
 	GetGenre(ctx context.Context, in *GetGenreRequest, opts ...grpc.CallOption) (*Genre, error)
-	// Get url for track streaming
 	GetTrackStreamURL(ctx context.Context, in *GetTrackStreamURLRequest, opts ...grpc.CallOption) (*StreamURLResponse, error)
-	// Get url for cover streaming
 	GetCoverURL(ctx context.Context, in *GetCoverURLRequest, opts ...grpc.CallOption) (*StreamURLResponse, error)
-	// Heath check
 	Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error)
 }
 
@@ -450,67 +419,36 @@ func (c *catalogServiceClient) Health(ctx context.Context, in *common.Empty, opt
 //
 // Catalog Service - main service for managing music-service
 type CatalogServiceServer interface {
-	// Get track by id
 	GetTrack(context.Context, *GetTrackRequest) (*Track, error)
-	// List tracks with filtration and pagination
 	ListTracks(context.Context, *ListTracksRequest) (*ListTracksResponse, error)
-	// Create new track
 	CreateTrack(context.Context, *CreateTrackRequest) (*Track, error)
-	// Update existed track
 	UpdateTrack(context.Context, *UpdateTrackRequest) (*Track, error)
-	// Delete track
 	DeleteTrack(context.Context, *DeleteTrackRequest) (*common.Empty, error)
-	// Search tracks by parametres
 	SearchTracks(context.Context, *SearchTrackRequest) (*ListTracksResponse, error)
-	// Increment plays count by value
 	IncrementPlaysCount(context.Context, *IncrementPlaysCountRequest) (*common.Empty, error)
-	// Get tracks by IDs (batch)
 	GetTracksByIDs(context.Context, *GetTracksByIDsRequest) (*ListTracksResponse, error)
-	// Get artist by id
 	GetArtist(context.Context, *GetArtistRequest) (*Artist, error)
-	// List artists
 	ListArtists(context.Context, *ListArtistsRequest) (*ListArtistsResponse, error)
-	// Create new artist
 	CreateArtist(context.Context, *CreateArtistRequest) (*Artist, error)
-	// Update existed artist
 	UpdateArtist(context.Context, *UpdateArtistRequest) (*Artist, error)
-	// Delete artist
 	DeleteArtist(context.Context, *DeleteArtistRequest) (*common.Empty, error)
-	// Artists search
 	SearchArtists(context.Context, *SearchArtistsRequest) (*ListArtistsResponse, error)
-	// Get artists tracks
 	GetArtistTracks(context.Context, *GetArtistTracksRequest) (*ListTracksResponse, error)
-	// Get artists albums
 	GetArtistAlbums(context.Context, *GetArtistAlbumsRequest) (*ListAlbumsResponse, error)
-	// Get artists by IDs (batch)
 	GetArtistsByIDs(context.Context, *GetArtistsByIDsRequest) (*ListArtistsResponse, error)
-	// Get album by id
 	GetAlbum(context.Context, *GetAlbumRequest) (*Album, error)
-	// List albums
 	ListAlbums(context.Context, *ListAlbumsRequest) (*ListAlbumsResponse, error)
-	// Create album
 	CreateAlbum(context.Context, *CreateAlbumRequest) (*Album, error)
-	// Update existed album
 	UpdateAlbum(context.Context, *UpdateAlbumRequest) (*Album, error)
-	// Delete album
 	DeleteAlbum(context.Context, *DeleteAlbumRequest) (*common.Empty, error)
-	// Get album with tracks
 	GetAlbumWithTracks(context.Context, *GetAlbumTracksRequest) (*AlbumWithTracks, error)
-	// Get album with tracks
 	SearchAlbums(context.Context, *SearchAlbumsRequest) (*ListAlbumsResponse, error)
-	// List genres
 	ListGenres(context.Context, *ListGenresRequest) (*ListGenresResponse, error)
-	// Create new genre
 	CreateGenre(context.Context, *CreateGenreRequest) (*Genre, error)
-	// Get tracks by genre
 	GetTrackByGenre(context.Context, *GetTracksByGenreRequest) (*ListTracksResponse, error)
-	// Get genre by id
 	GetGenre(context.Context, *GetGenreRequest) (*Genre, error)
-	// Get url for track streaming
 	GetTrackStreamURL(context.Context, *GetTrackStreamURLRequest) (*StreamURLResponse, error)
-	// Get url for cover streaming
 	GetCoverURL(context.Context, *GetCoverURLRequest) (*StreamURLResponse, error)
-	// Heath check
 	Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error)
 	mustEmbedUnimplementedCatalogServiceServer()
 }

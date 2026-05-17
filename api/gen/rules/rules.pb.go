@@ -11,6 +11,7 @@ package rulespb
 
 import (
 	common "github.com/CAATHARSIS/music-service/api/gen/common"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -661,7 +662,7 @@ var File_rules_proto protoreflect.FileDescriptor
 
 const file_rules_proto_rawDesc = "" +
 	"\n" +
-	"\vrules.proto\x12\x05rules\x1a\fcommon.proto\"\xb4\x02\n" +
+	"\vrules.proto\x12\x05rules\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xb4\x02\n" +
 	"\rRuleCondition\x12\x16\n" +
 	"\x06genres\x18\x01 \x03(\tR\x06genres\x12 \n" +
 	"\tyear_from\x18\x02 \x01(\x05H\x00R\byearFrom\x88\x01\x01\x12\x1c\n" +
@@ -724,18 +725,18 @@ const file_rules_proto_rawDesc = "" +
 	"\vplaylist_id\x18\x01 \x01(\tR\n" +
 	"playlistId\x12\x1f\n" +
 	"\vtrack_count\x18\x02 \x01(\x05R\n" +
-	"trackCount2\xa2\x03\n" +
-	"\vRuleService\x123\n" +
+	"trackCount2\xf7\x04\n" +
+	"\vRuleService\x12I\n" +
 	"\n" +
-	"CreateRule\x12\x18.rules.CreateRuleRequest\x1a\v.rules.Rule\x12-\n" +
-	"\aGetRule\x12\x15.rules.GetRuleRequest\x1a\v.rules.Rule\x12F\n" +
-	"\rListUserRules\x12\x1b.rules.ListUserRulesRequest\x1a\x18.rules.ListRulesResponse\x123\n" +
+	"CreateRule\x12\x18.rules.CreateRuleRequest\x1a\v.rules.Rule\"\x14\x82\xd3\xe4\x93\x02\x0e:\x01*\"\t/v1/rules\x12J\n" +
+	"\aGetRule\x12\x15.rules.GetRuleRequest\x1a\v.rules.Rule\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/rules/{rule_id}\x12i\n" +
+	"\rListUserRules\x12\x1b.rules.ListUserRulesRequest\x1a\x18.rules.ListRulesResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/users/{user_id}/rules\x12S\n" +
 	"\n" +
-	"UpdateRule\x12\x18.rules.UpdateRuleRequest\x1a\v.rules.Rule\x125\n" +
+	"UpdateRule\x12\x18.rules.UpdateRuleRequest\x1a\v.rules.Rule\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\x1a\x13/v1/rules/{rule_id}\x12R\n" +
 	"\n" +
-	"DeleteRule\x12\x18.rules.DeleteRuleRequest\x1a\r.common.Empty\x12D\n" +
-	"\vExecuteRule\x12\x19.rules.ExecuteRuleRequest\x1a\x1a.rules.ExecuteRuleResponse\x125\n" +
-	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponseB;Z9github.com/CAATHARSIS/music-service/api/gen/rules;rulespbb\x06proto3"
+	"DeleteRule\x12\x18.rules.DeleteRuleRequest\x1a\r.common.Empty\"\x1b\x82\xd3\xe4\x93\x02\x15*\x13/v1/rules/{rule_id}\x12l\n" +
+	"\vExecuteRule\x12\x19.rules.ExecuteRuleRequest\x1a\x1a.rules.ExecuteRuleResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/v1/rules/{rule_id}/execute\x12O\n" +
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/rules/healthB;Z9github.com/CAATHARSIS/music-service/api/gen/rules;rulespbb\x06proto3"
 
 var (
 	file_rules_proto_rawDescOnce sync.Once
