@@ -25,8 +25,8 @@ func convertUserToProfileProto(user *models.User) *authpb.UserProfile {
 		Email: user.Email,
 		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 	}
-	if user.AvatarURL != nil {
-		pb.AvatarUrl = user.AvatarURL
+	if user.AvatarID != nil {
+		pb.AvatarId = user.AvatarID
 	}
 	return pb
 }

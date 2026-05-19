@@ -110,7 +110,7 @@ func (r *repository) GetUserByEmail(ctx context.Context, email string) (*models.
 			email,
 			password_hash,
 			role,
-			avatar_url,
+			avatar_id,
 			created_at,
 			updated_at
 		FROM

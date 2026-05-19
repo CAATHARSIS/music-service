@@ -8,7 +8,7 @@ type User struct {
 	Email        string    `db:"email"`
 	PasswordHash string    `db:"password_hash"`
 	Role         string    `db:"role"`
-	AvatarURL    *string   `db:"avatar_url"`
+	AvatarID    *string   `db:"avatar_id"`
 	CreatedAt    time.Time `db:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at"`
 }
