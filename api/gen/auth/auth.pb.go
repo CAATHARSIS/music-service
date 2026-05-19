@@ -115,7 +115,7 @@ type UserProfile struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	AvatarId      *string                `protobuf:"bytes,4,opt,name=avatar_id,json=avatarId,proto3,oneof" json:"avatar_id,omitempty"`
+	AvatarImageId *string                `protobuf:"bytes,4,opt,name=avatar_image_id,json=avatarImageId,proto3,oneof" json:"avatar_image_id,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -172,9 +172,9 @@ func (x *UserProfile) GetEmail() string {
 	return ""
 }
 
-func (x *UserProfile) GetAvatarId() string {
-	if x != nil && x.AvatarId != nil {
-		return *x.AvatarId
+func (x *UserProfile) GetAvatarImageId() string {
+	if x != nil && x.AvatarImageId != nil {
+		return *x.AvatarImageId
 	}
 	return ""
 }
@@ -668,16 +668,15 @@ const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"\x9e\x01\n" +
+	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"\xaf\x01\n" +
 	"\vUserProfile\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\x12 \n" +
-	"\tavatar_id\x18\x04 \x01(\tH\x00R\bavatarId\x88\x01\x01\x12\x1d\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12+\n" +
+	"\x0favatar_image_id\x18\x04 \x01(\tH\x00R\ravatarImageId\x88\x01\x01\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAtB\f\n" +
-	"\n" +
-	"_avatar_id\"_\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAtB\x12\n" +
+	"\x10_avatar_image_id\"_\n" +
 	"\x0fRegisterRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOt NULL,
     role TEXT DEFAULT 'user',
-    avatar_url UUID,
+    avatar_image_id UUID,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT check_username_len CHECK (char_length(username) <= 50),

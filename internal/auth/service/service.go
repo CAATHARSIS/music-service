@@ -80,7 +80,7 @@ func (s *AuthService) Login(ctx context.Context, req *authpb.LoginRequest) (*aut
 		if errors.Is(err, repository.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "user not found")
 		}
-		return nil, status.Error(codes.Internal, "internal error")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("internal error: %v", err))
 	}
 
 	if !s.repo.VerifyPassword(user, req.Password) {
