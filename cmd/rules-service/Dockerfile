@@ -27,7 +27,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /app/rule
 
 FROM alpine AS runner
 
-RUN apk add --no-cache ca-certificates tzdata
+RUN apk add --no-cache tzdata
 
 WORKDIR /app
 
