@@ -17,6 +17,7 @@ type Config struct {
 
 	GRPCPort string
 
+	AuthServiceAddr    string
 	CatalogServiceAddr string
 }
 
@@ -31,6 +32,7 @@ func Load(log *slog.Logger) *Config {
 
 		GRPCPort: getEnv("PLAYLIST_GRPC_PORT", "50054"),
 
+		AuthServiceAddr:    getEnv("AUTH_SERVICE_ADDR", "localhost:50051"),
 		CatalogServiceAddr: getEnv("CATALOG_SERVICE_ADDR", "localhost:50053"),
 	}
 

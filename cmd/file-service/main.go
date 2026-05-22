@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	authpb "github.com/CAATHARSIS/music-service/api/gen/auth"
 	filepb "github.com/CAATHARSIS/music-service/api/gen/file"
 	"github.com/CAATHARSIS/music-service/internal/file/config"
 	"github.com/CAATHARSIS/music-service/internal/file/repository"
@@ -18,6 +19,7 @@ import (
 	"github.com/CAATHARSIS/music-service/pkg/interceptor"
 	"github.com/CAATHARSIS/music-service/pkg/migrate"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -66,8 +68,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	authConn, err := grpc.NewClient(
+		cfg.AuthServiceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		logger.Error("failed to connect to auth service", "error", err)
+		os.Exit(1)
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(interceptor.Logging(logger)),
+		grpc.UnaryInterceptor(interceptor.Auth(authClient, logger)),
 	)
 
 	filepb.RegisterFileServiceServer(grpcServer, srv)

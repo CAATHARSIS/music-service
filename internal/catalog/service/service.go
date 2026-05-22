@@ -11,6 +11,7 @@ import (
 	filepb "github.com/CAATHARSIS/music-service/api/gen/file"
 	"github.com/CAATHARSIS/music-service/internal/catalog/models"
 	"github.com/CAATHARSIS/music-service/internal/catalog/repository"
+	"github.com/CAATHARSIS/music-service/pkg/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -109,6 +110,10 @@ func (s *CatalogService) ListTracks(ctx context.Context, req *catalogpb.ListTrac
 }
 
 func (s *CatalogService) CreateTrack(ctx context.Context, req *catalogpb.CreateTrackRequest) (*catalogpb.Track, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Title == "" {
 		return nil, status.Error(codes.InvalidArgument, "title is required")
 	}
@@ -145,6 +150,10 @@ func (s *CatalogService) CreateTrack(ctx context.Context, req *catalogpb.CreateT
 }
 
 func (s *CatalogService) UpdateTrack(ctx context.Context, req *catalogpb.UpdateTrackRequest) (*catalogpb.Track, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "track id is required")
 	}
@@ -178,6 +187,10 @@ func (s *CatalogService) UpdateTrack(ctx context.Context, req *catalogpb.UpdateT
 }
 
 func (s *CatalogService) DeleteTrack(ctx context.Context, req *catalogpb.DeleteTrackRequest) (*commonpb.Empty, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.TrackId == "" {
 		return nil, status.Error(codes.InvalidArgument, "track_id is required")
 	}
@@ -374,6 +387,10 @@ func (s *CatalogService) ListArtists(ctx context.Context, req *catalogpb.ListArt
 }
 
 func (s *CatalogService) CreateArtist(ctx context.Context, req *catalogpb.CreateArtistRequest) (*catalogpb.Artist, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is required")
 	}
@@ -395,6 +412,10 @@ func (s *CatalogService) CreateArtist(ctx context.Context, req *catalogpb.Create
 }
 
 func (s *CatalogService) UpdateArtist(ctx context.Context, req *catalogpb.UpdateArtistRequest) (*catalogpb.Artist, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "artist id is required")
 	}
@@ -422,6 +443,10 @@ func (s *CatalogService) UpdateArtist(ctx context.Context, req *catalogpb.Update
 }
 
 func (s *CatalogService) DeleteArtist(ctx context.Context, req *catalogpb.DeleteArtistRequest) (*commonpb.Empty, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "artist id is required")
 	}
@@ -588,6 +613,10 @@ func (s *CatalogService) ListAlbums(ctx context.Context, req *catalogpb.ListAlbu
 }
 
 func (s *CatalogService) CreateAlbum(ctx context.Context, req *catalogpb.CreateAlbumRequest) (*catalogpb.Album, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Title == "" {
 		return nil, status.Error(codes.InvalidArgument, "title is required")
 	}
@@ -614,6 +643,10 @@ func (s *CatalogService) CreateAlbum(ctx context.Context, req *catalogpb.CreateA
 }
 
 func (s *CatalogService) UpdateAlbum(ctx context.Context, req *catalogpb.UpdateAlbumRequest) (*catalogpb.Album, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "album id is required")
 	}
@@ -645,6 +678,10 @@ func (s *CatalogService) UpdateAlbum(ctx context.Context, req *catalogpb.UpdateA
 }
 
 func (s *CatalogService) DeleteAlbum(ctx context.Context, req *catalogpb.DeleteAlbumRequest) (*commonpb.Empty, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "album id is required")
 	}
@@ -741,6 +778,10 @@ func (s *CatalogService) ListGenres(ctx context.Context, req *catalogpb.ListGenr
 }
 
 func (s *CatalogService) CreateGenre(ctx context.Context, req *catalogpb.CreateGenreRequest) (*catalogpb.Genre, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	} 
+
 	if req.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is required")
 	}

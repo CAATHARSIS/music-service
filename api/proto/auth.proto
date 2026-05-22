@@ -49,6 +49,13 @@ service AuthService {
             get: "/v1/auth/health"
         };
     }
+
+    rpc SetUserRole(SetUserRoleRequest) returns (User) {
+        option (google.api.http) = {
+            put: "/v1/users/{user_id}/role"
+            body: "*"
+        };
+    }
 }
 
 message User {
@@ -102,6 +109,11 @@ message RefreshTokenRequest {
 
 message GetProfileRequest {
     string user_id = 1;
+}
+
+message SetUserRoleRequest {
+    string user_id = 1;
+    string role = 2;
 }
 
 // File Service Integration

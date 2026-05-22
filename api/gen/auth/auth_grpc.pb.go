@@ -29,6 +29,7 @@ const (
 	AuthService_RefreshToken_FullMethodName  = "/auth.AuthService/RefreshToken"
 	AuthService_GetProfile_FullMethodName    = "/auth.AuthService/GetProfile"
 	AuthService_Health_FullMethodName        = "/auth.AuthService/Health"
+	AuthService_SetUserRole_FullMethodName   = "/auth.AuthService/SetUserRole"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -41,6 +42,7 @@ type AuthServiceClient interface {
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*UserProfile, error)
 	Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error)
+	SetUserRole(ctx context.Context, in *SetUserRoleRequest, opts ...grpc.CallOption) (*User, error)
 }
 
 type authServiceClient struct {
@@ -111,6 +113,16 @@ func (c *authServiceClient) Health(ctx context.Context, in *common.Empty, opts .
 	return out, nil
 }
 
+func (c *authServiceClient) SetUserRole(ctx context.Context, in *SetUserRoleRequest, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, AuthService_SetUserRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -121,6 +133,7 @@ type AuthServiceServer interface {
 	RefreshToken(context.Context, *RefreshTokenRequest) (*AuthResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*UserProfile, error)
 	Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error)
+	SetUserRole(context.Context, *SetUserRoleRequest) (*User, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -148,6 +161,9 @@ func (UnimplementedAuthServiceServer) GetProfile(context.Context, *GetProfileReq
 }
 func (UnimplementedAuthServiceServer) Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
+}
+func (UnimplementedAuthServiceServer) SetUserRole(context.Context, *SetUserRoleRequest) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetUserRole not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -278,6 +294,24 @@ func _AuthService_Health_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_SetUserRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetUserRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SetUserRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SetUserRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SetUserRole(ctx, req.(*SetUserRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -308,6 +342,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Health",
 			Handler:    _AuthService_Health_Handler,
+		},
+		{
+			MethodName: "SetUserRole",
+			Handler:    _AuthService_SetUserRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -23,6 +24,7 @@ import (
 
 type Gateway struct {
 	mux *runtime.ServeMux
+	cfg *config.Config
 }
 
 func NewGateway(ctx context.Context, cfg *config.Config) (*Gateway, error) {
@@ -57,7 +59,7 @@ func NewGateway(ctx context.Context, cfg *config.Config) (*Gateway, error) {
 		return nil, fmt.Errorf("register rules: %w", err)
 	}
 
-	return &Gateway{mux: mux}, nil
+	return &Gateway{mux: mux, cfg: cfg}, nil
 }
 
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +91,13 @@ func (g *Gateway) handleFileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	conn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	uploadedBy := ""
+    if authHeader := r.Header.Get("Authorization"); authHeader != "" {
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+        uploadedBy = g.extractUserID(tokenString)
+    }
+
+	conn, err := grpc.NewClient(g.cfg.FileServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
@@ -109,6 +117,7 @@ func (g *Gateway) handleFileUpload(w http.ResponseWriter, r *http.Request) {
 				OriginalName: header.Filename,
 				MimeType:     header.Header.Get("Content-Type"),
 				Bucket:       "music-files",
+				UploadedBy: uploadedBy,
 			},
 		},
 	})
@@ -139,4 +148,21 @@ func (g *Gateway) handleFileUpload(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(w, `{"id":"%s","original_name":"%s","size":%d}`, resp.Id, resp.OriginalName, resp.Size)
+}
+
+func (g *Gateway) extractUserID(tokenString string) string {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(g.cfg.JWTSecret), nil
+	})
+	if err != nil {
+		return ""
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return ""
+	}
+
+	userID, _ := claims["sub"].(string)
+	return userID
 }

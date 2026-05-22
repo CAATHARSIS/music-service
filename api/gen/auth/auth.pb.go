@@ -558,6 +558,58 @@ func (x *GetProfileRequest) GetUserId() string {
 	return ""
 }
 
+type SetUserRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Role          string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetUserRoleRequest) Reset() {
+	*x = SetUserRoleRequest{}
+	mi := &file_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetUserRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetUserRoleRequest) ProtoMessage() {}
+
+func (x *SetUserRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetUserRoleRequest.ProtoReflect.Descriptor instead.
+func (*SetUserRoleRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SetUserRoleRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SetUserRoleRequest) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
 type GetAvatarURLRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AvatarImageId string                 `protobuf:"bytes,1,opt,name=avatar_image_id,json=avatarImageId,proto3" json:"avatar_image_id,omitempty"`
@@ -567,7 +619,7 @@ type GetAvatarURLRequest struct {
 
 func (x *GetAvatarURLRequest) Reset() {
 	*x = GetAvatarURLRequest{}
-	mi := &file_auth_proto_msgTypes[9]
+	mi := &file_auth_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -579,7 +631,7 @@ func (x *GetAvatarURLRequest) String() string {
 func (*GetAvatarURLRequest) ProtoMessage() {}
 
 func (x *GetAvatarURLRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_auth_proto_msgTypes[9]
+	mi := &file_auth_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -592,7 +644,7 @@ func (x *GetAvatarURLRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAvatarURLRequest.ProtoReflect.Descriptor instead.
 func (*GetAvatarURLRequest) Descriptor() ([]byte, []int) {
-	return file_auth_proto_rawDescGZIP(), []int{9}
+	return file_auth_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetAvatarURLRequest) GetAvatarImageId() string {
@@ -612,7 +664,7 @@ type AvatarURLResponse struct {
 
 func (x *AvatarURLResponse) Reset() {
 	*x = AvatarURLResponse{}
-	mi := &file_auth_proto_msgTypes[10]
+	mi := &file_auth_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -624,7 +676,7 @@ func (x *AvatarURLResponse) String() string {
 func (*AvatarURLResponse) ProtoMessage() {}
 
 func (x *AvatarURLResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_auth_proto_msgTypes[10]
+	mi := &file_auth_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -637,7 +689,7 @@ func (x *AvatarURLResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AvatarURLResponse.ProtoReflect.Descriptor instead.
 func (*AvatarURLResponse) Descriptor() ([]byte, []int) {
-	return file_auth_proto_rawDescGZIP(), []int{10}
+	return file_auth_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *AvatarURLResponse) GetUrl() string {
@@ -700,13 +752,16 @@ const file_auth_proto_rawDesc = "" +
 	"\x13RefreshTokenRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\",\n" +
 	"\x11GetProfileRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"=\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"A\n" +
+	"\x12SetUserRoleRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04role\x18\x02 \x01(\tR\x04role\"=\n" +
 	"\x13GetAvatarURLRequest\x12&\n" +
 	"\x0favatar_image_id\x18\x01 \x01(\tR\ravatarImageId\"D\n" +
 	"\x11AvatarURLResponse\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
-	"expires_at\x18\x02 \x01(\x03R\texpiresAt2\x99\x04\n" +
+	"expires_at\x18\x02 \x01(\x03R\texpiresAt2\xf3\x04\n" +
 	"\vAuthService\x12S\n" +
 	"\bRegister\x12\x15.auth.RegisterRequest\x1a\x12.auth.AuthResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/auth/register\x12J\n" +
 	"\x05Login\x12\x12.auth.LoginRequest\x1a\x12.auth.AuthResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12f\n" +
@@ -714,7 +769,9 @@ const file_auth_proto_rawDesc = "" +
 	"\fRefreshToken\x12\x19.auth.RefreshTokenRequest\x1a\x12.auth.AuthResponse\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/auth/refresh\x12U\n" +
 	"\n" +
 	"GetProfile\x12\x17.auth.GetProfileRequest\x1a\x11.auth.UserProfile\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/users/{user_id}\x12N\n" +
-	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/auth/healthB9Z7github.com/CAATHARSIS/music-service/api/gen/auth;authpbb\x06proto3"
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/auth/health\x12X\n" +
+	"\vSetUserRole\x12\x18.auth.SetUserRoleRequest\x1a\n" +
+	".auth.User\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\x1a\x18/v1/users/{user_id}/roleB9Z7github.com/CAATHARSIS/music-service/api/gen/auth;authpbb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -728,7 +785,7 @@ func file_auth_proto_rawDescGZIP() []byte {
 	return file_auth_proto_rawDescData
 }
 
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_auth_proto_goTypes = []any{
 	(*User)(nil),                        // 0: auth.User
 	(*UserProfile)(nil),                 // 1: auth.UserProfile
@@ -739,10 +796,11 @@ var file_auth_proto_goTypes = []any{
 	(*ValidateTokenResponse)(nil),       // 6: auth.ValidateTokenResponse
 	(*RefreshTokenRequest)(nil),         // 7: auth.RefreshTokenRequest
 	(*GetProfileRequest)(nil),           // 8: auth.GetProfileRequest
-	(*GetAvatarURLRequest)(nil),         // 9: auth.GetAvatarURLRequest
-	(*AvatarURLResponse)(nil),           // 10: auth.AvatarURLResponse
-	(*common.Empty)(nil),                // 11: common.Empty
-	(*common.HealthyCheckResponse)(nil), // 12: common.HealthyCheckResponse
+	(*SetUserRoleRequest)(nil),          // 9: auth.SetUserRoleRequest
+	(*GetAvatarURLRequest)(nil),         // 10: auth.GetAvatarURLRequest
+	(*AvatarURLResponse)(nil),           // 11: auth.AvatarURLResponse
+	(*common.Empty)(nil),                // 12: common.Empty
+	(*common.HealthyCheckResponse)(nil), // 13: common.HealthyCheckResponse
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: auth.AuthResponse.user:type_name -> auth.User
@@ -751,15 +809,17 @@ var file_auth_proto_depIdxs = []int32{
 	5,  // 3: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenRequest
 	7,  // 4: auth.AuthService.RefreshToken:input_type -> auth.RefreshTokenRequest
 	8,  // 5: auth.AuthService.GetProfile:input_type -> auth.GetProfileRequest
-	11, // 6: auth.AuthService.Health:input_type -> common.Empty
-	4,  // 7: auth.AuthService.Register:output_type -> auth.AuthResponse
-	4,  // 8: auth.AuthService.Login:output_type -> auth.AuthResponse
-	6,  // 9: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
-	4,  // 10: auth.AuthService.RefreshToken:output_type -> auth.AuthResponse
-	1,  // 11: auth.AuthService.GetProfile:output_type -> auth.UserProfile
-	12, // 12: auth.AuthService.Health:output_type -> common.HealthyCheckResponse
-	7,  // [7:13] is the sub-list for method output_type
-	1,  // [1:7] is the sub-list for method input_type
+	12, // 6: auth.AuthService.Health:input_type -> common.Empty
+	9,  // 7: auth.AuthService.SetUserRole:input_type -> auth.SetUserRoleRequest
+	4,  // 8: auth.AuthService.Register:output_type -> auth.AuthResponse
+	4,  // 9: auth.AuthService.Login:output_type -> auth.AuthResponse
+	6,  // 10: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
+	4,  // 11: auth.AuthService.RefreshToken:output_type -> auth.AuthResponse
+	1,  // 12: auth.AuthService.GetProfile:output_type -> auth.UserProfile
+	13, // 13: auth.AuthService.Health:output_type -> common.HealthyCheckResponse
+	0,  // 14: auth.AuthService.SetUserRole:output_type -> auth.User
+	8,  // [8:15] is the sub-list for method output_type
+	1,  // [1:8] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -777,7 +837,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

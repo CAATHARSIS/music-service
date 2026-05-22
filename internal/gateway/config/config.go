@@ -13,6 +13,7 @@ type Config struct {
 	FileServiceAddr     string
 	PlaylistServiceAddr string
 	RulesServiceAddr    string
+	JWTSecret           string
 }
 
 func Load(log *slog.Logger) *Config {
@@ -24,6 +25,7 @@ func Load(log *slog.Logger) *Config {
 		FileServiceAddr:     getEnv("FILE_SERVICE_ADDR", "localhost:50052"),
 		PlaylistServiceAddr: getEnv("PLAYLIST_SERVICE_ADDR", "localhost:50054"),
 		RulesServiceAddr:    getEnv("RULES_SERVICE_ADDR", "localhost:50055"),
+		JWTSecret:           getEnv("JWT_SECRET", "super-secret-key"),
 	}
 
 	log.Info("gateway configuration loaded", "http_port", cfg.HTTPPort)

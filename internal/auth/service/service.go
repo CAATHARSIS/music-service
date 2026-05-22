@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	authpb "github.com/CAATHARSIS/music-service/api/gen/auth"
@@ -18,6 +19,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -31,10 +33,10 @@ type AuthService struct {
 
 func NewAuthService(repo repository.Repository, fileClient filepb.FileServiceClient, cfg *config.Config, log *slog.Logger) *AuthService {
 	return &AuthService{
-		repo: repo,
+		repo:       repo,
 		fileClient: fileClient,
-		cfg:  cfg,
-		log:  log,
+		cfg:        cfg,
+		log:        log,
 	}
 }
 
@@ -172,7 +174,7 @@ func (s *AuthService) GetProfile(ctx context.Context, req *authpb.GetProfileRequ
 
 func (s *AuthService) GetAvatarURL(ctx context.Context, req *authpb.GetAvatarURLRequest) (*authpb.AvatarURLResponse, error) {
 	resp, err := s.fileClient.GetDownloadURL(ctx, &filepb.GetDownloadURLRequest{
-		FileId: req.AvatarImageId,
+		FileId:        req.AvatarImageId,
 		ExpirySeconds: 86400,
 	})
 	if err != nil {
@@ -180,9 +182,47 @@ func (s *AuthService) GetAvatarURL(ctx context.Context, req *authpb.GetAvatarURL
 	}
 
 	return &authpb.AvatarURLResponse{
-		Url: resp.Url,
+		Url:       resp.Url,
 		ExpiresAt: resp.ExpiresAt,
 	}, nil
+}
+
+func (s *AuthService) SetUserRole(ctx context.Context, req *authpb.SetUserRoleRequest) (*authpb.User, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "missing metadata")
+	}
+
+	tokens := md.Get("authorization")
+	if len(tokens) == 0 {
+		return nil, status.Error(codes.Unauthenticated, "missing token")
+	}
+
+	token := tokens[0]
+	token = strings.TrimPrefix(token, "Bearer ")
+
+	tokenResp, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Token: token})
+    if err != nil || !tokenResp.Valid {
+        return nil, status.Error(codes.Unauthenticated, "invalid token")
+    }
+
+    if tokenResp.Role != "admin" {
+        return nil, status.Error(codes.PermissionDenied, "admin access required")
+    }
+
+	if req.Role != "user" && req.Role != "admin" {
+        return nil, status.Error(codes.InvalidArgument, "role must be 'user' or 'admin'")
+    }
+
+	user, err := s.repo.SetUserRole(ctx, req.UserId, req.Role)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		return nil, status.Error(codes.Internal, fmt.Sprintf("internal error: %v", err))
+	}
+
+	return convertUserToProto(user), nil
 }
 
 func (s *AuthService) Health(ctx context.Context, req *commonpb.Empty) (*commonpb.HealthyCheckResponse, error) {

@@ -11,6 +11,7 @@ import (
 	filepb "github.com/CAATHARSIS/music-service/api/gen/file"
 	"github.com/CAATHARSIS/music-service/internal/file/models"
 	"github.com/CAATHARSIS/music-service/internal/file/repository"
+	"github.com/CAATHARSIS/music-service/pkg/auth"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,87 +33,87 @@ func NewFileService(pgRepo repository.PostgresRepository, minioRepo repository.M
 }
 
 func (s *FileService) UploadFile(stream filepb.FileService_UploadFileServer) error {
-    var metadata *filepb.FileMetadata
-    var key string
-    var bucket string
-    var pipeReader *io.PipeReader
-    var pipeWriter *io.PipeWriter
-    var uploadDone chan error
-    var totalSize int64
+	var metadata *filepb.FileMetadata
+	var key string
+	var bucket string
+	var pipeReader *io.PipeReader
+	var pipeWriter *io.PipeWriter
+	var uploadDone chan error
+	var totalSize int64
 
-    for {
-        req, err := stream.Recv()
-        if err == io.EOF {
-            break
-        }
-        if err != nil {
-            return status.Error(codes.Internal, "receive failed")
-        }
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return status.Error(codes.Internal, "receive failed")
+		}
 
-        switch data := req.Data.(type) {
-        case *filepb.UploadFileRequest_Metadata:
-            metadata = data.Metadata
-            if metadata == nil {
-                return status.Error(codes.InvalidArgument, "metadata required")
-            }
-            key = fmt.Sprintf("%s/%s", uuid.New().String(), metadata.OriginalName)
-            bucket = metadata.Bucket
-            if bucket == "" {
-                bucket = "music-files"
-            }
+		switch data := req.Data.(type) {
+		case *filepb.UploadFileRequest_Metadata:
+			metadata = data.Metadata
+			if metadata == nil {
+				return status.Error(codes.InvalidArgument, "metadata required")
+			}
+			key = fmt.Sprintf("%s/%s", uuid.New().String(), metadata.OriginalName)
+			bucket = metadata.Bucket
+			if bucket == "" {
+				bucket = "music-files"
+			}
 
-            pipeReader, pipeWriter = io.Pipe()
-            uploadDone = make(chan error, 1)
+			pipeReader, pipeWriter = io.Pipe()
+			uploadDone = make(chan error, 1)
 
-            go func() {
-                defer pipeReader.Close()
-                err := s.minioRepo.Upload(
-                    stream.Context(),
-                    key,
-                    pipeReader,
-                    -1,
-                    metadata.MimeType,
-                )
-                uploadDone <- err
-            }()
+			go func() {
+				defer pipeReader.Close()
+				err := s.minioRepo.Upload(
+					stream.Context(),
+					key,
+					pipeReader,
+					-1,
+					metadata.MimeType,
+				)
+				uploadDone <- err
+			}()
 
-        case *filepb.UploadFileRequest_Chunk:
-            if pipeWriter == nil {
-                return status.Error(codes.InvalidArgument, "metadata must be sent first")
-            }
-            n, err := pipeWriter.Write(data.Chunk)
-            if err != nil {
-                pipeWriter.Close()
-                return status.Error(codes.Internal, "write chunk failed")
-            }
-            totalSize += int64(n)
-        }
-    }
+		case *filepb.UploadFileRequest_Chunk:
+			if pipeWriter == nil {
+				return status.Error(codes.InvalidArgument, "metadata must be sent first")
+			}
+			n, err := pipeWriter.Write(data.Chunk)
+			if err != nil {
+				pipeWriter.Close()
+				return status.Error(codes.Internal, "write chunk failed")
+			}
+			totalSize += int64(n)
+		}
+	}
 
-    if metadata == nil {
-        return status.Error(codes.InvalidArgument, "metadata is required")
-    }
+	if metadata == nil {
+		return status.Error(codes.InvalidArgument, "metadata is required")
+	}
 
-    pipeWriter.Close()
-    if err := <-uploadDone; err != nil {
-        s.log.Error("upload to minio failed", "error", err)
-        return status.Error(codes.Internal, "upload failed")
-    }
+	pipeWriter.Close()
+	if err := <-uploadDone; err != nil {
+		s.log.Error("upload to minio failed", "error", err)
+		return status.Error(codes.Internal, "upload failed")
+	}
 
-    file := &models.File{
-        ID:           uuid.New().String(),
-        OriginalName: metadata.OriginalName,
-        Bucket:       bucket,
-        Key:          key,
-        Size:         totalSize,
-        MimeType:     metadata.MimeType,
-        UploadedBy:   &metadata.UploadedBy,
-    }
-    if err := s.pgRepo.CreateFile(stream.Context(), file); err != nil {
-        return status.Error(codes.Internal, "save metadata failed")
-    }
+	file := &models.File{
+		ID:           uuid.New().String(),
+		OriginalName: metadata.OriginalName,
+		Bucket:       bucket,
+		Key:          key,
+		Size:         totalSize,
+		MimeType:     metadata.MimeType,
+		UploadedBy:   &metadata.UploadedBy,
+	}
+	if err := s.pgRepo.CreateFile(stream.Context(), file); err != nil {
+		return status.Error(codes.Internal, "save metadata failed")
+	}
 
-    return stream.SendAndClose(convertFileToProto(file))
+	return stream.SendAndClose(convertFileToProto(file))
 }
 
 func (s *FileService) GetFileInfo(ctx context.Context, req *filepb.GetFileInfoRequest) (*filepb.FileInfo, error) {
@@ -146,6 +147,10 @@ func (s *FileService) GetDownloadURL(ctx context.Context, req *filepb.GetDownloa
 }
 
 func (s *FileService) DeleteFile(ctx context.Context, req *filepb.DeleteFileRequest) (*commonpb.Empty, error) {
+	if err := auth.RequireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
 	file, err := s.pgRepo.GetFile(ctx, req.FileId)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "file not found")

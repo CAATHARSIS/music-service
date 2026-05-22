@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
+	authpb "github.com/CAATHARSIS/music-service/api/gen/auth"
 	catalogpb "github.com/CAATHARSIS/music-service/api/gen/catalog"
 	playlistpb "github.com/CAATHARSIS/music-service/api/gen/playlist"
 	rulespb "github.com/CAATHARSIS/music-service/api/gen/rules"
@@ -74,8 +75,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	authConn, err := grpc.NewClient(
+		cfg.AuthServiceAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		logger.Error("failed to connect to auth service", "error", err)
+		os.Exit(1)
+	}
+	defer authConn.Close()
+
+	authClient := authpb.NewAuthServiceClient(authConn)
+
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(interceptor.Logging(logger)),
+		grpc.ChainUnaryInterceptor(interceptor.Auth(authClient, logger)),
 	)
 
 	rulespb.RegisterRuleServiceServer(grpcServer, srv)

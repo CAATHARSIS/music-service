@@ -28,6 +28,7 @@ type Repository interface {
 	SaveRefreshToken(ctx context.Context, userID, tokenHash string, expiresAt time.Time) error
 	GetRefreshToken(ctx context.Context, tokenHash string) (*models.RefreshToken, error)
 	DeleteRefreshToken(ctx context.Context, id string) error
+	SetUserRole(ctx context.Context, userID, role string) (*models.User, error)
 }
 
 type repository struct {
@@ -216,6 +217,33 @@ func (r *repository) GetRefreshToken(ctx context.Context, tokenHash string) (*mo
 func (r *repository) DeleteRefreshToken(ctx context.Context, id string) error {
 	_, err := r.db.ExecContext(ctx, "DELETE FROM refresh_tokens WHERE id = $1", id)
 	return err
+}
+
+func (r *repository) SetUserRole(ctx context.Context, userID, role string) (*models.User, error) {
+	query := `
+		UPDATE
+			users
+		SET
+			role = $1,
+			updated_at = NOW()
+		WHERE
+			id = $2
+		RETURNING
+			id,
+			username,
+			email,
+			role,
+			avatar_image_id,
+			created_at,
+			updated_at
+	`
+
+	var user models.User
+	err := r.db.GetContext(ctx, &user, query, role, userID)
+	if err == sql.ErrNoRows {
+		return nil, ErrNotFound
+	}
+	return &user, err
 }
 
 func isUniqueViolation(err error) bool {

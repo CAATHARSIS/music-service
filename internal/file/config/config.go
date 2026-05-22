@@ -14,7 +14,8 @@ type Config struct {
 	DBName     string
 	DBSSLMode  string
 
-	GRPCPort string
+	AuthServiceAddr string
+	GRPCPort        string
 
 	S3Endpoint  string
 	S3AccessKey string
@@ -32,7 +33,8 @@ func Load(log *slog.Logger) *Config {
 		DBName:     getEnv("FILE_DB_NAME", "catalog-service-test"),
 		DBSSLMode:  getEnv("FILE_DB_SSL_MODE", "disable"),
 
-		GRPCPort: getEnv("FILE_GRPC_PORT", "50052"),
+		AuthServiceAddr: getEnv("AUTH_SERVICE_ADDR", "localhost:50051"),
+		GRPCPort:        getEnv("FILE_GRPC_PORT", "50052"),
 
 		S3Endpoint:  getEnv("S3_ENDPOINT", "localhost:9000"),
 		S3AccessKey: getEnv("S3_ACCESS_KEY", "minioadming"),

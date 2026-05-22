@@ -4,6 +4,7 @@ go 1.25.1
 
 require (
 	github.com/CAATHARSIS/music-service/api/gen v0.0.0-20260517152457-cf0fe2771766
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0
 	google.golang.org/grpc v1.81.0
 )
