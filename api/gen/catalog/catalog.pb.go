@@ -390,8 +390,8 @@ type Track struct {
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Duration      int32                  `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"`
 	Year          int32                  `protobuf:"varint,4,opt,name=year,proto3" json:"year,omitempty"`
-	Artist        *Artist                `protobuf:"bytes,5,opt,name=artist,proto3" json:"artist,omitempty"`
-	Album         *Album                 `protobuf:"bytes,6,opt,name=album,proto3" json:"album,omitempty"`
+	Album         *Album                 `protobuf:"bytes,5,opt,name=album,proto3" json:"album,omitempty"`
+	Artists       []*Artist              `protobuf:"bytes,6,rep,name=artists,proto3" json:"artists,omitempty"`
 	Genres        []*Genre               `protobuf:"bytes,7,rep,name=genres,proto3" json:"genres,omitempty"`
 	FileId        string                 `protobuf:"bytes,8,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
 	CoverImageId  *string                `protobuf:"bytes,9,opt,name=cover_image_id,json=coverImageId,proto3,oneof" json:"cover_image_id,omitempty"`
@@ -462,16 +462,16 @@ func (x *Track) GetYear() int32 {
 	return 0
 }
 
-func (x *Track) GetArtist() *Artist {
+func (x *Track) GetAlbum() *Album {
 	if x != nil {
-		return x.Artist
+		return x.Album
 	}
 	return nil
 }
 
-func (x *Track) GetAlbum() *Album {
+func (x *Track) GetArtists() []*Artist {
 	if x != nil {
-		return x.Album
+		return x.Artists
 	}
 	return nil
 }
@@ -637,7 +637,7 @@ type Album struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Year          int32                  `protobuf:"varint,3,opt,name=year,proto3" json:"year,omitempty"`
-	Artist        *Artist                `protobuf:"bytes,4,opt,name=artist,proto3" json:"artist,omitempty"`
+	Artists       []*Artist              `protobuf:"bytes,4,rep,name=artists,proto3" json:"artists,omitempty"`
 	Genres        []*Genre               `protobuf:"bytes,5,rep,name=genres,proto3" json:"genres,omitempty"`
 	Type          AlbumType              `protobuf:"varint,6,opt,name=type,proto3,enum=catalog.AlbumType" json:"type,omitempty"`
 	CoverImageId  *string                `protobuf:"bytes,7,opt,name=cover_image_id,json=coverImageId,proto3,oneof" json:"cover_image_id,omitempty"`
@@ -698,9 +698,9 @@ func (x *Album) GetYear() int32 {
 	return 0
 }
 
-func (x *Album) GetArtist() *Artist {
+func (x *Album) GetArtists() []*Artist {
 	if x != nil {
-		return x.Artist
+		return x.Artists
 	}
 	return nil
 }
@@ -1085,7 +1085,7 @@ type CreateTrackRequest struct {
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Duration      int32                  `protobuf:"varint,2,opt,name=duration,proto3" json:"duration,omitempty"`
 	Year          int32                  `protobuf:"varint,3,opt,name=year,proto3" json:"year,omitempty"`
-	ArtistId      string                 `protobuf:"bytes,4,opt,name=artist_id,json=artistId,proto3" json:"artist_id,omitempty"`
+	ArtistIds     []string               `protobuf:"bytes,4,rep,name=artist_ids,json=artistIds,proto3" json:"artist_ids,omitempty"`
 	AlbumId       string                 `protobuf:"bytes,5,opt,name=album_id,json=albumId,proto3" json:"album_id,omitempty"`
 	GenreIds      []string               `protobuf:"bytes,6,rep,name=genre_ids,json=genreIds,proto3" json:"genre_ids,omitempty"`
 	FileId        string                 `protobuf:"bytes,7,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
@@ -1147,11 +1147,11 @@ func (x *CreateTrackRequest) GetYear() int32 {
 	return 0
 }
 
-func (x *CreateTrackRequest) GetArtistId() string {
+func (x *CreateTrackRequest) GetArtistIds() []string {
 	if x != nil {
-		return x.ArtistId
+		return x.ArtistIds
 	}
-	return ""
+	return nil
 }
 
 func (x *CreateTrackRequest) GetAlbumId() string {
@@ -1202,9 +1202,9 @@ type UpdateTrackRequest struct {
 	Title         *string                `protobuf:"bytes,2,opt,name=title,proto3,oneof" json:"title,omitempty"`
 	Duration      *int32                 `protobuf:"varint,3,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
 	Year          *int32                 `protobuf:"varint,4,opt,name=year,proto3,oneof" json:"year,omitempty"`
-	ArtistId      *string                `protobuf:"bytes,5,opt,name=artist_id,json=artistId,proto3,oneof" json:"artist_id,omitempty"`
+	ArtistIds     []string               `protobuf:"bytes,5,rep,name=artist_ids,json=artistIds,proto3" json:"artist_ids,omitempty"`
 	AlbumId       *string                `protobuf:"bytes,6,opt,name=album_id,json=albumId,proto3,oneof" json:"album_id,omitempty"`
-	GenresId      []string               `protobuf:"bytes,7,rep,name=genres_id,json=genresId,proto3" json:"genres_id,omitempty"`
+	GenreIds      []string               `protobuf:"bytes,7,rep,name=genre_ids,json=genreIds,proto3" json:"genre_ids,omitempty"`
 	FileId        *string                `protobuf:"bytes,8,opt,name=file_id,json=fileId,proto3,oneof" json:"file_id,omitempty"`
 	CoverImageId  *string                `protobuf:"bytes,9,opt,name=cover_image_id,json=coverImageId,proto3,oneof" json:"cover_image_id,omitempty"`
 	TrackNumber   *int32                 `protobuf:"varint,10,opt,name=track_number,json=trackNumber,proto3,oneof" json:"track_number,omitempty"`
@@ -1271,11 +1271,11 @@ func (x *UpdateTrackRequest) GetYear() int32 {
 	return 0
 }
 
-func (x *UpdateTrackRequest) GetArtistId() string {
-	if x != nil && x.ArtistId != nil {
-		return *x.ArtistId
+func (x *UpdateTrackRequest) GetArtistIds() []string {
+	if x != nil {
+		return x.ArtistIds
 	}
-	return ""
+	return nil
 }
 
 func (x *UpdateTrackRequest) GetAlbumId() string {
@@ -1285,9 +1285,9 @@ func (x *UpdateTrackRequest) GetAlbumId() string {
 	return ""
 }
 
-func (x *UpdateTrackRequest) GetGenresId() []string {
+func (x *UpdateTrackRequest) GetGenreIds() []string {
 	if x != nil {
-		return x.GenresId
+		return x.GenreIds
 	}
 	return nil
 }
@@ -2239,8 +2239,8 @@ func (x *GetAlbumRequest) GetIncludeGenres() bool {
 type ListAlbumsRequest struct {
 	state         protoimpl.MessageState    `protogen:"open.v1"`
 	Pagination    *common.PaginationRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	ArtistId      *string                   `protobuf:"bytes,2,opt,name=artist_id,json=artistId,proto3,oneof" json:"artist_id,omitempty"`
-	GenresId      []string                  `protobuf:"bytes,3,rep,name=genres_id,json=genresId,proto3" json:"genres_id,omitempty"`
+	ArtistIds     []string                  `protobuf:"bytes,2,rep,name=artist_ids,json=artistIds,proto3" json:"artist_ids,omitempty"`
+	GenreIds      []string                  `protobuf:"bytes,3,rep,name=genre_ids,json=genreIds,proto3" json:"genre_ids,omitempty"`
 	YearFrom      *int32                    `protobuf:"varint,4,opt,name=year_from,json=yearFrom,proto3,oneof" json:"year_from,omitempty"`
 	YearTo        *int32                    `protobuf:"varint,5,opt,name=year_to,json=yearTo,proto3,oneof" json:"year_to,omitempty"`
 	Type          *AlbumType                `protobuf:"varint,6,opt,name=type,proto3,enum=catalog.AlbumType,oneof" json:"type,omitempty"`
@@ -2287,16 +2287,16 @@ func (x *ListAlbumsRequest) GetPagination() *common.PaginationRequest {
 	return nil
 }
 
-func (x *ListAlbumsRequest) GetArtistId() string {
-	if x != nil && x.ArtistId != nil {
-		return *x.ArtistId
+func (x *ListAlbumsRequest) GetArtistIds() []string {
+	if x != nil {
+		return x.ArtistIds
 	}
-	return ""
+	return nil
 }
 
-func (x *ListAlbumsRequest) GetGenresId() []string {
+func (x *ListAlbumsRequest) GetGenreIds() []string {
 	if x != nil {
-		return x.GenresId
+		return x.GenreIds
 	}
 	return nil
 }
@@ -2392,7 +2392,7 @@ type CreateAlbumRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Year          int32                  `protobuf:"varint,2,opt,name=year,proto3" json:"year,omitempty"`
-	ArtistId      string                 `protobuf:"bytes,3,opt,name=artist_id,json=artistId,proto3" json:"artist_id,omitempty"`
+	ArtistIds     []string               `protobuf:"bytes,3,rep,name=artist_ids,json=artistIds,proto3" json:"artist_ids,omitempty"`
 	GenreIds      []string               `protobuf:"bytes,4,rep,name=genre_ids,json=genreIds,proto3" json:"genre_ids,omitempty"`
 	Type          AlbumType              `protobuf:"varint,5,opt,name=type,proto3,enum=catalog.AlbumType" json:"type,omitempty"`
 	CoverImageId  *string                `protobuf:"bytes,6,opt,name=cover_image_id,json=coverImageId,proto3,oneof" json:"cover_image_id,omitempty"`
@@ -2444,11 +2444,11 @@ func (x *CreateAlbumRequest) GetYear() int32 {
 	return 0
 }
 
-func (x *CreateAlbumRequest) GetArtistId() string {
+func (x *CreateAlbumRequest) GetArtistIds() []string {
 	if x != nil {
-		return x.ArtistId
+		return x.ArtistIds
 	}
-	return ""
+	return nil
 }
 
 func (x *CreateAlbumRequest) GetGenreIds() []string {
@@ -2477,7 +2477,7 @@ type UpdateAlbumRequest struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title         *string                `protobuf:"bytes,2,opt,name=title,proto3,oneof" json:"title,omitempty"`
 	Year          *int32                 `protobuf:"varint,3,opt,name=year,proto3,oneof" json:"year,omitempty"`
-	ArtistId      *string                `protobuf:"bytes,4,opt,name=artist_id,json=artistId,proto3,oneof" json:"artist_id,omitempty"`
+	ArtistIds     []string               `protobuf:"bytes,4,rep,name=artist_ids,json=artistIds,proto3" json:"artist_ids,omitempty"`
 	GenreIds      []string               `protobuf:"bytes,5,rep,name=genre_ids,json=genreIds,proto3" json:"genre_ids,omitempty"`
 	Type          *AlbumType             `protobuf:"varint,6,opt,name=type,proto3,enum=catalog.AlbumType,oneof" json:"type,omitempty"`
 	CoverImageId  *string                `protobuf:"bytes,7,opt,name=cover_image_id,json=coverImageId,proto3,oneof" json:"cover_image_id,omitempty"`
@@ -2536,11 +2536,11 @@ func (x *UpdateAlbumRequest) GetYear() int32 {
 	return 0
 }
 
-func (x *UpdateAlbumRequest) GetArtistId() string {
-	if x != nil && x.ArtistId != nil {
-		return *x.ArtistId
+func (x *UpdateAlbumRequest) GetArtistIds() []string {
+	if x != nil {
+		return x.ArtistIds
 	}
-	return ""
+	return nil
 }
 
 func (x *UpdateAlbumRequest) GetGenreIds() []string {
@@ -2661,12 +2661,12 @@ func (x *GetAlbumTracksRequest) GetId() string {
 }
 
 type SearchAlbumsRequest struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Query         string                    `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	IncludeArtist bool                      `protobuf:"varint,2,opt,name=include_artist,json=includeArtist,proto3" json:"include_artist,omitempty"`
-	Pagination    *common.PaginationRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState    `protogen:"open.v1"`
+	Query          string                    `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	IncludeArtists bool                      `protobuf:"varint,2,opt,name=include_artists,json=includeArtists,proto3" json:"include_artists,omitempty"`
+	Pagination     *common.PaginationRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *SearchAlbumsRequest) Reset() {
@@ -2706,9 +2706,9 @@ func (x *SearchAlbumsRequest) GetQuery() string {
 	return ""
 }
 
-func (x *SearchAlbumsRequest) GetIncludeArtist() bool {
+func (x *SearchAlbumsRequest) GetIncludeArtists() bool {
 	if x != nil {
-		return x.IncludeArtist
+		return x.IncludeArtists
 	}
 	return false
 }
@@ -3148,14 +3148,14 @@ var File_catalog_proto protoreflect.FileDescriptor
 
 const file_catalog_proto_rawDesc = "" +
 	"\n" +
-	"\rcatalog.proto\x12\acatalog\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xeb\x03\n" +
+	"\rcatalog.proto\x12\acatalog\x1a\x1cgoogle/api/annotations.proto\x1a\fcommon.proto\"\xed\x03\n" +
 	"\x05Track\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x05R\bduration\x12\x12\n" +
-	"\x04year\x18\x04 \x01(\x05R\x04year\x12'\n" +
-	"\x06artist\x18\x05 \x01(\v2\x0f.catalog.ArtistR\x06artist\x12$\n" +
-	"\x05album\x18\x06 \x01(\v2\x0e.catalog.AlbumR\x05album\x12&\n" +
+	"\x04year\x18\x04 \x01(\x05R\x04year\x12$\n" +
+	"\x05album\x18\x05 \x01(\v2\x0e.catalog.AlbumR\x05album\x12)\n" +
+	"\aartists\x18\x06 \x03(\v2\x0f.catalog.ArtistR\aartists\x12&\n" +
 	"\x06genres\x18\a \x03(\v2\x0e.catalog.GenreR\x06genres\x12\x17\n" +
 	"\afile_id\x18\b \x01(\tR\x06fileId\x12)\n" +
 	"\x0ecover_image_id\x18\t \x01(\tH\x00R\fcoverImageId\x88\x01\x01\x12\x1f\n" +
@@ -3185,12 +3185,12 @@ const file_catalog_proto_rawDesc = "" +
 	"updated_at\x18\b \x01(\tR\tupdatedAtB\n" +
 	"\n" +
 	"\b_countryB\x12\n" +
-	"\x10_avatar_image_id\"\xb6\x02\n" +
+	"\x10_avatar_image_id\"\xb8\x02\n" +
 	"\x05Album\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x12\n" +
-	"\x04year\x18\x03 \x01(\x05R\x04year\x12'\n" +
-	"\x06artist\x18\x04 \x01(\v2\x0f.catalog.ArtistR\x06artist\x12&\n" +
+	"\x04year\x18\x03 \x01(\x05R\x04year\x12)\n" +
+	"\aartists\x18\x04 \x03(\v2\x0f.catalog.ArtistR\aartists\x12&\n" +
 	"\x06genres\x18\x05 \x03(\v2\x0e.catalog.GenreR\x06genres\x12&\n" +
 	"\x04type\x18\x06 \x01(\x0e2\x12.catalog.AlbumTypeR\x04type\x12)\n" +
 	"\x0ecover_image_id\x18\a \x01(\tH\x00R\fcoverImageId\x88\x01\x01\x12\x1d\n" +
@@ -3236,12 +3236,13 @@ const file_catalog_proto_rawDesc = "" +
 	"\x06tracks\x18\x01 \x03(\v2\x0e.catalog.TrackR\x06tracks\x12:\n" +
 	"\n" +
 	"pagination\x18\x02 \x01(\v2\x1a.common.PaginationResponseR\n" +
-	"pagination\"\xe7\x02\n" +
+	"pagination\"\xe9\x02\n" +
 	"\x12CreateTrackRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1a\n" +
 	"\bduration\x18\x02 \x01(\x05R\bduration\x12\x12\n" +
-	"\x04year\x18\x03 \x01(\x05R\x04year\x12\x1b\n" +
-	"\tartist_id\x18\x04 \x01(\tR\bartistId\x12\x19\n" +
+	"\x04year\x18\x03 \x01(\x05R\x04year\x12\x1d\n" +
+	"\n" +
+	"artist_ids\x18\x04 \x03(\tR\tartistIds\x12\x19\n" +
 	"\balbum_id\x18\x05 \x01(\tR\aalbumId\x12\x1b\n" +
 	"\tgenre_ids\x18\x06 \x03(\tR\bgenreIds\x12\x17\n" +
 	"\afile_id\x18\a \x01(\tR\x06fileId\x12)\n" +
@@ -3251,25 +3252,24 @@ const file_catalog_proto_rawDesc = "" +
 	" \x01(\tH\x02R\x06lyrics\x88\x01\x01B\x11\n" +
 	"\x0f_cover_image_idB\x0f\n" +
 	"\r_track_numberB\t\n" +
-	"\a_lyrics\"\xdc\x03\n" +
+	"\a_lyrics\"\xcb\x03\n" +
 	"\x12UpdateTrackRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01\x12\x1f\n" +
 	"\bduration\x18\x03 \x01(\x05H\x01R\bduration\x88\x01\x01\x12\x17\n" +
-	"\x04year\x18\x04 \x01(\x05H\x02R\x04year\x88\x01\x01\x12 \n" +
-	"\tartist_id\x18\x05 \x01(\tH\x03R\bartistId\x88\x01\x01\x12\x1e\n" +
-	"\balbum_id\x18\x06 \x01(\tH\x04R\aalbumId\x88\x01\x01\x12\x1b\n" +
-	"\tgenres_id\x18\a \x03(\tR\bgenresId\x12\x1c\n" +
-	"\afile_id\x18\b \x01(\tH\x05R\x06fileId\x88\x01\x01\x12)\n" +
-	"\x0ecover_image_id\x18\t \x01(\tH\x06R\fcoverImageId\x88\x01\x01\x12&\n" +
+	"\x04year\x18\x04 \x01(\x05H\x02R\x04year\x88\x01\x01\x12\x1d\n" +
+	"\n" +
+	"artist_ids\x18\x05 \x03(\tR\tartistIds\x12\x1e\n" +
+	"\balbum_id\x18\x06 \x01(\tH\x03R\aalbumId\x88\x01\x01\x12\x1b\n" +
+	"\tgenre_ids\x18\a \x03(\tR\bgenreIds\x12\x1c\n" +
+	"\afile_id\x18\b \x01(\tH\x04R\x06fileId\x88\x01\x01\x12)\n" +
+	"\x0ecover_image_id\x18\t \x01(\tH\x05R\fcoverImageId\x88\x01\x01\x12&\n" +
 	"\ftrack_number\x18\n" +
-	" \x01(\x05H\aR\vtrackNumber\x88\x01\x01\x12\x1b\n" +
-	"\x06lyrycs\x18\v \x01(\tH\bR\x06lyrycs\x88\x01\x01B\b\n" +
+	" \x01(\x05H\x06R\vtrackNumber\x88\x01\x01\x12\x1b\n" +
+	"\x06lyrycs\x18\v \x01(\tH\aR\x06lyrycs\x88\x01\x01B\b\n" +
 	"\x06_titleB\v\n" +
 	"\t_durationB\a\n" +
-	"\x05_yearB\f\n" +
-	"\n" +
-	"_artist_idB\v\n" +
+	"\x05_yearB\v\n" +
 	"\t_album_idB\n" +
 	"\n" +
 	"\b_file_idB\x11\n" +
@@ -3362,21 +3362,20 @@ const file_catalog_proto_rawDesc = "" +
 	"\x0fGetAlbumRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12'\n" +
 	"\x0finclude_artists\x18\x02 \x01(\bR\x0eincludeArtists\x12%\n" +
-	"\x0einclude_genres\x18\x03 \x01(\bR\rincludeGenres\"\x8d\x03\n" +
+	"\x0einclude_genres\x18\x03 \x01(\bR\rincludeGenres\"\xfc\x02\n" +
 	"\x11ListAlbumsRequest\x129\n" +
 	"\n" +
 	"pagination\x18\x01 \x01(\v2\x19.common.PaginationRequestR\n" +
-	"pagination\x12 \n" +
-	"\tartist_id\x18\x02 \x01(\tH\x00R\bartistId\x88\x01\x01\x12\x1b\n" +
-	"\tgenres_id\x18\x03 \x03(\tR\bgenresId\x12 \n" +
-	"\tyear_from\x18\x04 \x01(\x05H\x01R\byearFrom\x88\x01\x01\x12\x1c\n" +
-	"\ayear_to\x18\x05 \x01(\x05H\x02R\x06yearTo\x88\x01\x01\x12+\n" +
-	"\x04type\x18\x06 \x01(\x0e2\x12.catalog.AlbumTypeH\x03R\x04type\x88\x01\x01\x12-\n" +
+	"pagination\x12\x1d\n" +
+	"\n" +
+	"artist_ids\x18\x02 \x03(\tR\tartistIds\x12\x1b\n" +
+	"\tgenre_ids\x18\x03 \x03(\tR\bgenreIds\x12 \n" +
+	"\tyear_from\x18\x04 \x01(\x05H\x00R\byearFrom\x88\x01\x01\x12\x1c\n" +
+	"\ayear_to\x18\x05 \x01(\x05H\x01R\x06yearTo\x88\x01\x01\x12+\n" +
+	"\x04type\x18\x06 \x01(\x0e2\x12.catalog.AlbumTypeH\x02R\x04type\x88\x01\x01\x12-\n" +
 	"\asort_by\x18\a \x01(\x0e2\x14.catalog.AlbumSortByR\x06sortBy\x121\n" +
 	"\n" +
 	"sort_order\x18\b \x01(\x0e2\x12.catalog.SortOrderR\tsortOrderB\f\n" +
-	"\n" +
-	"_artist_idB\f\n" +
 	"\n" +
 	"_year_fromB\n" +
 	"\n" +
@@ -3386,37 +3385,37 @@ const file_catalog_proto_rawDesc = "" +
 	"\x06albums\x18\x01 \x03(\v2\x0e.catalog.AlbumR\x06albums\x12:\n" +
 	"\n" +
 	"pagination\x18\x02 \x01(\v2\x1a.common.PaginationResponseR\n" +
-	"pagination\"\xde\x01\n" +
+	"pagination\"\xe0\x01\n" +
 	"\x12CreateAlbumRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x12\n" +
-	"\x04year\x18\x02 \x01(\x05R\x04year\x12\x1b\n" +
-	"\tartist_id\x18\x03 \x01(\tR\bartistId\x12\x1b\n" +
+	"\x04year\x18\x02 \x01(\x05R\x04year\x12\x1d\n" +
+	"\n" +
+	"artist_ids\x18\x03 \x03(\tR\tartistIds\x12\x1b\n" +
 	"\tgenre_ids\x18\x04 \x03(\tR\bgenreIds\x12&\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x12.catalog.AlbumTypeR\x04type\x12)\n" +
 	"\x0ecover_image_id\x18\x06 \x01(\tH\x00R\fcoverImageId\x88\x01\x01B\x11\n" +
-	"\x0f_cover_image_id\"\xac\x02\n" +
+	"\x0f_cover_image_id\"\x9b\x02\n" +
 	"\x12UpdateAlbumRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01\x12\x17\n" +
-	"\x04year\x18\x03 \x01(\x05H\x01R\x04year\x88\x01\x01\x12 \n" +
-	"\tartist_id\x18\x04 \x01(\tH\x02R\bartistId\x88\x01\x01\x12\x1b\n" +
-	"\tgenre_ids\x18\x05 \x03(\tR\bgenreIds\x12+\n" +
-	"\x04type\x18\x06 \x01(\x0e2\x12.catalog.AlbumTypeH\x03R\x04type\x88\x01\x01\x12)\n" +
-	"\x0ecover_image_id\x18\a \x01(\tH\x04R\fcoverImageId\x88\x01\x01B\b\n" +
-	"\x06_titleB\a\n" +
-	"\x05_yearB\f\n" +
+	"\x04year\x18\x03 \x01(\x05H\x01R\x04year\x88\x01\x01\x12\x1d\n" +
 	"\n" +
-	"_artist_idB\a\n" +
+	"artist_ids\x18\x04 \x03(\tR\tartistIds\x12\x1b\n" +
+	"\tgenre_ids\x18\x05 \x03(\tR\bgenreIds\x12+\n" +
+	"\x04type\x18\x06 \x01(\x0e2\x12.catalog.AlbumTypeH\x02R\x04type\x88\x01\x01\x12)\n" +
+	"\x0ecover_image_id\x18\a \x01(\tH\x03R\fcoverImageId\x88\x01\x01B\b\n" +
+	"\x06_titleB\a\n" +
+	"\x05_yearB\a\n" +
 	"\x05_typeB\x11\n" +
 	"\x0f_cover_image_id\">\n" +
 	"\x12DeleteAlbumRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
 	"\acascade\x18\x02 \x01(\bR\acascade\"'\n" +
 	"\x15GetAlbumTracksRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x8d\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x8f\x01\n" +
 	"\x13SearchAlbumsRequest\x12\x14\n" +
-	"\x05query\x18\x01 \x01(\tR\x05query\x12%\n" +
-	"\x0einclude_artist\x18\x02 \x01(\bR\rincludeArtist\x129\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12'\n" +
+	"\x0finclude_artists\x18\x02 \x01(\bR\x0eincludeArtists\x129\n" +
 	"\n" +
 	"pagination\x18\x03 \x01(\v2\x19.common.PaginationRequestR\n" +
 	"pagination\"\xd5\x01\n" +
@@ -3597,11 +3596,11 @@ var file_catalog_proto_goTypes = []any{
 	(*common.HealthyCheckResponse)(nil), // 50: common.HealthyCheckResponse
 }
 var file_catalog_proto_depIdxs = []int32{
-	8,  // 0: catalog.Track.artist:type_name -> catalog.Artist
-	9,  // 1: catalog.Track.album:type_name -> catalog.Album
+	9,  // 0: catalog.Track.album:type_name -> catalog.Album
+	8,  // 1: catalog.Track.artists:type_name -> catalog.Artist
 	10, // 2: catalog.Track.genres:type_name -> catalog.Genre
 	10, // 3: catalog.Artist.genres:type_name -> catalog.Genre
-	8,  // 4: catalog.Album.artist:type_name -> catalog.Artist
+	8,  // 4: catalog.Album.artists:type_name -> catalog.Artist
 	10, // 5: catalog.Album.genres:type_name -> catalog.Genre
 	0,  // 6: catalog.Album.type:type_name -> catalog.AlbumType
 	9,  // 7: catalog.AlbumWithTracks.album:type_name -> catalog.Album

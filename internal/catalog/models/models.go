@@ -15,12 +15,16 @@ type Track struct {
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 
-	Artist *Artist  `db:"artist" json:"artist"`
-	Album  *Album   `db:"album" json:"album"`
-	Genres []*Genre `json:"genres,omitempty"`
+	Artists []*Artist `json:"artist"`
+	Genres  []*Genre  `json:"genres,omitempty"`
 
-	ArtistID string  `db:"artist_id" json:"-"`
-	AlbumID  *string `db:"album_id" json:"-"`
+	AlbumID        *string    `db:"album_id" json:"-"`
+	AlbumTitle     *string    `db:"album_title" json:"-"`
+	AlbumYear      *int32     `db:"album_year" json:"-"`
+	AlbumCoverID   *string    `db:"album_cover_image_id" json:"-"`
+	AlbumType      *AlbumType `db:"album_type" json:"-"`
+	AlbumCreatedAt *time.Time `db:"album_created_at" json:"-"`
+	AlbumUpdatedAt *time.Time `db:"album_updated_at" json:"-"`
 }
 
 type Artist struct {
@@ -39,14 +43,13 @@ type Album struct {
 	ID           string    `db:"id" json:"id"`
 	Title        string    `db:"title" json:"title"`
 	Year         int32     `db:"year" json:"year"`
-	ArtistID     string    `db:"artist_id" json:"artist_id"`
 	AlbumType    AlbumType `db:"album_type" json:"album_type"`
 	CoverImageID *string   `db:"cover_image_id" json:"cover_image_id"`
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 
-	Artist *Artist  `db:"artist" json:"artist,omitempty"`
-	Genres []*Genre `json:"genres,omitempty"`
+	Artists []*Artist `json:"artist,omitempty"`
+	Genres  []*Genre  `json:"genres,omitempty"`
 }
 
 type AlbumWithTracks struct {
@@ -67,7 +70,7 @@ type CreateTrackParams struct {
 	Title        string
 	Duration     int
 	Year         int
-	ArtistID     string
+	ArtistIDs    []string
 	AlbumID      *string
 	GenreIDs     []string
 	FileID       string
@@ -77,9 +80,9 @@ type CreateTrackParams struct {
 }
 
 type GetTrackOptions struct {
-	IncludeArtist bool
-	IncludeAlbum  bool
-	IncludeGenres bool
+	IncludeArtists bool
+	IncludeAlbum   bool
+	IncludeGenres  bool
 }
 
 type UpdateTrackParams struct {
@@ -90,7 +93,7 @@ type UpdateTrackParams struct {
 	CoverImageID *string
 	TrackNumber  *int32
 	Lyrics       *string
-	ArtistID     *string
+	ArtistIDs    *[]string
 	AlbumID      *string
 	GenreIDs     *[]string
 }
@@ -118,7 +121,7 @@ type SearchTracksOptions struct {
 type CreateAlbumParams struct {
 	Title        string
 	Year         int
-	ArtistID     string
+	ArtistIDs    []string
 	CoverImageID *string
 	AlbumType    AlbumType
 	GenresIDs    []string
@@ -127,7 +130,7 @@ type CreateAlbumParams struct {
 type UpdateAlbumParams struct {
 	Title        *string
 	Year         *int32
-	ArtistID     *string
+	ArtistIDs    []string
 	CoverImageID *string
 	AlbumType    *AlbumType
 	GenreIDs     []string
@@ -171,7 +174,7 @@ type ArtistFilter struct {
 }
 
 type AlbumFilter struct {
-	ArtistID  string
+	ArtistIDs []string
 	GenreIDs  []string
 	YearFrom  int
 	YearTo    int

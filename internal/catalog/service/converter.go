@@ -34,9 +34,32 @@ func convertTrackToProto(track *models.Track) *catalogpb.Track {
 		pb.Lyrics = track.Lyrics
 	}
 
-	pb.Artist = convertArtistToProto(track.Artist)
-	pb.Album = convertAlbumToProto(track.Album)
+	pb.Artists = convertArtistsToProto(track.Artists)
 	pb.Genres = convertGenresToProto(track.Genres)
+
+	if track.AlbumID != nil {
+        pb.Album = &catalogpb.Album{
+            Id: *track.AlbumID,
+        }
+        if track.AlbumTitle != nil {
+            pb.Album.Title = *track.AlbumTitle
+        }
+        if track.AlbumYear != nil {
+            pb.Album.Year = int32(*track.AlbumYear)
+        }
+        if track.AlbumCoverID != nil {
+            pb.Album.CoverImageId = track.AlbumCoverID
+        }
+		if track.AlbumUpdatedAt != nil {
+			pb.Album.UpdatedAt = track.AlbumUpdatedAt.Format(time.RFC3339)
+		}
+		if track.AlbumCreatedAt != nil {
+			pb.Album.CreatedAt = track.AlbumCreatedAt.Format(time.RFC3339)
+		}
+		if track.AlbumType != nil {
+			pb.Album.Type = convertAlbumTypeToProto(*track.AlbumType)
+		}
+    }
 
 	return pb
 }
@@ -110,7 +133,7 @@ func convertAlbumToProto(album *models.Album) *catalogpb.Album {
 		pb.CoverImageId = album.CoverImageID
 	}
 
-	pb.Artist = convertArtistToProto(album.Artist)
+	pb.Artists = convertArtistsToProto(album.Artists)
 	pb.Genres = convertGenresToProto(album.Genres)
 
 	return pb

@@ -4,8 +4,9 @@ syntax = "proto3";
 
 package catalog;
 
-import "common.proto";
 import "google/api/annotations.proto";
+
+import "common.proto";
 
 
 option go_package = "github.com/CAATHARSIS/music-service/api/gen/catalog;catalogpb";
@@ -225,8 +226,8 @@ message Track {
     int32 duration = 3;
     int32 year = 4;
 
-    Artist artist = 5;
-    Album album = 6;
+    Album album = 5;
+    repeated Artist artists = 6;
     repeated Genre genres = 7;
 
     string file_id = 8;
@@ -257,7 +258,7 @@ message Album {
     string title = 2;
     int32 year = 3;
 
-    Artist artist = 4;
+    repeated Artist artists = 4;
     repeated Genre genres = 5;
 
     AlbumType type = 6;
@@ -320,7 +321,7 @@ message CreateTrackRequest {
     int32 duration = 2;
     int32 year = 3;
 
-    string artist_id = 4;
+    repeated string artist_ids = 4;
     string album_id = 5;
     repeated string genre_ids = 6;
 
@@ -336,9 +337,9 @@ message UpdateTrackRequest {
     optional string title = 2;
     optional int32 duration = 3;
     optional int32 year = 4;
-    optional string artist_id = 5;
+    repeated string artist_ids = 5;
     optional string album_id = 6;
-    repeated string genres_id = 7;
+    repeated string genre_ids = 7;
     optional string file_id = 8;
     optional string cover_image_id = 9;
     optional int32 track_number = 10;
@@ -472,8 +473,8 @@ message GetAlbumRequest {
 message ListAlbumsRequest {
     common.PaginationRequest pagination = 1;
 
-    optional string artist_id = 2;
-    repeated string genres_id = 3;
+    repeated string artist_ids = 2;
+    repeated string genre_ids = 3;
     optional int32 year_from = 4;
     optional int32 year_to = 5;
     optional AlbumType type = 6;
@@ -491,7 +492,7 @@ message ListAlbumsResponse {
 message CreateAlbumRequest {
     string title = 1;
     int32 year = 2;
-    string artist_id = 3;
+    repeated string artist_ids = 3;
     repeated string genre_ids = 4;
     AlbumType type = 5;
     optional string cover_image_id = 6;
@@ -502,7 +503,7 @@ message UpdateAlbumRequest {
 
     optional string title = 2;
     optional int32 year = 3;
-    optional string artist_id = 4;
+    repeated string artist_ids = 4;
     repeated string genre_ids = 5;
     optional AlbumType type = 6;
     optional string cover_image_id = 7;
@@ -519,7 +520,7 @@ message GetAlbumTracksRequest {
 
 message SearchAlbumsRequest {
     string query = 1;
-    bool include_artist = 2;
+    bool include_artists = 2;
     common.PaginationRequest pagination = 3;
 }
 

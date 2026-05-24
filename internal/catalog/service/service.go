@@ -39,9 +39,9 @@ func (s *CatalogService) GetTrack(ctx context.Context, req *catalogpb.GetTrackRe
 	}
 
 	opts := &models.GetTrackOptions{
-		IncludeArtist: req.IncludeArtist,
-		IncludeAlbum:  req.IncludeAlbum,
-		IncludeGenres: req.IncludeGenres,
+		IncludeArtists: req.IncludeArtist,
+		IncludeAlbum:   req.IncludeAlbum,
+		IncludeGenres:  req.IncludeGenres,
 	}
 
 	track, err := s.repo.GetTrackByID(ctx, req.Id, opts)
@@ -112,13 +112,13 @@ func (s *CatalogService) ListTracks(ctx context.Context, req *catalogpb.ListTrac
 func (s *CatalogService) CreateTrack(ctx context.Context, req *catalogpb.CreateTrackRequest) (*catalogpb.Track, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Title == "" {
 		return nil, status.Error(codes.InvalidArgument, "title is required")
 	}
-	if req.ArtistId == "" {
-		return nil, status.Error(codes.InvalidArgument, "artist_id is required")
+	if req.ArtistIds == nil {
+		return nil, status.Error(codes.InvalidArgument, "artist_ids is required")
 	}
 	if req.FileId == "" {
 		return nil, status.Error(codes.InvalidArgument, "file_id is required")
@@ -128,7 +128,7 @@ func (s *CatalogService) CreateTrack(ctx context.Context, req *catalogpb.CreateT
 		Title:        req.Title,
 		Duration:     int(req.Duration),
 		Year:         int(req.Year),
-		ArtistID:     req.ArtistId,
+		ArtistIDs:    req.ArtistIds,
 		FileID:       req.FileId,
 		GenreIDs:     req.GenreIds,
 		CoverImageID: req.CoverImageId,
@@ -152,7 +152,7 @@ func (s *CatalogService) CreateTrack(ctx context.Context, req *catalogpb.CreateT
 func (s *CatalogService) UpdateTrack(ctx context.Context, req *catalogpb.UpdateTrackRequest) (*catalogpb.Track, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "track id is required")
@@ -162,7 +162,6 @@ func (s *CatalogService) UpdateTrack(ctx context.Context, req *catalogpb.UpdateT
 		Title:        req.Title,
 		Duration:     req.Duration,
 		Year:         req.Year,
-		ArtistID:     req.ArtistId,
 		AlbumID:      req.AlbumId,
 		FileID:       req.FileId,
 		CoverImageID: req.CoverImageId,
@@ -170,8 +169,12 @@ func (s *CatalogService) UpdateTrack(ctx context.Context, req *catalogpb.UpdateT
 		Lyrics:       req.Lyrycs,
 	}
 
-	if len(req.GenresId) > 0 {
-		params.GenreIDs = &req.GenresId
+	if len(req.GenreIds) > 0 {
+		params.GenreIDs = &req.GenreIds
+	}
+
+	if len(req.ArtistIds) > 0 {
+		params.ArtistIDs = &req.ArtistIds
 	}
 
 	track, err := s.repo.UpdateTrack(ctx, req.Id, params)
@@ -189,7 +192,7 @@ func (s *CatalogService) UpdateTrack(ctx context.Context, req *catalogpb.UpdateT
 func (s *CatalogService) DeleteTrack(ctx context.Context, req *catalogpb.DeleteTrackRequest) (*commonpb.Empty, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.TrackId == "" {
 		return nil, status.Error(codes.InvalidArgument, "track_id is required")
@@ -266,9 +269,9 @@ func (s *CatalogService) GetTracksByIDs(ctx context.Context, req *catalogpb.GetT
 	}
 
 	opts := &models.GetTrackOptions{
-		IncludeArtist: req.IncludeArtist,
-		IncludeAlbum:  req.IncludeAlbum,
-		IncludeGenres: req.IncludeGenres,
+		IncludeArtists: req.IncludeArtist,
+		IncludeAlbum:   req.IncludeAlbum,
+		IncludeGenres:  req.IncludeGenres,
 	}
 
 	tracks, err := s.repo.GetTracksByIDs(ctx, req.Ids, opts)
@@ -306,9 +309,14 @@ func (s *CatalogService) IncrementPlaysCount(ctx context.Context, req *catalogpb
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	if err := s.repo.UpdateArtistStats(ctx, track.ArtistID, incrementBy); err != nil {
-		s.log.Warn("update artist stats failed", "artist_id", track.ArtistID, "error", err)
+	if track.Artists != nil {
+		for _, artist := range track.Artists {
+			if err := s.repo.UpdateArtistStats(ctx, artist.ID, incrementBy); err != nil {
+				s.log.Warn("update artist stats failed", "artist_id", artist.ID, "error", err)
+			}
+		}
 	}
+	
 
 	return &commonpb.Empty{}, nil
 }
@@ -389,7 +397,7 @@ func (s *CatalogService) ListArtists(ctx context.Context, req *catalogpb.ListArt
 func (s *CatalogService) CreateArtist(ctx context.Context, req *catalogpb.CreateArtistRequest) (*catalogpb.Artist, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is required")
@@ -414,7 +422,7 @@ func (s *CatalogService) CreateArtist(ctx context.Context, req *catalogpb.Create
 func (s *CatalogService) UpdateArtist(ctx context.Context, req *catalogpb.UpdateArtistRequest) (*catalogpb.Artist, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "artist id is required")
@@ -445,7 +453,7 @@ func (s *CatalogService) UpdateArtist(ctx context.Context, req *catalogpb.Update
 func (s *CatalogService) DeleteArtist(ctx context.Context, req *catalogpb.DeleteArtistRequest) (*commonpb.Empty, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "artist id is required")
@@ -578,17 +586,17 @@ func (s *CatalogService) ListAlbums(ctx context.Context, req *catalogpb.ListAlbu
 		SortOrder: convertSortOrder(req.SortOrder),
 	}
 
-	if req.ArtistId != nil {
-		filter.ArtistID = *req.ArtistId
-	}
 	if req.YearFrom != nil {
 		filter.YearFrom = int(*req.YearFrom)
 	}
 	if req.YearTo != nil {
 		filter.YearTo = int(*req.YearTo)
 	}
-	if len(req.GenresId) > 0 {
-		filter.GenreIDs = req.GenresId
+	if len(req.GenreIds) > 0 {
+		filter.GenreIDs = req.GenreIds
+	}
+	if len(req.ArtistIds) > 0 {
+		filter.ArtistIDs = req.ArtistIds
 	}
 
 	if req.Type != nil {
@@ -615,19 +623,19 @@ func (s *CatalogService) ListAlbums(ctx context.Context, req *catalogpb.ListAlbu
 func (s *CatalogService) CreateAlbum(ctx context.Context, req *catalogpb.CreateAlbumRequest) (*catalogpb.Album, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Title == "" {
 		return nil, status.Error(codes.InvalidArgument, "title is required")
 	}
-	if req.ArtistId == "" {
-		return nil, status.Error(codes.InvalidArgument, "artist_id is required")
+	if req.ArtistIds == nil {
+		return nil, status.Error(codes.InvalidArgument, "artist_ids is required")
 	}
 
 	params := &models.CreateAlbumParams{
 		Title:        req.Title,
 		Year:         int(req.Year),
-		ArtistID:     req.ArtistId,
+		ArtistIDs:    req.ArtistIds,
 		AlbumType:    convertAlbumTypeFromProto(req.Type),
 		CoverImageID: req.CoverImageId,
 		GenresIDs:    req.GenreIds,
@@ -645,7 +653,7 @@ func (s *CatalogService) CreateAlbum(ctx context.Context, req *catalogpb.CreateA
 func (s *CatalogService) UpdateAlbum(ctx context.Context, req *catalogpb.UpdateAlbumRequest) (*catalogpb.Album, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "album id is required")
@@ -656,13 +664,16 @@ func (s *CatalogService) UpdateAlbum(ctx context.Context, req *catalogpb.UpdateA
 	params := &models.UpdateAlbumParams{
 		Title:        req.Title,
 		Year:         req.Year,
-		ArtistID:     req.ArtistId,
 		CoverImageID: req.CoverImageId,
 		AlbumType:    &albumType,
 	}
 
 	if len(req.GenreIds) > 0 {
 		params.GenreIDs = req.GenreIds
+	}
+
+	if len(req.ArtistIds) > 0 {
+		params.ArtistIDs = req.ArtistIds
 	}
 
 	album, err := s.repo.UpdateAlbum(ctx, req.Id, params)
@@ -680,7 +691,7 @@ func (s *CatalogService) UpdateAlbum(ctx context.Context, req *catalogpb.UpdateA
 func (s *CatalogService) DeleteAlbum(ctx context.Context, req *catalogpb.DeleteAlbumRequest) (*commonpb.Empty, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "album id is required")
@@ -725,7 +736,7 @@ func (s *CatalogService) SearchAlbums(ctx context.Context, req *catalogpb.Search
 
 	opts := &models.SearchAlbumsOptions{
 		Limit:         20,
-		IncludeArtist: req.IncludeArtist,
+		IncludeArtist: req.IncludeArtists,
 	}
 
 	if req.Pagination != nil && req.Pagination.PageSize > 0 {
@@ -780,7 +791,7 @@ func (s *CatalogService) ListGenres(ctx context.Context, req *catalogpb.ListGenr
 func (s *CatalogService) CreateGenre(ctx context.Context, req *catalogpb.CreateGenreRequest) (*catalogpb.Genre, error) {
 	if err := auth.RequireAdmin(ctx); err != nil {
 		return nil, err
-	} 
+	}
 
 	if req.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is required")
