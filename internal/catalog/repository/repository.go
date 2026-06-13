@@ -598,7 +598,7 @@ func (r *repository) ListTracks(ctx context.Context, filter *models.TrackFilter)
 		argIdx++
 	}
 
-	orderBy := "t.created_at DESC"
+	orderBy := ""
 	switch filter.SortBy {
 	case models.SortByTitle:
 		orderBy = "t.title"
@@ -1090,7 +1090,7 @@ func (r *repository) ListArtists(ctx context.Context, filter *models.ArtistFilte
 
 	whereClause := strings.Join(whereParts, " AND ")
 
-	orderBy := "created_at DESC"
+	orderBy := ""
 	switch filter.SortBy {
 	case models.SortArtistsByPlays:
 		orderBy = "total_plays DESC"
