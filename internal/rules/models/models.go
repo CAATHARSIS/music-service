@@ -7,11 +7,12 @@ import (
 
 type RuleCondition struct {
 	Genres        []string `json:"genres,omitempty"`
-	YearFrom      *int     `json:"year_from,omitempty"`
-	YearTo        *int     `json:"year_to,omitempty"`
-	MinDuration   *int     `json:"min_duration,omitempty"`
-	MaxDuration   *int     `json:"max_duration,omitempty"`
-	MinPlaysCount *int     `json:"min_plays_count,omitempty"`
+	YearFrom      *int32   `json:"year_from,omitempty"`
+	YearTo        *int32   `json:"year_to,omitempty"`
+	MinDuration   *int32   `json:"min_duration,omitempty"`
+	MaxDuration   *int32   `json:"max_duration,omitempty"`
+	MinPlaysCount *int32   `json:"min_plays_count,omitempty"`
+	MaxPlaysCount *int32   `json:"max_plays_count,omitempty"`
 }
 
 type Rule struct {

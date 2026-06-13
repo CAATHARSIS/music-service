@@ -598,6 +598,18 @@ func (r *repository) ListTracks(ctx context.Context, filter *models.TrackFilter)
 		argIdx++
 	}
 
+	if filter.MinPlaysCount > 0 {
+		wherePart = append(wherePart, fmt.Sprintf("t.plays_count >= $%d", argIdx))
+		args = append(args, filter.MinPlaysCount)
+		argIdx++
+	}
+
+	if filter.MaxPlaysCount > 0 {
+		wherePart = append(wherePart, fmt.Sprintf("t.plays_count <= $%d", argIdx))
+		args = append(args, filter.MaxPlaysCount)
+		argIdx++
+	}
+
 	orderBy := ""
 	switch filter.SortBy {
 	case models.SortByTitle:
@@ -610,7 +622,7 @@ func (r *repository) ListTracks(ctx context.Context, filter *models.TrackFilter)
 		orderBy = "t.plays_count"
 	}
 
-	if filter.SortOrder != "" {
+	if filter.SortOrder != "" && orderBy != "" {
 		if filter.SortOrder == models.SortOrderDesc {
 			orderBy += " DESC"
 		} else {

@@ -150,17 +150,19 @@ type CreateGenreParams struct {
 // Filters
 
 type TrackFilter struct {
-	ArtistID    string
-	AlbumID     string
-	GenreIDs    []string
-	YearFrom    int
-	YearTo      int
-	MinDuration int
-	MaxDuration int
-	SortBy      TrackSortBy
-	SortOrder   SortOrder
-	Page        int
-	PageSize    int
+	ArtistID      string
+	AlbumID       string
+	GenreIDs      []string
+	YearFrom      int
+	YearTo        int
+	MinDuration   int
+	MaxDuration   int
+	MinPlaysCount int
+	MaxPlaysCount int
+	SortBy        TrackSortBy
+	SortOrder     SortOrder
+	Page          int
+	PageSize      int
 }
 
 type ArtistFilter struct {

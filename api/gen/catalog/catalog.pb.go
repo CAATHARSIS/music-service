@@ -936,8 +936,12 @@ type ListTracksRequest struct {
 	GenreIds      []string                  `protobuf:"bytes,4,rep,name=genre_ids,json=genreIds,proto3" json:"genre_ids,omitempty"`
 	YearFrom      *int32                    `protobuf:"varint,5,opt,name=year_from,json=yearFrom,proto3,oneof" json:"year_from,omitempty"`
 	YearTo        *int32                    `protobuf:"varint,6,opt,name=year_to,json=yearTo,proto3,oneof" json:"year_to,omitempty"`
-	SortBy        TrackSortBy               `protobuf:"varint,7,opt,name=sort_by,json=sortBy,proto3,enum=catalog.TrackSortBy" json:"sort_by,omitempty"`
-	SortOrder     SortOrder                 `protobuf:"varint,8,opt,name=sort_order,json=sortOrder,proto3,enum=catalog.SortOrder" json:"sort_order,omitempty"`
+	MinDur        *int32                    `protobuf:"varint,7,opt,name=min_dur,json=minDur,proto3,oneof" json:"min_dur,omitempty"`
+	MaxDur        *int32                    `protobuf:"varint,8,opt,name=max_dur,json=maxDur,proto3,oneof" json:"max_dur,omitempty"`
+	MinPlaysCount *int32                    `protobuf:"varint,9,opt,name=min_plays_count,json=minPlaysCount,proto3,oneof" json:"min_plays_count,omitempty"`
+	MaxPlaysCount *int32                    `protobuf:"varint,10,opt,name=max_plays_count,json=maxPlaysCount,proto3,oneof" json:"max_plays_count,omitempty"`
+	SortBy        TrackSortBy               `protobuf:"varint,11,opt,name=sort_by,json=sortBy,proto3,enum=catalog.TrackSortBy" json:"sort_by,omitempty"`
+	SortOrder     SortOrder                 `protobuf:"varint,12,opt,name=sort_order,json=sortOrder,proto3,enum=catalog.SortOrder" json:"sort_order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1010,6 +1014,34 @@ func (x *ListTracksRequest) GetYearFrom() int32 {
 func (x *ListTracksRequest) GetYearTo() int32 {
 	if x != nil && x.YearTo != nil {
 		return *x.YearTo
+	}
+	return 0
+}
+
+func (x *ListTracksRequest) GetMinDur() int32 {
+	if x != nil && x.MinDur != nil {
+		return *x.MinDur
+	}
+	return 0
+}
+
+func (x *ListTracksRequest) GetMaxDur() int32 {
+	if x != nil && x.MaxDur != nil {
+		return *x.MaxDur
+	}
+	return 0
+}
+
+func (x *ListTracksRequest) GetMinPlaysCount() int32 {
+	if x != nil && x.MinPlaysCount != nil {
+		return *x.MinPlaysCount
+	}
+	return 0
+}
+
+func (x *ListTracksRequest) GetMaxPlaysCount() int32 {
+	if x != nil && x.MaxPlaysCount != nil {
+		return *x.MaxPlaysCount
 	}
 	return 0
 }
@@ -3212,7 +3244,7 @@ const file_catalog_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
 	"\x0einclude_artist\x18\x02 \x01(\bR\rincludeArtist\x12#\n" +
 	"\rinclude_album\x18\x03 \x01(\bR\fincludeAlbum\x12%\n" +
-	"\x0einclude_genres\x18\x04 \x01(\bR\rincludeGenres\"\x84\x03\n" +
+	"\x0einclude_genres\x18\x04 \x01(\bR\rincludeGenres\"\xda\x04\n" +
 	"\x11ListTracksRequest\x129\n" +
 	"\n" +
 	"pagination\x18\x01 \x01(\v2\x19.common.PaginationRequestR\n" +
@@ -3221,17 +3253,28 @@ const file_catalog_proto_rawDesc = "" +
 	"\balbum_id\x18\x03 \x01(\tH\x01R\aalbumId\x88\x01\x01\x12\x1b\n" +
 	"\tgenre_ids\x18\x04 \x03(\tR\bgenreIds\x12 \n" +
 	"\tyear_from\x18\x05 \x01(\x05H\x02R\byearFrom\x88\x01\x01\x12\x1c\n" +
-	"\ayear_to\x18\x06 \x01(\x05H\x03R\x06yearTo\x88\x01\x01\x12-\n" +
-	"\asort_by\x18\a \x01(\x0e2\x14.catalog.TrackSortByR\x06sortBy\x121\n" +
+	"\ayear_to\x18\x06 \x01(\x05H\x03R\x06yearTo\x88\x01\x01\x12\x1c\n" +
+	"\amin_dur\x18\a \x01(\x05H\x04R\x06minDur\x88\x01\x01\x12\x1c\n" +
+	"\amax_dur\x18\b \x01(\x05H\x05R\x06maxDur\x88\x01\x01\x12+\n" +
+	"\x0fmin_plays_count\x18\t \x01(\x05H\x06R\rminPlaysCount\x88\x01\x01\x12+\n" +
+	"\x0fmax_plays_count\x18\n" +
+	" \x01(\x05H\aR\rmaxPlaysCount\x88\x01\x01\x12-\n" +
+	"\asort_by\x18\v \x01(\x0e2\x14.catalog.TrackSortByR\x06sortBy\x121\n" +
 	"\n" +
-	"sort_order\x18\b \x01(\x0e2\x12.catalog.SortOrderR\tsortOrderB\f\n" +
+	"sort_order\x18\f \x01(\x0e2\x12.catalog.SortOrderR\tsortOrderB\f\n" +
 	"\n" +
 	"_artist_idB\v\n" +
 	"\t_album_idB\f\n" +
 	"\n" +
 	"_year_fromB\n" +
 	"\n" +
-	"\b_year_to\"x\n" +
+	"\b_year_toB\n" +
+	"\n" +
+	"\b_min_durB\n" +
+	"\n" +
+	"\b_max_durB\x12\n" +
+	"\x10_min_plays_countB\x12\n" +
+	"\x10_max_plays_count\"x\n" +
 	"\x12ListTracksResponse\x12&\n" +
 	"\x06tracks\x18\x01 \x03(\v2\x0e.catalog.TrackR\x06tracks\x12:\n" +
 	"\n" +

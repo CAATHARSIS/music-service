@@ -33,22 +33,22 @@ func convertConditionFromProto(c *rulespb.RuleCondition) models.RuleCondition {
 	}
 	return models.RuleCondition{
 		Genres:        c.Genres,
-		YearFrom:      toPtr(int(*c.YearFrom)),
-		YearTo:        toPtr(int(*c.YearTo)),
-		MinPlaysCount: toPtr(int(*c.MinPlaysCount)),
-		MinDuration:   toPtr(int(*c.MinDuration)),
-		MaxDuration:   toPtr(int(*c.MaxDuration)),
+		YearFrom:      c.YearFrom,
+		YearTo:        c.YearTo,
+		MinPlaysCount: c.MinPlaysCount,
+		MinDuration:   c.MinDuration,
+		MaxDuration:   c.MaxDuration,
 	}
 }
 
 func convertConditionToProto(c models.RuleCondition) *rulespb.RuleCondition {
 	return &rulespb.RuleCondition{
 		Genres:        c.Genres,
-		YearFrom:      toPtr(int32(*c.YearFrom)),
-		YearTo:        toPtr(int32(*c.YearTo)),
-		MinPlaysCount: toPtr(int32(*c.MinPlaysCount)),
-		MinDuration:   toPtr(int32(*c.MinDuration)),
-		MaxDuration:   toPtr(int32(*c.MaxDuration)),
+		YearFrom:      c.YearFrom,
+		YearTo:        c.YearTo,
+		MinPlaysCount: c.MinPlaysCount,
+		MinDuration:   c.MinDuration,
+		MaxDuration:   c.MaxDuration,
 	}
 }
 

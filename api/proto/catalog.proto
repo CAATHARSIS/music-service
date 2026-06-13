@@ -306,9 +306,13 @@ message ListTracksRequest {
     repeated string genre_ids = 4;
     optional int32 year_from = 5;
     optional int32 year_to = 6;
+    optional int32 min_dur = 7;
+    optional int32 max_dur = 8;
+    optional int32 min_plays_count = 9;
+    optional int32 max_plays_count = 10;
 
-    TrackSortBy sort_by = 7;
-    SortOrder sort_order = 8;
+    TrackSortBy sort_by = 11;
+    SortOrder sort_order = 12;
 }
 
 message ListTracksResponse {

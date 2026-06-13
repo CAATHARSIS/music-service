@@ -43,10 +43,24 @@ func (s *RuleEngineService) executeRule(ctx context.Context, rule *models.Rule) 
 	}
 
 	if rule.Condition.YearFrom != nil {
-		req.YearFrom = toPtr(int32(*rule.Condition.YearFrom))
+		req.YearFrom = rule.Condition.YearFrom
 	}
 	if rule.Condition.YearTo != nil {
-		req.YearTo = toPtr(int32(*rule.Condition.YearTo))
+		req.YearTo = rule.Condition.YearTo
+	}
+
+	if rule.Condition.MinPlaysCount != nil {
+		req.YearFrom = rule.Condition.MinPlaysCount
+	}
+	if rule.Condition.MaxPlaysCount != nil {
+		req.YearTo = rule.Condition.MaxPlaysCount
+	}
+
+	if rule.Condition.MinDuration != nil {
+		req.YearFrom = rule.Condition.MinDuration
+	}
+	if rule.Condition.MaxDuration != nil {
+		req.YearTo = rule.Condition.MaxDuration
 	}
 
 	resp, err := s.catalogClient.ListTracks(ctx, req)
@@ -54,18 +68,9 @@ func (s *RuleEngineService) executeRule(ctx context.Context, rule *models.Rule) 
 		return nil, fmt.Errorf("catalog list tracks: %w", err)
 	}
 
-	var trackIDs []string
-	for _, t := range resp.Tracks {
-		if rule.Condition.MinPlaysCount != nil && t.PlaysCount < int64(*rule.Condition.MinPlaysCount) {
-			continue
-		}
-		if rule.Condition.MinDuration != nil && t.Duration < int32(*rule.Condition.MinDuration) {
-			continue
-		}
-		if rule.Condition.MaxDuration != nil && t.Duration > int32(*rule.Condition.MaxDuration) {
-			continue
-		}
-		trackIDs = append(trackIDs, t.Id)
+	trackIDs := make([]string, len(resp.Tracks))
+	for i, t := range resp.Tracks {
+		trackIDs[i] = t.Id
 	}
 
 	return trackIDs, nil
