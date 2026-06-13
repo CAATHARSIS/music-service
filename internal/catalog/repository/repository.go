@@ -743,71 +743,63 @@ func (r *repository) searchTracksFuzzy(ctx context.Context, query string, opts *
 }
 
 func (r *repository) buildSearchTracksQuery(isFullText bool, opts *models.SearchTracksOptions) string {
-	innerCols := []string{
-		"t.id", "t.title", "t.duration", "t.year", "t.file_id", "t.cover_image_id",
-		"t.track_number", "t.lyrics", "t.plays_count", "t.created_at", "t.updated_at",
-		"t.artist_id", "t.album_id",
+	selectPart := []string{
+		"t.id",
+		"t.title",
+		"t.duration",
+		"t.year",
+		"t.file_id",
+		"t.cover_image_id",
+		"t.track_number",
+		"t.lyrics",
+		"t.plays_count",
+		"t.created_at",
+		"t.updated_at",
+		"t.album_id",
 	}
 
-	outerCols := []string{
-		"id", "title", "duration", "year", "file_id", "cover_image_id",
-		"track_number", "lyrics", "plays_count", "created_at", "updated_at",
-		"artist_id", "album_id",
-	}
-
-	fromClause := "FROM tracks t"
+	fromPart := "FROM tracks t"
+	wherePart := ""
+	orderByPart := ""
 
 	if opts.IncludeArtist {
-		innerCols = append(innerCols,
-			`a.id AS "artist.id"`, `a.name AS "artist.name"`, `a.country AS "artist.country"`,
-			`a.avatar_image_id AS "artist.avatar_image_id"`, `a.total_plays AS "artist.total_plays"`,
+		selectPart = append(selectPart,
+			"a.id as \"artist.id\"",
+			"a.name as \"artist.name\"",
+			"a.country as \"artist.country\"",
+			"a.avatar_image_id as \"artist.avatar_image_id\"",
+			"a.total_plays as \"artist.total_plays\"",
 		)
-		outerCols = append(outerCols,
-			`"artist.id"`, `"artist.name"`, `"artist.country"`,
-			`"artist.avatar_image_id"`, `"artist.total_plays"`,
-		)
-		fromClause += " JOIN artists a ON t.artist_id = a.id"
+		fromPart += " JOIN track_artists ta ON t.id = ta.track_id"
+		fromPart += " JOIN artists a ON ta.artist_id = a.id"
 	}
 
 	if opts.IncludeAlbum {
-		innerCols = append(innerCols,
-			`al.id AS "album.id"`, `al.title AS "album.title"`,
-			`al.year AS "album.year"`, `al.cover_image_id AS "album.cover_image_id"`,
+		selectPart = append(selectPart,
+			"al.id as \"album.id\"",
+			"al.title as \"album.title\"",
+			"al.year as \"album.year\"",
+			"al.cover_image_id as \"album.cover_image_id\"",
 		)
-		outerCols = append(outerCols,
-			`"album.id"`, `"album.title"`, `"album.year"`, `"album.cover_image_id"`,
-		)
-		fromClause += " LEFT JOIN albums al ON t.album_id = al.id"
+		fromPart += " LEFT JOIN albums al ON t.album_id = al.id"
 	}
 
-	var metricCol, metricAlias, whereClause, orderByClause string
 	if isFullText {
-		metricCol = "ts_rank(t.search_vector, to_tsquery('simple', $1))"
-		metricAlias = "rank"
-		whereClause = "WHERE t.search_vector @@ to_tsquery('simple', $1)"
-		orderByClause = "ORDER BY rank DESC"
+		wherePart = "WHERE t.search_vector @@ to_tsquery('simple', $1)"
+		selectPart = append(selectPart, "ts_rank(t.search_vector, to_tsquery('simple', $1)) as rank")
+		orderByPart = "ORDER BY rank DESC"
 	} else {
-		metricCol = "similarity(t.title, $1)"
-		metricAlias = "sim"
-		whereClause = "WHERE t.title % $1"
-		orderByClause = "ORDER BY sim DESC"
+		wherePart = "WHERE t.title % $1"
+		orderByPart = "ORDER BY similarity(t.title, $1) DESC"
 	}
 
 	return fmt.Sprintf(`
-		SELECT %s
-		FROM (
-			SELECT %s, %s AS %s
-			%s
-			%s
-			%s
-			LIMIT $2
-		) AS sub
-	`,
-		strings.Join(outerCols, ", "),
-		strings.Join(innerCols, ", "),
-		metricCol, metricAlias,
-		fromClause, whereClause, orderByClause,
-	)
+        SELECT %s
+        %s
+        %s
+        %s
+        LIMIT $2
+    `, strings.Join(selectPart, ", "), fromPart, wherePart, orderByPart)
 }
 
 func (r *repository) addTrackArtists(ctx context.Context, trackID string, artistIDs []string) error {

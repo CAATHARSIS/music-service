@@ -13,6 +13,7 @@ import (
 	"github.com/CAATHARSIS/music-service/internal/catalog/repository"
 	"github.com/CAATHARSIS/music-service/pkg/auth"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -316,7 +317,6 @@ func (s *CatalogService) IncrementPlaysCount(ctx context.Context, req *catalogpb
 			}
 		}
 	}
-	
 
 	return &commonpb.Empty{}, nil
 }
@@ -846,6 +846,11 @@ func (s *CatalogService) GetTrackStreamURL(ctx context.Context, req *catalogpb.G
 		return nil, err
 	}
 
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		ctx = metadata.NewOutgoingContext(ctx, md)
+	}
+
 	expiry := int32(3600)
 	if req.Expiryseconds > 0 {
 		expiry = req.Expiryseconds
@@ -856,7 +861,7 @@ func (s *CatalogService) GetTrackStreamURL(ctx context.Context, req *catalogpb.G
 		ExpirySeconds: expiry,
 	})
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to get stream URL")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to get stream URL: %v", err))
 	}
 
 	return &catalogpb.StreamURLResponse{

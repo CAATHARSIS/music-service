@@ -30,10 +30,14 @@ type Gateway struct {
 func NewGateway(ctx context.Context, cfg *config.Config) (*Gateway, error) {
 	mux := runtime.NewServeMux(
 		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
-			return metadata.Pairs(
+			md := metadata.Pairs(
 				"grpcgateway-http-method", req.Method,
 				"grpcgateway-http-path", req.URL.Path,
 			)
+			if authHeader := req.Header.Get("Authorization"); authHeader != "" {
+				md.Set("authorization", authHeader)
+			}
+			return md
 		}),
 	)
 
@@ -63,11 +67,6 @@ func NewGateway(ctx context.Context, cfg *config.Config) (*Gateway, error) {
 }
 
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if authHeader := r.Header.Get("Authorization"); authHeader != "" {
-		ctx := metadata.AppendToOutgoingContext(r.Context(), "authorization", authHeader)
-		r = r.WithContext(ctx)
-	}
-
 	if r.Method == "POST" && strings.HasPrefix(r.URL.Path, "/v1/files/upload") {
 		g.handleFileUpload(w, r)
 		return
