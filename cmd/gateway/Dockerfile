@@ -3,7 +3,6 @@ FROM golang:1.26-alpine AS builder
 RUN apk add --no-cache git ca-certificates
 WORKDIR /app
 
-COPY go.work ./
 RUN printf "go 1.22\n\nuse (\n\t./api/gen\n\t./cmd/gateway\n\t./internal/gateway\n\t./pkg\n)\n" > go.work
 
 COPY api/gen/go.mod api/gen/go.mod

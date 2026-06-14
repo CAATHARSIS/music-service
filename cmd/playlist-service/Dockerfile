@@ -4,7 +4,6 @@ RUN apk add --no-cache git ca-certificates
 
 WORKDIR /app
 
-COPY go.work ./
 RUN printf "go 1.26\n\nuse (\n\t./api/gen\n\t./cmd/playlist-service\n\t./internal/playlist\n\t./pkg\n)" > go.work
 
 COPY api/gen/go.mod api/gen/go.mod
