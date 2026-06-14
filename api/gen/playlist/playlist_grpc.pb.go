@@ -31,6 +31,7 @@ const (
 	PlaylistService_AddTrack_FullMethodName          = "/playlist.PlaylistService/AddTrack"
 	PlaylistService_RemoveTrack_FullMethodName       = "/playlist.PlaylistService/RemoveTrack"
 	PlaylistService_Health_FullMethodName            = "/playlist.PlaylistService/Health"
+	PlaylistService_ClearTracks_FullMethodName       = "/playlist.PlaylistService/ClearTracks"
 )
 
 // PlaylistServiceClient is the client API for PlaylistService service.
@@ -45,6 +46,7 @@ type PlaylistServiceClient interface {
 	AddTrack(ctx context.Context, in *AddTrackRequest, opts ...grpc.CallOption) (*Playlist, error)
 	RemoveTrack(ctx context.Context, in *RemoveTrackRequest, opts ...grpc.CallOption) (*Playlist, error)
 	Health(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*common.HealthyCheckResponse, error)
+	ClearTracks(ctx context.Context, in *ClearTracksRequest, opts ...grpc.CallOption) (*common.Empty, error)
 }
 
 type playlistServiceClient struct {
@@ -135,6 +137,16 @@ func (c *playlistServiceClient) Health(ctx context.Context, in *common.Empty, op
 	return out, nil
 }
 
+func (c *playlistServiceClient) ClearTracks(ctx context.Context, in *ClearTracksRequest, opts ...grpc.CallOption) (*common.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(common.Empty)
+	err := c.cc.Invoke(ctx, PlaylistService_ClearTracks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlaylistServiceServer is the server API for PlaylistService service.
 // All implementations must embed UnimplementedPlaylistServiceServer
 // for forward compatibility.
@@ -147,6 +159,7 @@ type PlaylistServiceServer interface {
 	AddTrack(context.Context, *AddTrackRequest) (*Playlist, error)
 	RemoveTrack(context.Context, *RemoveTrackRequest) (*Playlist, error)
 	Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error)
+	ClearTracks(context.Context, *ClearTracksRequest) (*common.Empty, error)
 	mustEmbedUnimplementedPlaylistServiceServer()
 }
 
@@ -180,6 +193,9 @@ func (UnimplementedPlaylistServiceServer) RemoveTrack(context.Context, *RemoveTr
 }
 func (UnimplementedPlaylistServiceServer) Health(context.Context, *common.Empty) (*common.HealthyCheckResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
+}
+func (UnimplementedPlaylistServiceServer) ClearTracks(context.Context, *ClearTracksRequest) (*common.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClearTracks not implemented")
 }
 func (UnimplementedPlaylistServiceServer) mustEmbedUnimplementedPlaylistServiceServer() {}
 func (UnimplementedPlaylistServiceServer) testEmbeddedByValue()                         {}
@@ -346,6 +362,24 @@ func _PlaylistService_Health_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlaylistService_ClearTracks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClearTracksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlaylistServiceServer).ClearTracks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlaylistService_ClearTracks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlaylistServiceServer).ClearTracks(ctx, req.(*ClearTracksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlaylistService_ServiceDesc is the grpc.ServiceDesc for PlaylistService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -384,6 +418,10 @@ var PlaylistService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Health",
 			Handler:    _PlaylistService_Health_Handler,
+		},
+		{
+			MethodName: "ClearTracks",
+			Handler:    _PlaylistService_ClearTracks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

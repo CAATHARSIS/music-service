@@ -62,6 +62,12 @@ service PlaylistService {
             get: "/v1/playlists/health"
         };
     }
+
+    rpc ClearTracks(ClearTracksRequest) returns (common.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/playlists/{playlist_id}/tracks"
+        };
+    }
 }
 
 message Playlist {
@@ -136,4 +142,8 @@ message RemoveTrackRequest {
     string playlist_id = 1;
     string user_id = 2;
     string track_id = 3;
+}
+
+message ClearTracksRequest {
+    string playlist_id = 1;
 }

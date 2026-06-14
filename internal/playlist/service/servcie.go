@@ -193,6 +193,13 @@ func (s *PlaylistService) RemoveTrack(ctx context.Context, req *playlistpb.Remov
 	return s.GetPlaylist(ctx, &playlistpb.GetPlaylistRequest{PlaylistId: req.PlaylistId})
 }
 
+func (s *PlaylistService) ClearTracks(ctx context.Context, req *playlistpb.ClearTracksRequest) (*commonpb.Empty, error) {
+    if err := s.repo.ClearTracks(ctx, req.PlaylistId); err != nil {
+        return nil, status.Error(codes.Internal, "clear tracks failed")
+    }
+    return &commonpb.Empty{}, nil
+}
+
 func (s *PlaylistService) Health(ctx context.Context, req *commonpb.Empty) (*commonpb.HealthyCheckResponse, error) {
 	return &commonpb.HealthyCheckResponse{Status: "SERVING"}, nil
 }

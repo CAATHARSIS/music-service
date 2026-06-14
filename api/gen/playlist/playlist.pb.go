@@ -735,6 +735,50 @@ func (x *RemoveTrackRequest) GetTrackId() string {
 	return ""
 }
 
+type ClearTracksRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlaylistId    string                 `protobuf:"bytes,1,opt,name=playlist_id,json=playlistId,proto3" json:"playlist_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClearTracksRequest) Reset() {
+	*x = ClearTracksRequest{}
+	mi := &file_playlist_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClearTracksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClearTracksRequest) ProtoMessage() {}
+
+func (x *ClearTracksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_playlist_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClearTracksRequest.ProtoReflect.Descriptor instead.
+func (*ClearTracksRequest) Descriptor() ([]byte, []int) {
+	return file_playlist_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ClearTracksRequest) GetPlaylistId() string {
+	if x != nil {
+		return x.PlaylistId
+	}
+	return ""
+}
+
 var File_playlist_proto protoreflect.FileDescriptor
 
 const file_playlist_proto_rawDesc = "" +
@@ -802,12 +846,15 @@ const file_playlist_proto_rawDesc = "" +
 	"\vplaylist_id\x18\x01 \x01(\tR\n" +
 	"playlistId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
-	"\btrack_id\x18\x03 \x01(\tR\atrackId*\x81\x01\n" +
+	"\btrack_id\x18\x03 \x01(\tR\atrackId\"5\n" +
+	"\x12ClearTracksRequest\x12\x1f\n" +
+	"\vplaylist_id\x18\x01 \x01(\tR\n" +
+	"playlistId*\x81\x01\n" +
 	"\fPlaylistType\x12\x1d\n" +
 	"\x19PLAYLIST_TYPE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14PLAYLIST_TYPE_MANUAL\x10\x01\x12\x1b\n" +
 	"\x17PLAYLIST_TYPE_GENERATED\x10\x02\x12\x1b\n" +
-	"\x17PLAYLIST_TYPE_FAVORITES\x10\x032\xe6\x06\n" +
+	"\x17PLAYLIST_TYPE_FAVORITES\x10\x032\xce\a\n" +
 	"\x0fPlaylistService\x12_\n" +
 	"\x0eCreatePlaylist\x12\x1f.playlist.CreatePlaylistRequest\x1a\x12.playlist.Playlist\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/v1/playlists\x12d\n" +
 	"\vGetPlaylist\x12\x1c.playlist.GetPlaylistRequest\x1a\x12.playlist.Playlist\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/playlists/{playlist_id}\x12\x7f\n" +
@@ -816,7 +863,8 @@ const file_playlist_proto_rawDesc = "" +
 	"\x0eDeletePlaylist\x12\x1f.playlist.DeletePlaylistRequest\x1a\r.common.Empty\"#\x82\xd3\xe4\x93\x02\x1d*\x1b/v1/playlists/{playlist_id}\x12h\n" +
 	"\bAddTrack\x12\x19.playlist.AddTrackRequest\x1a\x12.playlist.Playlist\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/v1/playlists/{playlist_id}/tracks\x12v\n" +
 	"\vRemoveTrack\x12\x1c.playlist.RemoveTrackRequest\x1a\x12.playlist.Playlist\"5\x82\xd3\xe4\x93\x02/*-/v1/playlists/{playlist_id}/tracks/{track_id}\x12S\n" +
-	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/playlists/healthBAZ?github.com/CAATHARSIS/music-service/api/gen/playlist;playlistpbb\x06proto3"
+	"\x06Health\x12\r.common.Empty\x1a\x1c.common.HealthyCheckResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/playlists/health\x12f\n" +
+	"\vClearTracks\x12\x1c.playlist.ClearTracksRequest\x1a\r.common.Empty\"*\x82\xd3\xe4\x93\x02$*\"/v1/playlists/{playlist_id}/tracksBAZ?github.com/CAATHARSIS/music-service/api/gen/playlist;playlistpbb\x06proto3"
 
 var (
 	file_playlist_proto_rawDescOnce sync.Once
@@ -831,7 +879,7 @@ func file_playlist_proto_rawDescGZIP() []byte {
 }
 
 var file_playlist_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_playlist_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_playlist_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_playlist_proto_goTypes = []any{
 	(PlaylistType)(0),                   // 0: playlist.PlaylistType
 	(*Playlist)(nil),                    // 1: playlist.Playlist
@@ -844,20 +892,21 @@ var file_playlist_proto_goTypes = []any{
 	(*DeletePlaylistRequest)(nil),       // 8: playlist.DeletePlaylistRequest
 	(*AddTrackRequest)(nil),             // 9: playlist.AddTrackRequest
 	(*RemoveTrackRequest)(nil),          // 10: playlist.RemoveTrackRequest
-	(*catalog.Track)(nil),               // 11: catalog.Track
-	(*common.PaginationRequest)(nil),    // 12: common.PaginationRequest
-	(*common.PaginationResponse)(nil),   // 13: common.PaginationResponse
-	(*common.Empty)(nil),                // 14: common.Empty
-	(*common.HealthyCheckResponse)(nil), // 15: common.HealthyCheckResponse
+	(*ClearTracksRequest)(nil),          // 11: playlist.ClearTracksRequest
+	(*catalog.Track)(nil),               // 12: catalog.Track
+	(*common.PaginationRequest)(nil),    // 13: common.PaginationRequest
+	(*common.PaginationResponse)(nil),   // 14: common.PaginationResponse
+	(*common.Empty)(nil),                // 15: common.Empty
+	(*common.HealthyCheckResponse)(nil), // 16: common.HealthyCheckResponse
 }
 var file_playlist_proto_depIdxs = []int32{
 	0,  // 0: playlist.Playlist.type:type_name -> playlist.PlaylistType
 	2,  // 1: playlist.Playlist.tracks:type_name -> playlist.PlaylistTrack
-	11, // 2: playlist.PlaylistTrack.track_info:type_name -> catalog.Track
+	12, // 2: playlist.PlaylistTrack.track_info:type_name -> catalog.Track
 	0,  // 3: playlist.CreatePlaylistRequest.pType:type_name -> playlist.PlaylistType
-	12, // 4: playlist.ListUserPlaylistsRequest.pagination:type_name -> common.PaginationRequest
+	13, // 4: playlist.ListUserPlaylistsRequest.pagination:type_name -> common.PaginationRequest
 	1,  // 5: playlist.ListPlaylistsResponse.playlists:type_name -> playlist.Playlist
-	13, // 6: playlist.ListPlaylistsResponse.pagination:type_name -> common.PaginationResponse
+	14, // 6: playlist.ListPlaylistsResponse.pagination:type_name -> common.PaginationResponse
 	3,  // 7: playlist.PlaylistService.CreatePlaylist:input_type -> playlist.CreatePlaylistRequest
 	4,  // 8: playlist.PlaylistService.GetPlaylist:input_type -> playlist.GetPlaylistRequest
 	5,  // 9: playlist.PlaylistService.ListUserPlaylists:input_type -> playlist.ListUserPlaylistsRequest
@@ -865,17 +914,19 @@ var file_playlist_proto_depIdxs = []int32{
 	8,  // 11: playlist.PlaylistService.DeletePlaylist:input_type -> playlist.DeletePlaylistRequest
 	9,  // 12: playlist.PlaylistService.AddTrack:input_type -> playlist.AddTrackRequest
 	10, // 13: playlist.PlaylistService.RemoveTrack:input_type -> playlist.RemoveTrackRequest
-	14, // 14: playlist.PlaylistService.Health:input_type -> common.Empty
-	1,  // 15: playlist.PlaylistService.CreatePlaylist:output_type -> playlist.Playlist
-	1,  // 16: playlist.PlaylistService.GetPlaylist:output_type -> playlist.Playlist
-	6,  // 17: playlist.PlaylistService.ListUserPlaylists:output_type -> playlist.ListPlaylistsResponse
-	1,  // 18: playlist.PlaylistService.UpdatePlaylist:output_type -> playlist.Playlist
-	14, // 19: playlist.PlaylistService.DeletePlaylist:output_type -> common.Empty
-	1,  // 20: playlist.PlaylistService.AddTrack:output_type -> playlist.Playlist
-	1,  // 21: playlist.PlaylistService.RemoveTrack:output_type -> playlist.Playlist
-	15, // 22: playlist.PlaylistService.Health:output_type -> common.HealthyCheckResponse
-	15, // [15:23] is the sub-list for method output_type
-	7,  // [7:15] is the sub-list for method input_type
+	15, // 14: playlist.PlaylistService.Health:input_type -> common.Empty
+	11, // 15: playlist.PlaylistService.ClearTracks:input_type -> playlist.ClearTracksRequest
+	1,  // 16: playlist.PlaylistService.CreatePlaylist:output_type -> playlist.Playlist
+	1,  // 17: playlist.PlaylistService.GetPlaylist:output_type -> playlist.Playlist
+	6,  // 18: playlist.PlaylistService.ListUserPlaylists:output_type -> playlist.ListPlaylistsResponse
+	1,  // 19: playlist.PlaylistService.UpdatePlaylist:output_type -> playlist.Playlist
+	15, // 20: playlist.PlaylistService.DeletePlaylist:output_type -> common.Empty
+	1,  // 21: playlist.PlaylistService.AddTrack:output_type -> playlist.Playlist
+	1,  // 22: playlist.PlaylistService.RemoveTrack:output_type -> playlist.Playlist
+	16, // 23: playlist.PlaylistService.Health:output_type -> common.HealthyCheckResponse
+	15, // 24: playlist.PlaylistService.ClearTracks:output_type -> common.Empty
+	16, // [16:25] is the sub-list for method output_type
+	7,  // [7:16] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -893,7 +944,7 @@ func file_playlist_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_playlist_proto_rawDesc), len(file_playlist_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

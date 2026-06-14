@@ -21,6 +21,9 @@ type Repository interface {
 	UpdateRule(ctx context.Context, rule *models.Rule) error
 	DeleteRule(ctx context.Context, id string) error
 	MarkExecuted(ctx context.Context, id string) error
+	GetActiveRules(ctx context.Context) ([]*models.Rule, error)
+	SaveGeneratedPlaylist(ctx context.Context, ruleID, playlistID string) error
+	GetGeneratedPlaylistID(ctx context.Context, ruleID string) (string, error)
 }
 
 type repository struct {
@@ -199,8 +202,8 @@ func (r *repository) UpdateRule(ctx context.Context, rule *models.Rule) error {
 		rule.IsActive,
 	)
 	if err != nil {
-		r.log.Error("failed to execute UPDATE query", 
-			"rule_id", rule.ID, 
+		r.log.Error("failed to execute UPDATE query",
+			"rule_id", rule.ID,
 			"error", err,
 		)
 		return fmt.Errorf("exec update query: %w", err)
@@ -220,6 +223,33 @@ func (r *repository) DeleteRule(ctx context.Context, id string) error {
 		return ErrNotFound
 	}
 	return nil
+}
+
+func (r *repository) GetActiveRules(ctx context.Context) ([]*models.Rule, error) {
+	query := `SELECT * FROM rules WHERE is_active = true`
+	var rules []*models.Rule
+	err := r.db.SelectContext(ctx, &rules, query)
+	for i := range rules {
+		rules[i].UnmarshalCondition()
+	}
+	return rules, err
+}
+
+func (r *repository) SaveGeneratedPlaylist(ctx context.Context, ruleID, playlistID string) error {
+    query := `
+        INSERT INTO generated_playlists (rule_id, playlist_id, generated_at)
+        VALUES ($1, $2, NOW())
+        ON CONFLICT (rule_id) DO UPDATE SET playlist_id = $2, generated_at = NOW()
+    `
+    _, err := r.db.ExecContext(ctx, query, ruleID, playlistID)
+    return err
+}
+
+func (r *repository) GetGeneratedPlaylistID(ctx context.Context, ruleID string) (string, error) {
+    var playlistID string
+    err := r.db.GetContext(ctx, &playlistID,
+        "SELECT playlist_id FROM generated_playlists WHERE rule_id = $1", ruleID)
+    return playlistID, err
 }
 
 func (r *repository) MarkExecuted(ctx context.Context, id string) error {

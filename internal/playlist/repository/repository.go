@@ -24,6 +24,7 @@ type Repository interface {
 	AddTrack(ctx context.Context, playlistID, trackID string) error
 	RemoveTrack(ctx context.Context, playlistID, trackID string) error
 	GetPlaylistTracks(ctx context.Context, playlistID string) ([]models.PlaylistTrack, error)
+	ClearTracks(ctx context.Context, playlistID string) error
 }
 
 type repository struct {
@@ -271,4 +272,9 @@ func (r *repository) GetPlaylistTracks(ctx context.Context, playlistID string) (
 	var tracks []models.PlaylistTrack
 	err := r.db.SelectContext(ctx, &tracks, query, playlistID)
 	return tracks, err
+}
+
+func (r *repository) ClearTracks(ctx context.Context, playlistID string) error {
+	_, err := r.db.ExecContext(ctx, "DELETE FROM playlist_tracks WHERE playlist_id = $1", playlistID)
+	return err
 }

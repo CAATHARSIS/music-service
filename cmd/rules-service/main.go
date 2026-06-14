@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"log/slog"
 	"net"
@@ -68,6 +69,8 @@ func main() {
 
 	repo := repository.NewRepository(db, logger)
 	srv := service.NewRuleEngineService(repo, catalogClient, playlistClient, logger)
+
+	go srv.StartScheduler(context.Background())
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
